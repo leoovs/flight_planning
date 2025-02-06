@@ -1,0 +1,13 @@
+# CMake build-tree artifacts 
+**/build/**
+**/out/**
+
+# Visual Studio IDE
+**/.vs/**
+
+# Visual Studio Code
+**/.vscode/**
+
+# Clangd LSP
+**/.cache/**
+
