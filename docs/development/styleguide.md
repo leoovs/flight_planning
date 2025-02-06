@@ -3,16 +3,16 @@ This file covers essential style standards for different aspects of development,
 namely **C++**, **CMake** and **Git**.
 
 ### Table of Contents
-* [C++](#c--)
-    + [1: Organize related data into structs](#1--organize-related-data-into-structs)
-    + [2: A class has a single clearly defined responsibility](#2--a-class-has-a-single-clearly-defined-responsibility)
-    + [3: Function, class and method names are in `PascalCase`](#3--function--class-and-method-names-are-in--pascalcase-)
-    + [4: Variable names](#4--variable-names)
-    + [5: Namespace names](#5--namespace-names)
-    + [6: Macro names](#6--macro-names)
-    + [7: Curly braces positioning](#7--curly-braces-positioning)
-    + [8: Mark methods with `const` where possible](#8--mark-methods-with--const--where-possible)
-    + [9: Always use curly-braces](#9--always-use-curly-braces)
+* [C++](#c)
+    + [1: Organize related data into structs](#1-organize-related-data-into-structs)
+    + [2: A class has a single clearly defined responsibility](#2-a-class-has-a-single-clearly-defined-responsibility)
+    + [3: Function, class and method names are in `PascalCase`](#3-function--class-and-method-names-are-in--pascalcase-)
+    + [4: Variable names](#4-variable-names)
+    + [5: Namespace names](#5-namespace-names)
+    + [6: Macro names](#6-macro-names)
+    + [7: Curly braces positioning](#7-curly-braces-positioning)
+    + [8: Mark methods with `const` where possible](#8-mark-methods-with--const--where-possible)
+    + [9: Always use curly-braces](#9-always-use-curly-braces)
 
 ## C++
 
