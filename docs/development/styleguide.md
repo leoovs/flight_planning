@@ -97,6 +97,7 @@ with an `m` prefix. Public class fields are named in `PascalCase`.
 **Example**
 ```C++
 const float cPi = 3.14f;
+constexpr float cGravity = 10.0f;
 
 // Better
 // constexpr float cPi = 3.14f;
