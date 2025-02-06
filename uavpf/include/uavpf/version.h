@@ -1,7 +1,5 @@
 #pragma once
 
-#include "uavpf/config.h"
-
 #include <cinttypes>
 
 namespace uavpf

@@ -1,5 +1,7 @@
 #include "uavpf/version.h"
 
+#include "uavpf/config.h"
+
 uavpf::Version uavpf::GetCurrentVersion()
 {
 	return
