@@ -3,26 +3,20 @@ This file covers essential style standards for different aspects of development,
 namely **C++**, **CMake** and **Git**.
 
 ### Table of Contents
+* [C++](#c--)
+    + [1: Organize related data into structs](#1--organize-related-data-into-structs)
+    + [2: A class has a single clearly defined responsibility](#2--a-class-has-a-single-clearly-defined-responsibility)
+    + [3: Function, class and method names are in `PascalCase`](#3--function--class-and-method-names-are-in--pascalcase-)
+    + [4: Variable names](#4--variable-names)
+    + [5: Namespace names](#5--namespace-names)
+    + [6: Macro names](#6--macro-names)
+    + [7: Curly braces positioning](#7--curly-braces-positioning)
+    + [8: Mark methods with `const` where possible](#8--mark-methods-with--const--where-possible)
+    + [9: Always use curly-braces](#9--always-use-curly-braces)
 
-* [C++](#Cpp)
-* CMake (coming soon...)
-* Git (coming soon...)
+## C++
 
-### C++ <a name="Cpp"></a>
-
-**Topics covered**
-
-* [1: Organize related data into structs](#CppStructsData)
-* [2: Class single responsibility](#CppClassSingleResponsibility)
-* [3: Naming: functions, classes and methods](#CppFuncClassMethodNames)
-* [4: Naming: variables](#CppVariableNames)
-* [5: Naming: namespaces](#CppNamespaceNames)
-* [6: Naming: macros](#CppMacroNames)
-* [7: How to deal with `{}`](#CppCurlyBracesPositioning)
-* [8: Mark methods with `const` if possible](#CppConstMethods)
-* [9: Always use `{}`](#CppUseCurlyBracesForBlocks)
-
-### 1: Organize related data into structs <a name="CppStructsData"></a>
+### 1: Organize related data into structs
 
 **Reason**
 
@@ -45,14 +39,14 @@ struct Vector3
 void DrawLine3D(const Vector3& point1, const Vector3& point2);
 ```
 
-### 2: A class has a single clearly defined responsibility <a name="CppClassSingleResponsibility"></a>
+### 2: A class has a single clearly defined responsibility
 
 A class should only have **ONE** responsibility, for exapmle, an `std::vector`
 just manages elements in the memory, it's not responsible (and it shouldn't be)
 for printing them to console or serializing them into some kind of file. This is
 a separate functionality provided by other classes.
 
-### 3: Function, class and method names are in `PascalCase` <a name="CppFuncClassMethodNames"></a>
+### 3: Function, class and method names are in `PascalCase`
 
 **Don't**
 ```C++
@@ -76,7 +70,7 @@ class GraphNode
 };
 ```
 
-### 4: Variable names <a name="CppVariableNames"></a>
+### 4: Variable names
 
 Variables with automatic storage duration (including function and method
 parameters) are named in `camelCase`. Variables with static storage duration are
@@ -109,7 +103,7 @@ private:
 };
 ```
 
-### 5: Namespace names <a name="CppNamespaceNames"></a>
+### 5: Namespace names
 
 Namespace names are in `snake_case`.
 
@@ -120,7 +114,7 @@ namespace uavpf
 }
 ```
 
-### 6: Macro names <a name="CppMacroNames"></a>
+### 6: Macro names
 
 Macro names are in `MACRO_CASE`.
 
@@ -130,7 +124,7 @@ Macro names are in `MACRO_CASE`.
 #define UAVPF_DEBUG_ASSERT(condition, message) ::uavpf::DebugAssertImpl()
 ```
 
-### 7: Curly braces positioning <a name="CppCurlyBracesPositioning"></a>
+### 7: Curly braces positioning
 
 There should always be a line break before and after the curly braces. This is
 related to any kind of scope blocks.
@@ -170,7 +164,7 @@ public:
 };
 ```
 
-### 8: Mark methods with `const` where possible <a name="CppConstMethods"></a>
+### 8: Mark methods with `const` where possible
 
 **Reason**
 
@@ -219,7 +213,7 @@ private:
 };
 ```
 
-### 9: Always use curly-braces <a name="CppUseCurlyBracesForBlocks"></a>
+### 9: Always use curly-braces
 
 **Reason**
 
