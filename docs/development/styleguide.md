@@ -8,7 +8,7 @@ namely **C++**, **CMake** and **Git**.
 * CMake (coming soon...)
 * Git (coming soon...)
 
-### C++ <a name="Cpp"/>
+### C++ <a name="Cpp"></a>
 
 **Topics covered**
 
@@ -22,7 +22,7 @@ namely **C++**, **CMake** and **Git**.
 * [8: Mark methods with `const` if possible](#CppConstMethods)
 * [9: Always use `{}`](#CppUseCurlyBracesForBlocks)
 
-### 1: Organize related data into structs <a name="CppStructsData"/>
+### 1: Organize related data into structs <a name="CppStructsData"></a>
 
 **Reason**
 
@@ -45,14 +45,14 @@ struct Vector3
 void DrawLine3D(const Vector3& point1, const Vector3& point2);
 ```
 
-### 2: A class has a single clearly defined responsibility <a name="CppClassSingleResponsibility"/>
+### 2: A class has a single clearly defined responsibility <a name="CppClassSingleResponsibility"></a>
 
 A class should only have **ONE** responsibility, for exapmle, an `std::vector`
 just manages elements in the memory, it's not responsible (and it shouldn't be)
 for printing them to console or serializing them into some kind of file. This is
 a separate functionality provided by other classes.
 
-### 3: Function, class and method names are in `PascalCase` <a name="CppFuncClassMethodNames"/>
+### 3: Function, class and method names are in `PascalCase` <a name="CppFuncClassMethodNames"></a>
 
 **Don't**
 ```C++
@@ -76,7 +76,7 @@ class GraphNode
 };
 ```
 
-### 4: Variable names <a name="CppVariableNames"/>
+### 4: Variable names <a name="CppVariableNames"></a>
 
 Variables with automatic storage duration (including function and method
 parameters) are named in `camelCase`. Variables with static storage duration are
@@ -109,7 +109,7 @@ private:
 };
 ```
 
-### 5: Namespace names <a name="CppNamespaceNames"/>
+### 5: Namespace names <a name="CppNamespaceNames"></a>
 
 Namespace names are in `snake_case`.
 
@@ -120,7 +120,7 @@ namespace uavpf
 }
 ```
 
-### 6: Macro names <a name="CppMacroNames"/>
+### 6: Macro names <a name="CppMacroNames"></a>
 
 Macro names are in `MACRO_CASE`.
 
@@ -130,7 +130,7 @@ Macro names are in `MACRO_CASE`.
 #define UAVPF_DEBUG_ASSERT(condition, message) ::uavpf::DebugAssertImpl()
 ```
 
-### 7: Curly braces positioning <a name="CppCurlyBracesPositioning"/>
+### 7: Curly braces positioning <a name="CppCurlyBracesPositioning"></a>
 
 There should always be a line break before and after the curly braces. This is
 related to any kind of scope blocks.
@@ -170,7 +170,7 @@ public:
 };
 ```
 
-### 8: Mark methods with `const` where possible <a name="CppConstMethods"/>
+### 8: Mark methods with `const` where possible <a name="CppConstMethods"></a>
 
 **Reason**
 
@@ -219,7 +219,7 @@ private:
 };
 ```
 
-### 9: Always use curly-braces <a name="CppUseCurlyBracesForBlocks"/>
+### 9: Always use curly-braces <a name="CppUseCurlyBracesForBlocks"></a>
 
 **Reason**
 
