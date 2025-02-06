@@ -1,0 +1,12 @@
+[*.{cpp,hpp,c,h}]
+charset = utf-8
+indent_size = 4
+indent_style = tab
+insert_final_newline = true
+
+[**{CMakeLists.txt,.cmake}]
+charset = utf-8
+indent_size = 2
+indent_style = tab
+insert_final_newline = true
+
