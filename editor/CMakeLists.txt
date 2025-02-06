@@ -6,3 +6,9 @@ target_sources(
 	"src/main.cpp"
 )
 
+target_link_libraries(
+	editor
+	PRIVATE
+	uavpf
+)
+
