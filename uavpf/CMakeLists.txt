@@ -22,5 +22,12 @@ target_include_directories(
 	"src"
 )
 
+set_target_properties(
+	uavpf
+	PROPERTIES
+	CXX_STANDARD 17
+	CXX_STANDARD_REQUIRED TRUE
+)
+
 unset(UAVPF_ARTIFACT_DIRECTORY)
 
