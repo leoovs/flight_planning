@@ -11,6 +11,8 @@ target_sources(
 	uavpf
 	PRIVATE
 	"src/version.cpp"
+
+	"src/id/id_allocator.cpp"
 )
 
 target_include_directories(
