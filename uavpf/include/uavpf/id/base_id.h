@@ -2,9 +2,13 @@
 
 #include <cinttypes>
 
+#include <limits>
+
 namespace uavpf
 {
-	using BaseID = int64_t;
-	constexpr BaseID cBadID = -1;
+	using BaseID = uint64_t;
+
+	constexpr BaseID cFirstID = 0;
+	constexpr BaseID cBadID = std::numeric_limits<BaseID>::max();
 }
 
