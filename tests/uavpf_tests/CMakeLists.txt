@@ -5,6 +5,8 @@ add_executable(uavpf_tests)
 target_sources(
 	uavpf_tests
 	PRIVATE
+	"src/test_format_str.cpp"
+
 	"src/id/test_id_allocator.cpp"
 )
 
