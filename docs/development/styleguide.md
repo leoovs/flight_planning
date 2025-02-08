@@ -13,6 +13,10 @@ namely **C++**, **CMake** and **Git**.
     + [7: Curly braces positioning](#7-curly-braces-positioning)
     + [8: Mark methods with `const` where possible](#8-mark-methods-with--const--where-possible)
     + [9: Always use curly-braces](#9-always-use-curly-braces)
+* [Git](#git)
+    + [1: Commit message templates](#1-commit-message-templates)
+    + [2: Branching convention](#2-branching-convention)
+    + [3: Semantic versioning](#3-semantic-versioning)
 
 ## C++
 
@@ -253,3 +257,45 @@ if (cond1)
     }
 }
 ```
+
+## Git
+
+### 1: Commit message templates
+
+Use `fix: <describe bugfix>` template for bugfixes. You can also use an extended
+message for like that:
+
+```
+fix: <describe bugfix>
+
+- Fixed this by doing that.
+- Fixed that by doing this.
+```
+
+Use `feat: <describe implemented feature>` for feature commits. In case large
+changes made use extended message to describe the commit:
+
+```
+feat: implement <some feature>
+
+- Add this.
+- Add that.
+```
+
+### 2: Branching convention 
+
+Branches `master` and `dev` are public and should be used as a reference point
+for introducing new features. Thay can be modified through pull-request only.
+
+The `dev` branch is used to stage newly implemented features and perform final
+tests before making a big update for the `master`. The `master` branch should
+stay as perfect, as clean as possible at all times.
+
+In order to implement new features or fix bugs create local branches:
+`features/<feature name>` for features and `fix/<bug name>` for bugfixes.
+
+### 3: Semantic versioning
+
+Top-level `CMakeLists.txt` contains `project()` command that specifies its
+version. The versioning is done according to the
+[*semver specification*](https://semver.org/).
