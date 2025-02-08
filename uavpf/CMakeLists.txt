@@ -10,6 +10,7 @@ configure_file(
 target_sources(
 	uavpf
 	PRIVATE
+	"src/format_str.cpp"
 	"src/version.cpp"
 
 	"src/id/id_allocator.cpp"
