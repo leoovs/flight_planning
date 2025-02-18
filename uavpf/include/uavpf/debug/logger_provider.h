@@ -6,10 +6,15 @@
 #include <array>
 #include <vector>
 
-#define UAVPF_LOG(source, level, fmt, ...) \
-	::uavpf::LoggerProvider::Get().Log( \
-		source, \
-		::uavpf::MakeLogRecord(level, fmt, ##__VA_ARGS__))
+#define UAVPF_LOG(source, level, fmt, ...)	\
+	::uavpf::LoggerProvider::Get().Log(		\
+		::uavpf::LogSource::source,			\
+		::uavpf::MakeLogRecord(				\
+			__FILE__,						\
+			__LINE__,						\
+			uavpf::LogLevel::level,			\
+			fmt,							\
+			##__VA_ARGS__))
 
 namespace uavpf
 {
