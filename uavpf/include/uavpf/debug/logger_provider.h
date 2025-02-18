@@ -1,9 +1,15 @@
 #pragma once
 
 #include "uavpf/debug/logger.h"
+#include "uavpf/debug/log_record.h"
 
 #include <array>
 #include <vector>
+
+#define UAVPF_LOG(source, level, fmt, ...) \
+	::uavpf::LoggerProvider::Get().Log( \
+		source, \
+		::uavpf::MakeLogRecord(level, fmt, ##__VA_ARGS__))
 
 namespace uavpf
 {
