@@ -13,6 +13,7 @@ target_sources(
 	"src/format_str.cpp"
 	"src/version.cpp"
 
+	"src/debug/log_record.cpp"
 	"src/debug/logger.cpp"
 
 	"src/id/id_allocator.cpp"
