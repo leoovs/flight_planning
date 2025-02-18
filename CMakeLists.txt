@@ -7,6 +7,7 @@ list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 include(external/get_cpm)
 
 option(FP_BUILD_TESTS OFF "Build flight_planning unit-tests")
+set(FP_BUILD_TESTS ON)
 
 add_subdirectory("editor")
 add_subdirectory("uavpf")

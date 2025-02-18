@@ -7,6 +7,8 @@ target_sources(
 	PRIVATE
 	"src/test_format_str.cpp"
 
+	"src/debug/test_logger.cpp"
+
 	"src/id/test_id_allocator.cpp"
 )
 
