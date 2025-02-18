@@ -1,5 +1,7 @@
 #pragma once
 
+#include "uavpf/debug/formatted_log.h"
+
 #include <string_view>
 
 namespace uavpf
@@ -11,7 +13,7 @@ namespace uavpf
 	public:
 		virtual ~LogEmitter() = default;
 
-		virtual void Emit(const LogRecord& record, std::string_view log) = 0;
+		virtual void Emit(const FormattedLog& log) = 0;
 	};
 }
 

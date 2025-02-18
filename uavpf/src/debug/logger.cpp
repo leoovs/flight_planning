@@ -18,7 +18,7 @@ namespace uavpf
 
 	void Logger::Log(const LogRecord& record) const
 	{
-		mEmitter->Emit(record, mFormatter->Format(record));
+		mEmitter->Emit(mFormatter->Format(mSource, record));
 	}
 }
 

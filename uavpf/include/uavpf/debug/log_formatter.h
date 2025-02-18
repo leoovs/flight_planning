@@ -1,5 +1,7 @@
 #pragma once
 
+#include "uavpf/debug/formatted_log.h"
+
 #include <string>
 
 namespace uavpf
@@ -11,7 +13,7 @@ namespace uavpf
 	public:
 		virtual ~LogFormatter() = default;
 
-		virtual std::string Format(const LogRecord& record) = 0;
+		virtual FormattedLog Format(LogSource source, const LogRecord& record) = 0;
 	};
 }
 
