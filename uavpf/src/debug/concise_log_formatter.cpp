@@ -58,10 +58,11 @@ namespace uavpf
 		log.Source = source;
 		log.Level = record.Level;
 		log.Log = FormatStr(
-			"[%s] [%s] %s, " PRId32,
-			GetLogSourceString(source),
-			GetLogLevelString(record.Level),
+			"[%s] [%s] %s :: %s, %" PRId32,
+			GetLogSourceString(source).data(),
+			GetLogLevelString(record.Level).data(),
 			record.Message.data(),
+			shortFilename.data(),
 			record.SourceFileLineNumber);
 
 		return log;
