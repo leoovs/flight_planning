@@ -1,12 +1,10 @@
 #pragma once
 
-#include "uavpf/debug/formatted_log.h"
-
 #include <string_view>
 
 namespace uavpf
 {
-	struct LogRecord;
+	struct FormattedLog;
 
 	class LogEmitter
 	{
