@@ -7,6 +7,8 @@ namespace uavpf
 		Unspecified,
 		Mock,
 		Application,
+
+		Count_,
 	};
 }
 

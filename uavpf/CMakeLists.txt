@@ -15,6 +15,7 @@ target_sources(
 
 	"src/debug/log_record.cpp"
 	"src/debug/logger.cpp"
+	"src/debug/logger_provider.cpp"
 
 	"src/id/id_allocator.cpp"
 )
