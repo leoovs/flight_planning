@@ -8,6 +8,8 @@ target_sources(
 	editor
 	PRIVATE
 	"src/main.cpp"
+
+	"src/event/event_queue.cpp"
 )
 
 target_include_directories(
