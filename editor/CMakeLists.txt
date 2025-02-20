@@ -10,6 +10,12 @@ target_sources(
 	"src/main.cpp"
 )
 
+target_include_directories(
+	editor
+	PRIVATE
+	"src"
+)
+
 target_link_libraries(
 	editor
 	PRIVATE
