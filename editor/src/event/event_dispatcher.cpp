@@ -11,7 +11,8 @@ namespace editor
 
 	bool EventDispatcher::Notify(const Event& event)
 	{
-		return mCallbackRegistriesByEventTypeID.at(typeid(event))
+		return mCallbackRegistriesByEventTypeID
+			.at(typeid(event))
 			->Notify(event);
 	}
 
