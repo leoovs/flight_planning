@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include "event/event.h"
+
 namespace editor
 {
 	void EventQueue::Enqueue(std::unique_ptr<Event> event)
