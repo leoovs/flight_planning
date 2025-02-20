@@ -5,8 +5,8 @@ int main()
 	auto formatter = std::make_shared<uavpf::ConciseLogFormatter>();
 	auto emitter = std::make_shared<uavpf::ConsoleLogEmitter>();
 
-	uavpf::LoggerProvider::Get().
-		HostLogger(
+	uavpf::LoggerProvider::Get()
+		.HostLogger(
 			uavpf::LogSource::Application,
 			std::move(formatter),
 			std::move(emitter));
