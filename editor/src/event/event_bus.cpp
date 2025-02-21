@@ -1,32 +1,52 @@
 #include "event/event_bus.h"
 
+#include <cassert>
+
 #include "event/event_dispatcher.h"
 #include "event/event_queue.h"
 
 namespace editor
 {
 	EventBus::EventBus(EventQueue& events, EventDispatcher& dispatcher)
-		: mEvents(events)
-		, mDispatcher(dispatcher)
+		: mEvents(&events)
+		, mDispatcher(&dispatcher)
 	{}
 
-	void EventBus::Publish(EventPublishMode mode, std::unique_ptr<Event> event)
+	void EventBus::SetEvents(EventQueue& events)
+	{
+		mEvents = &events;
+	}
+
+	void EventBus::SetDispatcher(EventDispatcher& dispatcher)
+	{
+		mDispatcher = &dispatcher;
+	}
+
+	bool EventBus::Publish(EventPublishMode mode, std::unique_ptr<Event> event)
 	{
 		switch (mode)
 		{
 			case EventPublishMode::Queued:
-				mEvents.get().Enqueue(std::move(event));
-				break;
+				return HasEvents()
+					? mEvents->Enqueue(std::move(event)), true
+					: false;
 			case EventPublishMode::Immediate:
-				static_cast<void>(Fire(std::move(event)));
-				break;
+				return Fire(std::move(event));
 		}
+
+		assert(false && "Invalid EventPublishMode enum value");
+		return false;
 	}
 
 	void EventBus::Dispatch()
 	{
+		if (!HasEvents() || !HasDispatcher())
+		{
+			return;
+		}
+
 		EventQueue leftover;
-		EventQueue& pending = mEvents.get();
+		EventQueue& pending = *mEvents;
 
 		while (pending.Any())
 		{
@@ -45,9 +65,24 @@ namespace editor
 		pending = std::move(leftover);
 	}
 
+	bool EventBus::HasEvents() const
+	{
+		return nullptr != mEvents;
+	}
+
+	bool EventBus::HasDispatcher() const
+	{
+		return nullptr != mDispatcher;
+	}
+
 	bool EventBus::Fire(const std::unique_ptr<Event>& event)
 	{
-		return mDispatcher.get().Notify(event);
+		if (!HasDispatcher())
+		{
+			return false;
+		}
+
+		return mDispatcher->Notify(event);
 	}
 }
 

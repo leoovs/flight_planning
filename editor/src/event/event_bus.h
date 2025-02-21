@@ -21,9 +21,13 @@ namespace editor
 	class EventBus
 	{
 	public:
+		EventBus() = default;
 		EventBus(EventQueue& events, EventDispatcher& dispatcher);
 
-		void Publish(EventPublishMode mode, std::unique_ptr<Event> event);
+		void SetEvents(EventQueue& events);
+		void SetDispatcher(EventDispatcher& dispatcher);
+
+		bool Publish(EventPublishMode mode, std::unique_ptr<Event> event);
 
 		template<typename EventT, typename... ArgsT>
 		void Publish(EventPublishMode mode, ArgsT&&... args)
@@ -36,16 +40,19 @@ namespace editor
 		template<typename EventT>
 		void Subscribe(EventCallback<EventT> callback)
 		{
-			mDispatcher.get().Subscribe(std::move(callback));
+			mDispatcher->Subscribe(std::move(callback));
 		}
 
 		void Dispatch();
 
+		bool HasEvents() const;
+		bool HasDispatcher() const;
+
 	private:
 		bool Fire(const std::unique_ptr<Event>& event);
 
-		std::reference_wrapper<EventQueue> mEvents;
-		std::reference_wrapper<EventDispatcher> mDispatcher;
+		EventQueue* mEvents = nullptr;
+		EventDispatcher* mDispatcher = nullptr;
 	};
 }
 
