@@ -9,6 +9,7 @@ target_sources(
 	PRIVATE
 	"src/main.cpp"
 
+	"src/event/event_bus.cpp"
 	"src/event/event_dispatcher.cpp"
 	"src/event/event_queue.cpp"
 )
