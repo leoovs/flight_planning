@@ -12,6 +12,7 @@ target_sources(
 	"src/event/event_bus.cpp"
 	"src/event/event_dispatcher.cpp"
 	"src/event/event_queue.cpp"
+	"src/event/event_subscriber.cpp"
 )
 
 target_include_directories(
