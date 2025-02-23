@@ -1,7 +1,5 @@
 #include "event/event_bus.h"
 
-#include <cassert>
-
 #include "event/event_dispatcher.h"
 #include "event/event_queue.h"
 
@@ -36,6 +34,14 @@ namespace editor
 
 		assert(false && "Invalid EventPublishMode enum value");
 		return false;
+	}
+
+	void EventBus::Unsubscribe(const EventSubscription& subscription)
+	{
+		if (HasDispatcher())
+		{
+			mDispatcher->Unsubscribe(subscription);
+		}
 	}
 
 	void EventBus::Dispatch()

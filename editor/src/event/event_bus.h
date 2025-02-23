@@ -1,11 +1,13 @@
 #pragma once
 
-#include "event/event.h"
-#include "event/event_dispatcher.h"
+#include <cassert>
 
 #include <functional>
 #include <memory>
 #include <utility>
+
+#include "event/event.h"
+#include "event/event_dispatcher.h"
 
 namespace editor
 {
@@ -38,10 +40,14 @@ namespace editor
 		}
 
 		template<typename EventT>
-		void Subscribe(EventCallback<EventT> callback)
+		EventSubscription Subscribe(EventCallback<EventT> callback)
 		{
-			mDispatcher->Subscribe(std::move(callback));
+			assert(HasDispatcher() && "Trying to subscribe with no dispatcher"
+				" assigned to an event bus");
+			return mDispatcher->Subscribe(std::move(callback));
 		}
+
+		void Unsubscribe(const EventSubscription& subscription);
 
 		void Dispatch();
 
