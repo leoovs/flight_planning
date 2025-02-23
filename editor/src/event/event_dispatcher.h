@@ -86,6 +86,9 @@ namespace editor
 			{
 				if (callback && callback(event))
 				{
+					// Beware that `callback` may become `nullptr` at this 
+					// point (unsubscribed itself while processing current
+					// event).
 					return true;
 				}
 			}
