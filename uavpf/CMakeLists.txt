@@ -1,3 +1,7 @@
+set(BUILD_SHARED_LIBS OFF)
+
+cpmaddpackage("gl:libtiff/libtiff@4.7.0")
+
 add_library(uavpf STATIC)
 
 set(UAVPF_ARTIFACT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/build-artifacts")
@@ -20,6 +24,9 @@ target_sources(
 	"src/debug/logger_provider.cpp"
 
 	"src/id/id_allocator.cpp"
+
+	"src/image/tiff_image.cpp"
+	"src/image/tiff_loader.cpp"
 )
 
 target_include_directories(
@@ -29,6 +36,12 @@ target_include_directories(
 	"${UAVPF_ARTIFACT_DIRECTORY}/config"
 	PRIVATE
 	"src"
+)
+
+target_link_libraries(
+	uavpf
+	PRIVATE
+	TIFF::tiff
 )
 
 set_target_properties(
