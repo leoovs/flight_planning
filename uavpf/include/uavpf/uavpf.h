@@ -17,3 +17,6 @@
 
 #include "uavpf/id/base_id.h"
 
+#include "uavpf/image/tiff_image.h"
+#include "uavpf/image/tiff_loader.h"
+
