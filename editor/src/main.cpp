@@ -15,7 +15,8 @@ int main()
 	
 	//тест
 	editor::PlatformService* test = editor::CreatePlatformService();
-	UAVPF_LOG(Application, Error, test->GetName());
+	UAVPF_LOG(Application, Note, "Current platform is: %s", test->GetName().data());
+	editor::DestroyPlatformService(test);
 
 	UAVPF_LOG(Application, Trace, "Use this for USUAL things");
 	UAVPF_LOG(Application, Note, "Use this to CLARIFY things");
