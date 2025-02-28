@@ -28,4 +28,14 @@ namespace editor
 			}
 		}
 	}
+
+	Sdl3Window* Sdl3PlatformService::CreateWindow()
+	{
+		return new Sdl3Window();
+	}
+
+	void Sdl3PlatformService::DestroyWindow(Window* window)
+	{
+		delete window;
+	}
 }

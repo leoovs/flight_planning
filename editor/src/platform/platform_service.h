@@ -2,6 +2,8 @@
 
 #include <string_view>
 
+#include "platform/window.h"
+
 namespace editor
 {
 	class PlatformService
@@ -15,6 +17,9 @@ namespace editor
 		virtual void EndFrame() = 0;
 
 		virtual void PollEvents() = 0;
+
+		virtual Window* CreateWindow() = 0;
+		virtual void DestroyWindow(Window* window) = 0;
 	};
 
 	PlatformService* CreatePlatformService();

@@ -13,10 +13,12 @@ int main()
 			std::move(formatter),
 			std::move(emitter));
 	
-	//тест
-	editor::PlatformService* test = editor::CreatePlatformService();
-	UAVPF_LOG(Application, Note, "Current platform is: %s", test->GetName().data());
-	editor::DestroyPlatformService(test);
+	editor::PlatformService* platform = editor::CreatePlatformService();
+	UAVPF_LOG(Application, Note, "Current platform is: %s", platform->GetName().data());
+	editor::Window* window = platform->CreateWindow();
+
+	platform->DestroyWindow(window);
+	editor::DestroyPlatformService(platform);
 
 	UAVPF_LOG(Application, Trace, "Use this for USUAL things");
 	UAVPF_LOG(Application, Note, "Use this to CLARIFY things");

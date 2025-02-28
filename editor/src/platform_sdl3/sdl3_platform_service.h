@@ -1,6 +1,7 @@
 #pragma once
 
 #include "platform/platform_service.h"
+#include "platform_sdl3/sdl3_window.h"
 
 namespace editor
 {
@@ -15,5 +16,8 @@ namespace editor
 		void EndFrame() override;
 		 
 		void PollEvents() override;
+
+		Sdl3Window* CreateWindow() override;
+		void DestroyWindow(Window* window) override;
 	};
 }
