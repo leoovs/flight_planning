@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SDL3/SDL.h>
+
 #include "platform/window.h"
 
 namespace editor
@@ -7,13 +9,20 @@ namespace editor
 	class Sdl3Window final : public Window
 	{
 	public:
-		~Sdl3Window() override = default;
+		Sdl3Window(const WindowParams& params);
+		~Sdl3Window() override;
 
-		std::string_view SetWindowName() const override;
+		const WindowParams& GetParams() const override;
 
-		int ScreenWidth() override;
-		int ScreenHeight() override;
+		void SetTitle(std::string_view title) override;
+		void SetWidth(int32_t width) override;
+		void SetHeight(int32_t height) override;
 
-		void PollEvents() override;
+	private:
+		void CreateNativeWindow();
+		void DestroyNativeWindow();
+
+		WindowParams mParams;
+		SDL_Window* mNativeWindow = nullptr;
 	};
 }

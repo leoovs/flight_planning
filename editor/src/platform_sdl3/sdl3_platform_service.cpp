@@ -29,9 +29,9 @@ namespace editor
 		}
 	}
 
-	Sdl3Window* Sdl3PlatformService::CreateWindow()
+	Sdl3Window* Sdl3PlatformService::CreateWindow(const WindowParams& params)
 	{
-		return new Sdl3Window();
+		return new Sdl3Window(params);
 	}
 
 	void Sdl3PlatformService::DestroyWindow(Window* window)

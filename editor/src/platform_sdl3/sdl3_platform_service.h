@@ -17,7 +17,7 @@ namespace editor
 		 
 		void PollEvents() override;
 
-		Sdl3Window* CreateWindow() override;
+		Sdl3Window* CreateWindow(const WindowParams& params) override;
 		void DestroyWindow(Window* window) override;
 	};
 }

@@ -17,6 +17,11 @@ int main()
 	UAVPF_LOG(Application, Note, "Current platform is: %s", platform->GetName().data());
 	editor::Window* window = platform->CreateWindow();
 
+	while (true)
+	{
+		platform->PollEvents();
+	}
+
 	platform->DestroyWindow(window);
 	editor::DestroyPlatformService(platform);
 

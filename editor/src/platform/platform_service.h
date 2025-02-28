@@ -18,7 +18,7 @@ namespace editor
 
 		virtual void PollEvents() = 0;
 
-		virtual Window* CreateWindow() = 0;
+		virtual Window* CreateWindow(const WindowParams& params = {}) = 0;
 		virtual void DestroyWindow(Window* window) = 0;
 	};
 
