@@ -17,7 +17,6 @@ namespace editor
 		virtual void PollEvents() = 0;
 	};
 
-	// Фабричные функции для инициализации и разрушения.
 	PlatformService* CreatePlatformService();
 	void DestroyPlatformService(PlatformService* platform);
 }

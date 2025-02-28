@@ -11,7 +11,6 @@ namespace editor
 
 		std::string_view GetName() const override;
 
-		// Унаследовано через PlatformService
 		void BeginFrame() override;
 		void EndFrame() override;
 		 

@@ -11,7 +11,6 @@ namespace editor
 
 		std::string_view SetWindowName() const override;
 
-		// Унаследовано через Window
 		int ScreenWidth() override;
 		int ScreenHeight() override;
 
