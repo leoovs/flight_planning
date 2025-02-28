@@ -2,6 +2,7 @@
 
 #include <string_view>
 
+#include "event/event_bus.h"
 #include "platform/window.h"
 
 namespace editor
@@ -16,6 +17,7 @@ namespace editor
 		virtual void BeginFrame() = 0;
 		virtual void EndFrame() = 0;
 
+		virtual void BindEvents(EventBus& events) = 0;
 		virtual void PollEvents() = 0;
 
 		virtual Window* CreateWindow(const WindowParams& params = {}) = 0;
