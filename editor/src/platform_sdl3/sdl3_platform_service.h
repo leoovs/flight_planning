@@ -1,5 +1,7 @@
 #pragma once
 
+#include <unordered_map>
+
 #include "event/event_publisher.h"
 #include "platform/platform_service.h"
 #include "platform_sdl3/sdl3_window.h"
@@ -9,7 +11,8 @@ namespace editor
 	class Sdl3PlatformService final : public PlatformService
 	{
 	public:
-		~Sdl3PlatformService() override = default;
+		Sdl3PlatformService();
+		~Sdl3PlatformService() override;
 
 		std::string_view GetName() const override;
 
@@ -23,6 +26,19 @@ namespace editor
 		void DestroyWindow(Window* window) override;
 
 	private:
+		void RegisterWindow(Sdl3Window* window);
+		void UnregisterWindow(Sdl3Window* window);
+		Sdl3Window* FindRegisteredWindowByNativeWindowID(SDL_WindowID id) const;
+
+		void SetupNativeEventHandlers();
+
+		void Native_OnWindowResize(const SDL_Event& nativeEvent);
+		void Native_OnWindowClose(const SDL_Event& nativeEvent);
+
+		using NativeEventHandler = void(Sdl3PlatformService::*)(const SDL_Event&);
+
 		EventPublisher mPlatformEventPublisher;
+		std::unordered_map<SDL_WindowID, Sdl3Window*> mWindowsByNativeWindowID;
+		std::unordered_map<uint32_t, NativeEventHandler> mHandlersByNativeEventType;
 	};
 }

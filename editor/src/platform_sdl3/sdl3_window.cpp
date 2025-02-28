@@ -70,9 +70,14 @@ namespace editor
 		}
 	}
 
+	SDL_Window* Sdl3Window::GetNativeWindow() const
+	{
+		return mNativeWindow;
+	}
+
 	void Sdl3Window::CreateNativeWindow()
 	{
-		int32_t defaultWindowFlag = 0;
+		int32_t defaultWindowFlag = SDL_WINDOW_RESIZABLE;
 
 		mNativeWindow = SDL_CreateWindow(
 			mParams.Title.data(),

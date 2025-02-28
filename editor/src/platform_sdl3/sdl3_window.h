@@ -18,6 +18,8 @@ namespace editor
 		void SetWidth(int32_t width) override;
 		void SetHeight(int32_t height) override;
 
+		SDL_Window* GetNativeWindow() const;
+
 	private:
 		void CreateNativeWindow();
 		void DestroyNativeWindow();
