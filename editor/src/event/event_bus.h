@@ -32,9 +32,9 @@ namespace editor
 		bool Publish(EventPublishMode mode, std::unique_ptr<Event> event);
 
 		template<typename EventT, typename... ArgsT>
-		void Publish(EventPublishMode mode, ArgsT&&... args)
+		bool Publish(EventPublishMode mode, ArgsT&&... args)
 		{
-			Publish(
+			return Publish(
 				mode,
 				std::make_unique<EventT>(std::forward<ArgsT>(args)...));
 		}
