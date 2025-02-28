@@ -1,34 +1,108 @@
 #include <uavpf/uavpf.h>
 
+#include "event/event_bus.h"
+#include "event/event_queue.h"
+#include "event/event_subscriber.h"
+#include "platform/platform_events.h"
 #include "platform/platform_service.h"
+#include "uavpf/debug/concise_log_formatter.h"
 
+namespace editor
+{
+	class TestApplication
+	{
+	public:
+		TestApplication()
+		{
+			mEvents = EventBus(mEventQueue, mDispatcher);
+			mSubscriber = EventSubscriber(mEvents);
+
+			mSubscriber
+				.BeginClass(*this)
+					.SubscribeMethod(&TestApplication::OnWindowClose)
+					.SubscribeMethod(&TestApplication::OnWindowResize)
+				.EndClass();
+
+			mPlatform = CreatePlatformService();
+			mPlatform->BindEvents(mEvents);
+
+			mWindow = mPlatform->CreateWindow();
+			mWindow->SetTitle("Editor");
+		}
+
+		~TestApplication()
+		{
+			mPlatform->DestroyWindow(mWindow);
+			mWindow = nullptr;
+
+			DestroyPlatformService(mPlatform);
+			mPlatform = nullptr;
+		}
+
+		void StartMainLoop()
+		{
+			mRunning = true;
+			while (mRunning)
+			{
+				mPlatform->BeginFrame();
+
+				mPlatform->PollEvents();
+				mEvents.Dispatch();
+
+				mPlatform->EndFrame();
+			}
+		}
+
+	private:
+		bool OnWindowClose(const WindowCloseEvent& event)
+		{
+			UAVPF_LOG(
+				Application,
+				Info,
+				"Window '%s' closed!",
+				event.ClosedWindow->GetTitle().data());
+
+			mRunning = false;
+
+			return true;
+		}
+
+		bool OnWindowResize(const WindowResizeEvent& event)
+		{
+			UAVPF_LOG(
+				Application,
+				Info,
+				"Window '%s' is resized: %dx%d",
+				event.ResizedWindow->GetTitle().data(),
+				event.Width,
+				event.Height);
+
+			return true;
+		}
+
+		bool mRunning = true;
+
+		// Event-system
+		EventQueue mEventQueue;
+		EventDispatcher mDispatcher;
+		EventBus mEvents;
+		EventSubscriber mSubscriber;
+
+		// Platform
+		PlatformService* mPlatform = nullptr;
+		Window* mWindow = nullptr;
+	};
+}
 int main()
 {
-	auto formatter = std::make_shared<uavpf::ConciseLogFormatter>();
-	auto emitter = std::make_shared<uavpf::ConsoleLogEmitter>();
+	auto formatter = std::make_unique<uavpf::ConciseLogFormatter>();
+	auto emitter = std::make_unique<uavpf::ConsoleLogEmitter>();
 
-	uavpf::LoggerProvider::Get()
-		.HostLogger(
-			uavpf::LogSource::Application,
-			std::move(formatter),
-			std::move(emitter));
-	
-	editor::PlatformService* platform = editor::CreatePlatformService();
-	UAVPF_LOG(Application, Note, "Current platform is: %s", platform->GetName().data());
-	editor::Window* window = platform->CreateWindow();
+	uavpf::LoggerProvider::Get().HostLogger(
+		uavpf::LogSource::Application,
+		std::move(formatter),
+		std::move(emitter));
 
-	while (true)
-	{
-		platform->PollEvents();
-	}
-
-	platform->DestroyWindow(window);
-	editor::DestroyPlatformService(platform);
-
-	UAVPF_LOG(Application, Trace, "Use this for USUAL things");
-	UAVPF_LOG(Application, Note, "Use this to CLARIFY things");
-	UAVPF_LOG(Application, Info, "Use this when something GOOD happends");
-	UAVPF_LOG(Application, Warning, "Use this when something SUSPICIOUS happens");
-	UAVPF_LOG(Application, Error, "Use this when something (VERY) BAD happens");
+	editor::TestApplication().StartMainLoop();
 }
 
