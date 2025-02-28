@@ -14,10 +14,10 @@ target_sources(
 	"src/event/event_queue.cpp"
 	"src/event/event_subscriber.cpp"
 
-  "src/platform/platform_service.cpp" 
+  "src/platform/platform_service.cpp"
   "src/platform_sdl3/sdl3_platform_service.cpp"
-  "src/platform_sdl3/sdl3_window.cpp" 
-	)
+  "src/platform_sdl3/sdl3_window.cpp"
+)
 
 target_include_directories(
 	editor
