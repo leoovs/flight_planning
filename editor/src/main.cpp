@@ -1,5 +1,7 @@
 #include <uavpf/uavpf.h>
 
+#include "platform/platform_service.h"
+
 int main()
 {
 	auto formatter = std::make_shared<uavpf::ConciseLogFormatter>();
@@ -10,6 +12,10 @@ int main()
 			uavpf::LogSource::Application,
 			std::move(formatter),
 			std::move(emitter));
+	
+	//тест
+	editor::PlatformService* test = editor::CreatePlatformService();
+	UAVPF_LOG(Application, Error, test->GetName());
 
 	UAVPF_LOG(Application, Trace, "Use this for USUAL things");
 	UAVPF_LOG(Application, Note, "Use this to CLARIFY things");
