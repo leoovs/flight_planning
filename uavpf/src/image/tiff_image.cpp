@@ -28,4 +28,14 @@ namespace uavpf
 	{
 		return mImageHandle->Height;
 	}
+
+	bool TiffImage::IsValidImage() const
+	{
+		return nullptr != mImageHandle;
+	}
+
+	TiffImage::operator bool() const
+	{
+		return IsValidImage();
+	}
 }

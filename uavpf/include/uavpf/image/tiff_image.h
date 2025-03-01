@@ -22,6 +22,9 @@ namespace uavpf
 		int32_t GetWidth() const;
 		int32_t GetHeight() const;
 
+		bool IsValidImage() const; 
+		explicit operator bool() const;
+
 	private:
 		std::unique_ptr<TiffImageHandle> mImageHandle;
 	};
