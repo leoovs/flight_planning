@@ -7,6 +7,8 @@
 #include "platform/platform_service.h"
 #include "uavpf/debug/concise_log_formatter.h"
 
+#include "thread"
+
 namespace editor
 {
 	class TestApplication
@@ -21,6 +23,8 @@ namespace editor
 				.BeginClass(*this)
 					.SubscribeMethod(&TestApplication::OnWindowClose)
 					.SubscribeMethod(&TestApplication::OnWindowResize)
+					.SubscribeMethod(&TestApplication::OnMouseButtonDown)
+					.SubscribeMethod(&TestApplication::OnMouseButtonUp)
 				.EndClass();
 
 			mPlatform = CreatePlatformService();
@@ -28,12 +32,17 @@ namespace editor
 
 			mWindow = mPlatform->CreateWindow();
 			mWindow->SetTitle("Editor");
+
+			mMouse = mPlatform->CreateMouse();
 		}
 
 		~TestApplication()
 		{
 			mPlatform->DestroyWindow(mWindow);
 			mWindow = nullptr;
+
+			mPlatform->DestroyMouse(mMouse);
+			mMouse = nullptr;
 
 			DestroyPlatformService(mPlatform);
 			mPlatform = nullptr;
@@ -80,6 +89,26 @@ namespace editor
 			return true;
 		}
 
+		bool OnMouseButtonDown(const MouseButtonDownEvent& event)
+		{
+			UAVPF_LOG(
+				Application,
+				Info,
+				"Button: '%i' is down",
+				event.ButtonDown);
+			return true;
+		}
+
+		bool OnMouseButtonUp(const MouseButtonUpEvent& event)
+		{
+			UAVPF_LOG(
+				Application,
+				Info,
+				"Button: '%i' is up",
+				event.ButtonUp);
+			return true;
+		}
+
 		bool mRunning = true;
 
 		// Event-system
@@ -91,6 +120,7 @@ namespace editor
 		// Platform
 		PlatformService* mPlatform = nullptr;
 		Window* mWindow = nullptr;
+		Mouse* mMouse = nullptr;
 	};
 }
 int main()

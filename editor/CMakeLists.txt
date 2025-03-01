@@ -18,7 +18,8 @@ target_sources(
   "src/platform/platform_service.cpp"
   "src/platform_sdl3/sdl3_platform_service.cpp"
   "src/platform_sdl3/sdl3_window.cpp"
-)
+	"src/platform_sdl3/sdl3_mouse.cpp"
+ "src/platform/mouse_button.h")
 
 target_include_directories(
 	editor

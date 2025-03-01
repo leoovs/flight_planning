@@ -5,6 +5,7 @@
 #include "event/event_publisher.h"
 #include "platform/platform_service.h"
 #include "platform_sdl3/sdl3_window.h"
+#include "platform_sdl3/sdl3_mouse.h"
 
 namespace editor
 {
@@ -25,6 +26,9 @@ namespace editor
 		Sdl3Window* CreateWindow(const WindowParams& params) override;
 		void DestroyWindow(Window* window) override;
 
+		Sdl3Mouse* CreateMouse() override;
+		void DestroyMouse(Mouse* mouse) override;
+
 	private:
 		void RegisterWindow(Sdl3Window* window);
 		void UnregisterWindow(Sdl3Window* window);
@@ -34,11 +38,14 @@ namespace editor
 
 		void Native_OnWindowResize(const SDL_Event& nativeEvent);
 		void Native_OnWindowClose(const SDL_Event& nativeEvent);
+		void Native_OnMouseButtonDown(const SDL_Event& nativeEvent);
+		void Native_OnMouseButtonUp(const SDL_Event& nativeEvent);
 
 		using NativeEventHandler = void(Sdl3PlatformService::*)(const SDL_Event&);
 
 		EventPublisher mPlatformEventPublisher;
 		std::unordered_map<SDL_WindowID, Sdl3Window*> mWindowsByNativeWindowID;
 		std::unordered_map<uint32_t, NativeEventHandler> mHandlersByNativeEventType;
+		Sdl3Mouse* mRegisteredMouse = nullptr;
 	};
 }

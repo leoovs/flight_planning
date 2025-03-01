@@ -73,8 +73,41 @@ namespace editor
 
 	void Sdl3PlatformService::DestroyWindow(Window* window)
 	{
+		if (nullptr == window)
+		{
+			UAVPF_LOG(
+				Application,
+				Warning,
+				"Trying to destroy window which is nullptr");
+		}
 		UnregisterWindow(dynamic_cast<Sdl3Window*>(window));
 		delete window;
+	}
+
+	Sdl3Mouse* Sdl3PlatformService::CreateMouse()
+	{
+		if (nullptr != mRegisteredMouse)
+		{
+			UAVPF_LOG(
+				Application,
+				Warning,
+				"Trying to create second mouse");
+			return mRegisteredMouse;
+		}
+		return mRegisteredMouse = new Sdl3Mouse();
+	}
+
+	void Sdl3PlatformService::DestroyMouse(Mouse* mouse)
+	{
+		if (nullptr == mouse)
+		{
+			UAVPF_LOG(
+				Application,
+				Warning,
+				"Trying to destroy mouse which is nullptr");
+		}
+		delete mouse;
+		mRegisteredMouse = nullptr;
 	}
 
 	void Sdl3PlatformService::RegisterWindow(Sdl3Window* window)
@@ -143,6 +176,8 @@ namespace editor
 		{
 			{ SDL_EVENT_WINDOW_RESIZED, &Sdl3PlatformService::Native_OnWindowResize },
 			{ SDL_EVENT_WINDOW_CLOSE_REQUESTED, &Sdl3PlatformService::Native_OnWindowClose },
+			{ SDL_EVENT_MOUSE_BUTTON_DOWN, &Sdl3PlatformService::Native_OnMouseButtonDown },
+			{ SDL_EVENT_MOUSE_BUTTON_UP, &Sdl3PlatformService::Native_OnMouseButtonUp },
 		};
 	}
 
@@ -172,5 +207,25 @@ namespace editor
 		mPlatformEventPublisher.Publish<WindowCloseEvent>(
 			EventPublishMode::Queued,
 			closedWindow);
+	}
+
+	void Sdl3PlatformService::Native_OnMouseButtonDown(const SDL_Event& nativeEvent)
+	{
+		MouseButton buttonDown = mRegisteredMouse->ConvertNativeButtonToButton(nativeEvent.button.button);
+		
+		mPlatformEventPublisher.Publish<MouseButtonDownEvent>(
+			EventPublishMode::Queued,
+			mRegisteredMouse,
+			buttonDown);
+	}
+
+	void Sdl3PlatformService::Native_OnMouseButtonUp(const SDL_Event& nativeEvent)
+	{
+		MouseButton buttonUp = mRegisteredMouse->ConvertNativeButtonToButton(nativeEvent.button.button);
+
+		mPlatformEventPublisher.Publish<MouseButtonUpEvent>(
+			EventPublishMode::Queued,
+			mRegisteredMouse, 
+			buttonUp);
 	}
 }

@@ -3,6 +3,7 @@
 #include <cinttypes>
 
 #include "event/event.h"
+#include "platform/mouse_button.h"
 
 namespace editor
 {
@@ -38,6 +39,35 @@ namespace editor
 
 		WindowCloseEvent(Window* closedWindow)
 			: ClosedWindow(closedWindow)
+		{
+		}
+	};
+
+	class Mouse;
+
+	class MouseButtonDownEvent : public Event
+	{
+	public:
+		Mouse* RegisteredMouse = nullptr;
+		MouseButton ButtonDown = MouseButton::Unknown;
+
+		MouseButtonDownEvent(Mouse* registeredMouse, MouseButton buttonDown)
+			: RegisteredMouse(registeredMouse)
+			, ButtonDown(buttonDown)
+			
+		{
+		}
+	};
+
+	class MouseButtonUpEvent : public Event
+	{
+	public:
+		Mouse* RegisteredMouse = nullptr;
+		MouseButton ButtonUp = MouseButton::Unknown;
+
+		MouseButtonUpEvent(Mouse* registeredMouse, MouseButton buttonUp)
+			: RegisteredMouse(registeredMouse)
+			, ButtonUp(buttonUp)
 		{
 		}
 	};

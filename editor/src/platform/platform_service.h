@@ -4,6 +4,7 @@
 
 #include "event/event_bus.h"
 #include "platform/window.h"
+#include "platform/mouse.h"
 
 namespace editor
 {
@@ -22,6 +23,9 @@ namespace editor
 
 		virtual Window* CreateWindow(const WindowParams& params = {}) = 0;
 		virtual void DestroyWindow(Window* window) = 0;
+
+		virtual Mouse* CreateMouse() = 0;
+		virtual void DestroyMouse(Mouse* mouse) = 0;
 	};
 
 	PlatformService* CreatePlatformService();
