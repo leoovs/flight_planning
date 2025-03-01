@@ -29,6 +29,15 @@ namespace uavpf
 		return mImageHandle->Height;
 	}
 
+	uint32_t TiffImage::ReadPixelAt(int32_t x, int32_t y) const
+	{
+		size_t indexFrom2DCoords = y * mImageHandle->Width + x;
+
+		assert(indexFrom2DCoords < mImageHandle->RgbaPixels.size());
+
+		return mImageHandle->RgbaPixels.at(indexFrom2DCoords);
+	}
+
 	bool TiffImage::IsValidImage() const
 	{
 		return nullptr != mImageHandle;
