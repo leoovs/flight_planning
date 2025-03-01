@@ -26,10 +26,12 @@ namespace uavpf
 
 		if (!ReadImageSize(imageHandle.get()))
 		{
+			mLastLoadStatus = TiffLoadStatus::SizeReadFailure;
 			return TiffImage();
 		}
 		if (!ReadImagePixels(imageHandle.get()))
 		{
+			mLastLoadStatus = TiffLoadStatus::PixelsReadFailure;
 			return TiffImage();
 		}
 
@@ -53,13 +55,11 @@ namespace uavpf
 		uint32_t height = 0;
 		if (!TIFFGetField(handle->NativeTiff, TIFFTAG_IMAGEWIDTH, &width))
 		{
-			mLastLoadStatus = TiffLoadStatus::SizeReadFailure;
 			return false;
 		}
 
 		if (!TIFFGetField(handle->NativeTiff, TIFFTAG_IMAGELENGTH, &height))
 		{
-			mLastLoadStatus = TiffLoadStatus::SizeReadFailure;
 			return false;
 		}
 
@@ -86,7 +86,6 @@ namespace uavpf
 
 		if (0 == result)
 		{
-			mLastLoadStatus = TiffLoadStatus::PixelsReadFailure;
 			return false;
 		}
 
