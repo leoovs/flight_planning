@@ -22,7 +22,7 @@ namespace uavpf
 		}
 
 		auto imageHandle = std::make_unique<TiffImageHandle>();
-		imageHandle->NativeTiff = nativeTiff;
+		imageHandle->NativeTiff = TiffUniquePtr(nativeTiff);
 
 		if (!ReadImageSize(imageHandle.get()))
 		{
@@ -53,12 +53,12 @@ namespace uavpf
 
 		uint32_t width = 0;
 		uint32_t height = 0;
-		if (!TIFFGetField(handle->NativeTiff, TIFFTAG_IMAGEWIDTH, &width))
+		if (!TIFFGetField(handle->NativeTiff.get(), TIFFTAG_IMAGEWIDTH, &width))
 		{
 			return false;
 		}
 
-		if (!TIFFGetField(handle->NativeTiff, TIFFTAG_IMAGELENGTH, &height))
+		if (!TIFFGetField(handle->NativeTiff.get(), TIFFTAG_IMAGELENGTH, &height))
 		{
 			return false;
 		}
@@ -79,7 +79,7 @@ namespace uavpf
 		handle->RgbaPixels.resize(handle->Width * handle->Height);
 
 		int result = TIFFReadRGBAImage(
-			handle->NativeTiff,
+			handle->NativeTiff.get(),
 			handle->Width,
 			handle->Height,
 			handle->RgbaPixels.data());
