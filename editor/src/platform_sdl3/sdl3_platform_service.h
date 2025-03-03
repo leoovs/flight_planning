@@ -4,8 +4,8 @@
 
 #include "event/event_publisher.h"
 #include "platform/platform_service.h"
-#include "platform_sdl3/sdl3_window.h"
 #include "platform_sdl3/sdl3_mouse.h"
+#include "platform_sdl3/sdl3_window.h"
 
 namespace editor
 {

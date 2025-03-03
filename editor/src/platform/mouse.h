@@ -15,6 +15,6 @@ namespace editor
 
 		virtual std::pair<int32_t, int32_t> GetCursorCoords() const = 0;
 
-		virtual bool IsButtonPressed(MouseButton button) = 0;
+		virtual bool IsButtonPressed(MouseButton button) const = 0;
 	};
 }

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "platform/mouse.h"
-
 #include <cinttypes>
+
+#include "platform/mouse.h"
 
 namespace editor
 {
@@ -16,6 +16,6 @@ namespace editor
 
 		std::pair<int32_t, int32_t> GetCursorCoords() const override;
 
-		bool IsButtonPressed(MouseButton button) override;
+		bool IsButtonPressed(MouseButton button) const override;
 	};
 }

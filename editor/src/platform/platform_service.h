@@ -3,8 +3,8 @@
 #include <string_view>
 
 #include "event/event_bus.h"
-#include "platform/window.h"
 #include "platform/mouse.h"
+#include "platform/window.h"
 
 namespace editor
 {

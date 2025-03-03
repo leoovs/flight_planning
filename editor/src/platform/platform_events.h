@@ -54,7 +54,6 @@ namespace editor
 		MouseButtonDownEvent(Mouse* registeredMouse, MouseButton buttonDown)
 			: RegisteredMouse(registeredMouse)
 			, ButtonDown(buttonDown)
-			
 		{
 		}
 	};

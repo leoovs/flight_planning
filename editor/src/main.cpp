@@ -7,8 +7,6 @@
 #include "platform/platform_service.h"
 #include "uavpf/debug/concise_log_formatter.h"
 
-#include "thread"
-
 namespace editor
 {
 	class TestApplication
@@ -38,11 +36,11 @@ namespace editor
 
 		~TestApplication()
 		{
-			mPlatform->DestroyWindow(mWindow);
-			mWindow = nullptr;
-
 			mPlatform->DestroyMouse(mMouse);
 			mMouse = nullptr;
+
+			mPlatform->DestroyWindow(mWindow);
+			mWindow = nullptr;
 
 			DestroyPlatformService(mPlatform);
 			mPlatform = nullptr;
