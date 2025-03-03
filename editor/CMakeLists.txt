@@ -11,8 +11,14 @@ target_sources(
 
 	"src/event/event_bus.cpp"
 	"src/event/event_dispatcher.cpp"
+	"src/event/event_publisher.cpp"
 	"src/event/event_queue.cpp"
 	"src/event/event_subscriber.cpp"
+
+	"src/platform_sdl3/sdl3_mouse.cpp"
+	"src/platform/platform_service.cpp"
+	"src/platform_sdl3/sdl3_platform_service.cpp"
+	"src/platform_sdl3/sdl3_window.cpp"
 )
 
 target_include_directories(
