@@ -20,6 +20,8 @@ namespace editor
 
 		SDL_Window* GetNativeWindow() const;
 
+		void SyncSizeWithNativeWindow();
+
 	private:
 		void CreateNativeWindow();
 		void DestroyNativeWindow();

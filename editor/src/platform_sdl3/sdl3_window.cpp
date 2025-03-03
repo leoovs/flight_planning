@@ -75,6 +75,24 @@ namespace editor
 		return mNativeWindow;
 	}
 
+	void Sdl3Window::SyncSizeWithNativeWindow()
+	{
+		int width = 0;
+		int height = 0;
+		if (!SDL_GetWindowSize(mNativeWindow, &width, &height))
+		{
+			UAVPF_LOG(
+				Application,
+				Error,
+				"Could not retrieve SDL3 window size: %s",
+				SDL_GetError());
+			return;
+		}
+
+		mParams.Width = width;
+		mParams.Height = height;
+	}
+
 	void Sdl3Window::CreateNativeWindow()
 	{
 		int32_t defaultWindowFlag = SDL_WINDOW_RESIZABLE;

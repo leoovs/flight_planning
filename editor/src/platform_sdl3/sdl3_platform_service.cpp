@@ -190,6 +190,8 @@ namespace editor
 		Sdl3Window* resizedWindow = FindRegisteredWindowByNativeWindowID(
 			nativeWindowID);
 
+		resizedWindow->SyncSizeWithNativeWindow();
+
 		mPlatformEventPublisher.Publish<WindowResizeEvent>(
 			EventPublishMode::Queued,
 			width,

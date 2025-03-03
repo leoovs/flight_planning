@@ -81,8 +81,8 @@ namespace editor
 				Info,
 				"Window '%s' is resized: %dx%d",
 				event.ResizedWindow->GetTitle().data(),
-				event.Width,
-				event.Height);
+				event.ResizedWindow->GetWidth(),
+				event.ResizedWindow->GetHeight());
 
 			return true;
 		}
