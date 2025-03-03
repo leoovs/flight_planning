@@ -31,7 +31,7 @@ namespace uavpf
 
 	uint32_t TiffImage::ReadPixelAt(int32_t x, int32_t y) const
 	{
-		size_t indexFrom2DCoords = y * mImageHandle->Width + x;
+		size_t indexFrom2DCoords = x * mImageHandle->Width + y;
 
 		assert(indexFrom2DCoords < mImageHandle->RgbaPixels.size());
 
