@@ -36,6 +36,7 @@ namespace editor
 			GraphicsContextParams graphicsParams;
 			graphicsParams.OutputWindow = mWindow;
 			graphicsParams.Backend = GraphicsBackend::OpenGL;
+			graphicsParams.Kind = GraphicsContextKind::Debug;
 			mGraphics = mPlatform->CreateGraphicsContext(std::move(graphicsParams));
 
 			float positions[3*3]
@@ -51,12 +52,29 @@ namespace editor
 			vertexBufferParams.StructCount = 3;
 			vertexBufferParams.Target = GraphicsBufferTarget::Vertex;
 
+			mGraphicsDebug = mGraphics->CreateDebugWatch();
+			mGraphicsDebug->SetWatcher(
+				[](const GraphicsDebugEntry& entry)
+				{
+					UAVPF_LOG(
+						Application,
+						Info,
+						entry.Message);
+				}
+			);
+
 			mVertexBuffer = mGraphics->CreateGraphicsBuffer(std::move(vertexBufferParams));
 			mVertexBuffer->SetData(positions, sizeof(positions));
 		}
 
 		~TestApplication()
 		{
+			mGraphics->DestroyGraphicsBuffer(mVertexBuffer);
+			mVertexBuffer = nullptr;
+
+			mGraphics->DestroyDebugWatch(mGraphicsDebug);
+			mGraphicsDebug = nullptr;
+
 			mPlatform->DestroyGraphicsContext(mGraphics);
 			mGraphics = nullptr;
 
@@ -149,6 +167,7 @@ namespace editor
 
 		// Graphics
 		GraphicsContext* mGraphics = nullptr;
+		GraphicsDebugWatch* mGraphicsDebug = nullptr;
 		GraphicsBuffer* mVertexBuffer = nullptr;
 	};
 }

@@ -38,6 +38,10 @@ namespace editor
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 6);	
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);	
 
+		int32_t contextFlags = 0;	
+		contextFlags |= mParams.IsContextDebuggable ? SDL_GL_CONTEXT_DEBUG_FLAG : 0;
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, contextFlags);
+
 		mNativeWindow = mParams.OutputWindow->GetNativeWindow();
 		mNativeContext = SDL_GL_CreateContext(mNativeWindow);
 

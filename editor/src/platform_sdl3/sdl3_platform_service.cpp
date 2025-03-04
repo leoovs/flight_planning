@@ -236,6 +236,7 @@ namespace editor
 	{
 		Sdl3OglProviderParams providerParams;
 		providerParams.OutputWindow = dynamic_cast<Sdl3Window*>(params.OutputWindow);
+		providerParams.IsContextDebuggable = GraphicsContextKind::Debug == params.Kind;
 		
 		auto provider = std::make_unique<Sdl3OglProvider>(std::move(providerParams));
 

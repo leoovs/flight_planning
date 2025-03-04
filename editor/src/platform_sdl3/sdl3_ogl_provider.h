@@ -11,6 +11,7 @@ namespace editor
 	struct Sdl3OglProviderParams
 	{
 		Sdl3Window* OutputWindow = nullptr;
+		bool IsContextDebuggable = false;
 	};
 
 	class Sdl3OglProvider final : public OglProvider

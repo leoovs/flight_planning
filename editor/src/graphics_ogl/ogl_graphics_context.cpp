@@ -1,7 +1,9 @@
 #include "graphics_ogl/ogl_graphics_context.h"
+#include "graphics_ogl/ogl_graphics_debug_watch.h"
 
 #include <cassert>
 
+#include <uavpf/uavpf.h>
 #include <GL/glew.h>
 
 namespace editor
@@ -29,6 +31,43 @@ namespace editor
 	{
 		glClearColor(r, g, b, a);
 		glClear(GL_COLOR_BUFFER_BIT);
+	}
+
+	OglGraphicsDebugWatch* OglGraphicsContext::CreateDebugWatch()
+	{
+		if (nullptr != mRegisteredDebugWatch)
+		{
+			UAVPF_LOG(
+				Application,
+				Warning,
+				"Trying to create multiple graphics debug watches");
+			return mRegisteredDebugWatch;
+		}
+
+		return mRegisteredDebugWatch = new OglGraphicsDebugWatch();
+	}
+
+	void OglGraphicsContext::DestroyDebugWatch(GraphicsDebugWatch* debugWatch)
+	{
+		if (nullptr == debugWatch)
+		{
+			UAVPF_LOG(
+				Application,
+				Warning,
+				"Trying to destroy graphics debug watch which is nullptr");
+		}
+
+		if (debugWatch != mRegisteredDebugWatch)
+		{
+			UAVPF_LOG(
+				Application,
+				Warning,
+				"Trying to destroy graphics debug watch context which is"
+				" different from registered one");
+		}
+
+		delete debugWatch;
+		mRegisteredDebugWatch = nullptr;
 	}
 
 	OglGraphicsBuffer* OglGraphicsContext::CreateGraphicsBuffer(

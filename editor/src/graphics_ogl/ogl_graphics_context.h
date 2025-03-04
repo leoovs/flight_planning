@@ -3,8 +3,9 @@
 #include <memory>
 
 #include "graphics/graphics_context.h"
-#include "graphics_ogl/ogl_provider.h"
 #include "graphics_ogl/ogl_graphics_buffer.h"
+#include "graphics_ogl/ogl_graphics_debug_watch.h"
+#include "graphics_ogl/ogl_provider.h"
 
 namespace editor
 {
@@ -20,12 +21,17 @@ namespace editor
 		void Present() override;
 		void ClearColor(float r, float g, float b, float a) override;
 
+		OglGraphicsDebugWatch* CreateDebugWatch() override;
+		void DestroyDebugWatch(GraphicsDebugWatch* debugWatch) override;
+
 		OglGraphicsBuffer* CreateGraphicsBuffer(GraphicsBufferParams params) override;
 		void DestroyGraphicsBuffer(GraphicsBuffer* graphicsBuffer) override;
 
 	private:
 		GraphicsContextParams mParams;
 		std::unique_ptr<OglProvider> mProvider;
+
+		OglGraphicsDebugWatch* mRegisteredDebugWatch = nullptr;
 	};
 }
 
