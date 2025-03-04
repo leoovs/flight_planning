@@ -39,17 +39,22 @@ namespace editor
 			graphicsParams.Kind = GraphicsContextKind::Debug;
 			mGraphics = mPlatform->CreateGraphicsContext(std::move(graphicsParams));
 
-			float positions[3*3]
+			struct Position
 			{
-				1.0f, 2.0f, 3.0f,
-				4.0f, 5.0f, 6.0f,
-				7.0f, 8.0f, 9.0f,
+				float xyz[3];
+			};
+
+			Position positions[]
+			{
+				{ 0.0f, 1.0f, 2.0f },
+				{ 3.0f, 4.0f, 5.0f },
+				{ 6.0f, 7.0f, 8.0f },
 			};
 
 			GraphicsBufferParams vertexBufferParams;
 			vertexBufferParams.DebugName = "SUPER COOL vertex buffer";
-			vertexBufferParams.StructSize = sizeof(float[3]);
-			vertexBufferParams.StructCount = 3;
+			vertexBufferParams.StructSize = sizeof(*positions);
+			vertexBufferParams.StructCount = std::size(positions);
 			vertexBufferParams.Target = GraphicsBufferTarget::Vertex;
 
 			mGraphicsDebug = mGraphics->CreateDebugWatch();

@@ -36,7 +36,7 @@ namespace editor
 			mNativeBuffer,
 			static_cast<GLsizeiptr>(mParams.StructSize * mParams.StructCount),
 			nullptr,
-			OglFacts::ConvertTargetToNative(mParams.Target));
+			GL_DYNAMIC_STORAGE_BIT);
 
 		glObjectLabel(
 			GL_BUFFER,
