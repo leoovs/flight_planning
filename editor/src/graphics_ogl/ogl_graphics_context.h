@@ -19,6 +19,9 @@ namespace editor
 		void Present() override;
 		void ClearColor(float r, float g, float b, float a) override;
 
+		GraphicsBuffer* CreateGraphicsBuffer(GraphicsBufferParams params) override;
+		void DestroyGraphicsBuffer(GraphicsBuffer* graphicsBuffer) override;
+
 	private:
 		GraphicsContextParams mParams;
 		std::unique_ptr<OglProvider> mProvider;
