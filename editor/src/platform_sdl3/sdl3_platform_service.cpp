@@ -110,6 +110,43 @@ namespace editor
 		mRegisteredMouse = nullptr;
 	}
 
+	GraphicsContext* Sdl3PlatformService::CreateGraphicsContext()
+	{
+		if (nullptr != mRegisteredGraphicsContext)
+		{
+			UAVPF_LOG(
+				Application,
+				Warning,
+				"Trying to create multiple graphics contexts");
+			return mRegisteredGraphicsContext;
+		}
+		// TODO: implement.
+		return mRegisteredGraphicsContext = nullptr;
+	}
+
+	void Sdl3PlatformService::DestroyGraphicsContext(GraphicsContext* graphicsContext)
+	{
+		if (nullptr == graphicsContext)
+		{
+			UAVPF_LOG(
+				Application,
+				Warning,
+				"Trying to destroy graphics context which is nullptr");
+		}
+
+		if (graphicsContext != mRegisteredGraphicsContext)
+		{
+			UAVPF_LOG(
+				Application,
+				Warning,
+				"Trying to destroy graphics context which is different from"
+				" registered one");
+		}
+
+		delete graphicsContext;
+		mRegisteredGraphicsContext = nullptr;
+	}
+
 	void Sdl3PlatformService::RegisterWindow(Sdl3Window* window)
 	{
 		if (nullptr == window)

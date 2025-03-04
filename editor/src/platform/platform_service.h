@@ -3,6 +3,7 @@
 #include <string_view>
 
 #include "event/event_bus.h"
+#include "graphics/graphics_context.h"
 #include "platform/mouse.h"
 #include "platform/window.h"
 
@@ -26,6 +27,9 @@ namespace editor
 
 		virtual Mouse* CreateMouse() = 0;
 		virtual void DestroyMouse(Mouse* mouse) = 0;
+
+		virtual GraphicsContext* CreateGraphicsContext() = 0;
+		virtual void DestroyGraphicsContext(GraphicsContext* graphicsContext) = 0;
 	};
 
 	PlatformService* CreatePlatformService();

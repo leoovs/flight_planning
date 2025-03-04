@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cwctype>
 #include <unordered_map>
 
 #include "event/event_publisher.h"
@@ -29,6 +30,9 @@ namespace editor
 		Sdl3Mouse* CreateMouse() override;
 		void DestroyMouse(Mouse* mouse) override;
 
+		GraphicsContext* CreateGraphicsContext() override;
+		void DestroyGraphicsContext(GraphicsContext* graphicsContext) override;
+
 	private:
 		void RegisterWindow(Sdl3Window* window);
 		void UnregisterWindow(Sdl3Window* window);
@@ -47,5 +51,6 @@ namespace editor
 		std::unordered_map<SDL_WindowID, Sdl3Window*> mWindowsByNativeWindowID;
 		std::unordered_map<uint32_t, NativeEventHandler> mHandlersByNativeEventType;
 		Sdl3Mouse* mRegisteredMouse = nullptr;
+		GraphicsContext* mRegisteredGraphicsContext = nullptr;
 	};
 }

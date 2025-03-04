@@ -32,10 +32,15 @@ namespace editor
 			mWindow->SetTitle("Editor");
 
 			mMouse = mPlatform->CreateMouse();
+
+			mGraphics = mPlatform->CreateGraphicsContext();
 		}
 
 		~TestApplication()
 		{
+			mPlatform->DestroyGraphicsContext(mGraphics);
+			mGraphics = nullptr;
+
 			mPlatform->DestroyMouse(mMouse);
 			mMouse = nullptr;
 
@@ -119,6 +124,7 @@ namespace editor
 		PlatformService* mPlatform = nullptr;
 		Window* mWindow = nullptr;
 		Mouse* mMouse = nullptr;
+		GraphicsContext* mGraphics = nullptr;
 	};
 }
 int main()
