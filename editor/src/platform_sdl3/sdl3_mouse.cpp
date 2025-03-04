@@ -51,11 +51,9 @@ namespace editor
 
 	bool Sdl3Mouse::IsButtonPressed(MouseButton button) const
 	{
-		uint32_t mask = ConvertButtonToNativeMask(button);
-		if (SDL_GetMouseState(nullptr, nullptr) & mask)
-		{
-			return true;
-		}
-		return false;
+		uint32_t buttonMask = ConvertButtonToNativeMask(button);
+		SDL_MouseButtonFlags buttonFlags = SDL_GetMouseState(nullptr, nullptr);
+
+		return buttonMask & buttonFlags;
 	}
 }
