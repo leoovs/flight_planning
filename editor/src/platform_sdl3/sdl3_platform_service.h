@@ -10,6 +10,8 @@
 
 namespace editor
 {
+	class OglGraphicsContext;
+
 	class Sdl3PlatformService final : public PlatformService
 	{
 	public:
@@ -30,7 +32,7 @@ namespace editor
 		Sdl3Mouse* CreateMouse() override;
 		void DestroyMouse(Mouse* mouse) override;
 
-		GraphicsContext* CreateGraphicsContext() override;
+		GraphicsContext* CreateGraphicsContext(GraphicsContextParams params) override;
 		void DestroyGraphicsContext(GraphicsContext* graphicsContext) override;
 
 	private:
@@ -39,6 +41,8 @@ namespace editor
 		Sdl3Window* FindRegisteredWindowByNativeWindowID(SDL_WindowID id) const;
 
 		void SetupNativeEventHandlers();
+
+		OglGraphicsContext* CreateOglGraphicsContext(GraphicsContextParams params);
 
 		void Native_OnWindowResize(const SDL_Event& nativeEvent);
 		void Native_OnWindowClose(const SDL_Event& nativeEvent);

@@ -95,7 +95,7 @@ namespace editor
 
 	void Sdl3Window::CreateNativeWindow()
 	{
-		int32_t defaultWindowFlag = SDL_WINDOW_RESIZABLE;
+		int32_t defaultWindowFlag = SDL_WINDOW_RESIZABLE | SDL_WINDOW_OPENGL;
 
 		mNativeWindow = SDL_CreateWindow(
 			mParams.Title.data(),

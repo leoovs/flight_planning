@@ -28,7 +28,7 @@ namespace editor
 		virtual Mouse* CreateMouse() = 0;
 		virtual void DestroyMouse(Mouse* mouse) = 0;
 
-		virtual GraphicsContext* CreateGraphicsContext() = 0;
+		virtual GraphicsContext* CreateGraphicsContext(GraphicsContextParams params) = 0;
 		virtual void DestroyGraphicsContext(GraphicsContext* graphicsContext) = 0;
 	};
 

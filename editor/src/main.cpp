@@ -33,7 +33,10 @@ namespace editor
 
 			mMouse = mPlatform->CreateMouse();
 
-			mGraphics = mPlatform->CreateGraphicsContext();
+			GraphicsContextParams graphicsParams;
+			graphicsParams.OutputWindow = mWindow;
+			graphicsParams.Backend = GraphicsBackend::OpenGL;
+			mGraphics = mPlatform->CreateGraphicsContext(std::move(graphicsParams));
 		}
 
 		~TestApplication()
@@ -60,6 +63,9 @@ namespace editor
 
 				mPlatform->PollEvents();
 				mEvents.Dispatch();
+
+				mGraphics->ClearColor(0.7f, 0.4f, 0.3f, 0.0f);
+				mGraphics->Present();	
 
 				mPlatform->EndFrame();
 			}

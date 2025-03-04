@@ -5,6 +5,8 @@
 
 #include "event/event_bus.h"
 #include "platform/platform_events.h"
+#include "graphics_ogl/ogl_graphics_context.h"
+#include "platform_sdl3/sdl3_ogl_provider.h"
 
 namespace editor
 {
@@ -110,7 +112,8 @@ namespace editor
 		mRegisteredMouse = nullptr;
 	}
 
-	GraphicsContext* Sdl3PlatformService::CreateGraphicsContext()
+	GraphicsContext* Sdl3PlatformService::CreateGraphicsContext(
+		GraphicsContextParams params)
 	{
 		if (nullptr != mRegisteredGraphicsContext)
 		{
@@ -120,8 +123,18 @@ namespace editor
 				"Trying to create multiple graphics contexts");
 			return mRegisteredGraphicsContext;
 		}
-		// TODO: implement.
-		return mRegisteredGraphicsContext = nullptr;
+
+		switch (params.Backend)
+		{
+			case GraphicsBackend::None:
+				return nullptr;
+			case GraphicsBackend::OpenGL:
+				return mRegisteredGraphicsContext = CreateOglGraphicsContext(std::move(params));
+			default:
+				assert(false && "Unknown GraphicsBackend enum value");
+		}
+
+		return nullptr;
 	}
 
 	void Sdl3PlatformService::DestroyGraphicsContext(GraphicsContext* graphicsContext)
@@ -216,6 +229,17 @@ namespace editor
 			{ SDL_EVENT_MOUSE_BUTTON_DOWN, &Sdl3PlatformService::Native_OnMouseButtonDown },
 			{ SDL_EVENT_MOUSE_BUTTON_UP, &Sdl3PlatformService::Native_OnMouseButtonUp },
 		};
+	}
+
+	OglGraphicsContext* Sdl3PlatformService::CreateOglGraphicsContext(
+		GraphicsContextParams params)
+	{
+		Sdl3OglProviderParams providerParams;
+		providerParams.OutputWindow = dynamic_cast<Sdl3Window*>(params.OutputWindow);
+		
+		auto provider = std::make_unique<Sdl3OglProvider>(std::move(providerParams));
+
+		return new OglGraphicsContext(std::move(params), std::move(provider));
 	}
 
 	void Sdl3PlatformService::Native_OnWindowResize(const SDL_Event& nativeEvent)

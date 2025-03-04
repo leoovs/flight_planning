@@ -15,8 +15,11 @@ target_sources(
 	"src/event/event_queue.cpp"
 	"src/event/event_subscriber.cpp"
 
-	"src/platform_sdl3/sdl3_mouse.cpp"
+	"src/graphics_ogl/ogl_graphics_context.cpp"
+
 	"src/platform/platform_service.cpp"
+	"src/platform_sdl3/sdl3_mouse.cpp"
+	"src/platform_sdl3/sdl3_ogl_provider.cpp"
 	"src/platform_sdl3/sdl3_platform_service.cpp"
 	"src/platform_sdl3/sdl3_window.cpp"
 )
