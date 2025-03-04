@@ -37,6 +37,22 @@ namespace editor
 			graphicsParams.OutputWindow = mWindow;
 			graphicsParams.Backend = GraphicsBackend::OpenGL;
 			mGraphics = mPlatform->CreateGraphicsContext(std::move(graphicsParams));
+
+			float positions[3*3]
+			{
+				1.0f, 2.0f, 3.0f,
+				4.0f, 5.0f, 6.0f,
+				7.0f, 8.0f, 9.0f,
+			};
+
+			GraphicsBufferParams vertexBufferParams;
+			vertexBufferParams.DebugName = "SUPER COOL vertex buffer";
+			vertexBufferParams.StructSize = sizeof(float[3]);
+			vertexBufferParams.StructCount = 3;
+			vertexBufferParams.Target = GraphicsBufferTarget::Vertex;
+
+			mVertexBuffer = mGraphics->CreateGraphicsBuffer(std::move(vertexBufferParams));
+			mVertexBuffer->SetData(positions, sizeof(positions));
 		}
 
 		~TestApplication()
@@ -130,7 +146,10 @@ namespace editor
 		PlatformService* mPlatform = nullptr;
 		Window* mWindow = nullptr;
 		Mouse* mMouse = nullptr;
+
+		// Graphics
 		GraphicsContext* mGraphics = nullptr;
+		GraphicsBuffer* mVertexBuffer = nullptr;
 	};
 }
 int main()

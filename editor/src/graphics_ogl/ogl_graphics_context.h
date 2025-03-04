@@ -4,6 +4,7 @@
 
 #include "graphics/graphics_context.h"
 #include "graphics_ogl/ogl_provider.h"
+#include "graphics_ogl/ogl_graphics_buffer.h"
 
 namespace editor
 {
@@ -19,7 +20,7 @@ namespace editor
 		void Present() override;
 		void ClearColor(float r, float g, float b, float a) override;
 
-		GraphicsBuffer* CreateGraphicsBuffer(GraphicsBufferParams params) override;
+		OglGraphicsBuffer* CreateGraphicsBuffer(GraphicsBufferParams params) override;
 		void DestroyGraphicsBuffer(GraphicsBuffer* graphicsBuffer) override;
 
 	private:

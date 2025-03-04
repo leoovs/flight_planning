@@ -31,15 +31,16 @@ namespace editor
 		glClear(GL_COLOR_BUFFER_BIT);
 	}
 
-	GraphicsBuffer* OglGraphicsContext::CreateGraphicsBuffer(
+	OglGraphicsBuffer* OglGraphicsContext::CreateGraphicsBuffer(
 		GraphicsBufferParams params)
 	{
-		return nullptr;
+		return new OglGraphicsBuffer(std::move(params));
 	}
 
 	void OglGraphicsContext::DestroyGraphicsBuffer(
 		GraphicsBuffer* graphicsBuffer)
 	{
+		delete graphicsBuffer;
 	}
 }
 
