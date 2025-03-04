@@ -68,13 +68,13 @@ namespace editor
 				}
 			);
 
-			mVertexBuffer = mGraphics->CreateGraphicsBuffer(std::move(vertexBufferParams));
+			mVertexBuffer = mGraphics->CreateBuffer(std::move(vertexBufferParams));
 			mVertexBuffer->SetData(positions, sizeof(positions));
 		}
 
 		~TestApplication()
 		{
-			mGraphics->DestroyGraphicsBuffer(mVertexBuffer);
+			mGraphics->DestroyBuffer(mVertexBuffer);
 			mVertexBuffer = nullptr;
 
 			mGraphics->DestroyDebugWatch(mGraphicsDebug);

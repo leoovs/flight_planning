@@ -70,13 +70,13 @@ namespace editor
 		mRegisteredDebugWatch = nullptr;
 	}
 
-	OglGraphicsBuffer* OglGraphicsContext::CreateGraphicsBuffer(
+	OglGraphicsBuffer* OglGraphicsContext::CreateBuffer(
 		GraphicsBufferParams params)
 	{
 		return new OglGraphicsBuffer(std::move(params));
 	}
 
-	void OglGraphicsContext::DestroyGraphicsBuffer(
+	void OglGraphicsContext::DestroyBuffer(
 		GraphicsBuffer* graphicsBuffer)
 	{
 		delete graphicsBuffer;

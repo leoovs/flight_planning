@@ -24,8 +24,8 @@ namespace editor
 		OglGraphicsDebugWatch* CreateDebugWatch() override;
 		void DestroyDebugWatch(GraphicsDebugWatch* debugWatch) override;
 
-		OglGraphicsBuffer* CreateGraphicsBuffer(GraphicsBufferParams params) override;
-		void DestroyGraphicsBuffer(GraphicsBuffer* graphicsBuffer) override;
+		OglGraphicsBuffer* CreateBuffer(GraphicsBufferParams params) override;
+		void DestroyBuffer(GraphicsBuffer* graphicsBuffer) override;
 
 	private:
 		GraphicsContextParams mParams;

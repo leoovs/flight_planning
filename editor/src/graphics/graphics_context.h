@@ -35,8 +35,8 @@ namespace editor
 		virtual GraphicsDebugWatch* CreateDebugWatch() = 0;
 		virtual void DestroyDebugWatch(GraphicsDebugWatch* watch) = 0;
 
-		virtual GraphicsBuffer* CreateGraphicsBuffer(GraphicsBufferParams params) = 0;
-		virtual void DestroyGraphicsBuffer(GraphicsBuffer* graphicsBuffer) = 0;
+		virtual GraphicsBuffer* CreateBuffer(GraphicsBufferParams params) = 0;
+		virtual void DestroyBuffer(GraphicsBuffer* graphicsBuffer) = 0;
 	};
 }
 
