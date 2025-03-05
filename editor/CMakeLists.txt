@@ -15,6 +15,8 @@ target_sources(
 	"src/event/event_queue.cpp"
 	"src/event/event_subscriber.cpp"
 
+	"src/graphics/graphics_buffer_slots.cpp"
+
 	"src/graphics_ogl/ogl_facts.cpp"
 	"src/graphics_ogl/ogl_graphics_buffer.cpp"
 	"src/graphics_ogl/ogl_graphics_context.cpp"
