@@ -27,7 +27,7 @@ namespace editor
 		ConstIterator end() const;
 
 	private:
-		Container mBuffersBySlot;
+		Container mBuffersBySlot = {};
 	};
 }
 
