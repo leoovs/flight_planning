@@ -81,5 +81,22 @@ namespace editor
 	{
 		delete graphicsBuffer;
 	}
+
+	VertexInput* OglGraphicsContext::CreateVertexInput(VertexInputParams params)
+	{
+		return nullptr;
+	}
+
+	void OglGraphicsContext::DestroyVertexInput(VertexInput* vertexInput)
+	{
+		if (nullptr == vertexInput)
+		{
+			UAVPF_LOG(
+				Application,
+				Warning,
+				"Trying to destroy nullptr vertex input");
+		}
+		delete vertexInput;
+	}
 }
 

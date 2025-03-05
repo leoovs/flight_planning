@@ -27,6 +27,9 @@ namespace editor
 		OglGraphicsBuffer* CreateBuffer(GraphicsBufferParams params) override;
 		void DestroyBuffer(GraphicsBuffer* graphicsBuffer) override;
 
+		VertexInput* CreateVertexInput(VertexInputParams params) override;
+		void DestroyVertexInput(VertexInput* vertexInput) override;
+
 	private:
 		GraphicsContextParams mParams;
 		std::unique_ptr<OglProvider> mProvider;

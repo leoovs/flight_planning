@@ -5,6 +5,7 @@
 #include "graphics/graphics_backend.h"
 #include "graphics/graphics_buffer.h"
 #include "graphics/graphics_debug_watch.h"
+#include "graphics/vertex_input.h"
 #include "platform/window.h"
 
 namespace editor
@@ -37,6 +38,9 @@ namespace editor
 
 		virtual GraphicsBuffer* CreateBuffer(GraphicsBufferParams params) = 0;
 		virtual void DestroyBuffer(GraphicsBuffer* graphicsBuffer) = 0;
+
+		virtual VertexInput* CreateVertexInput(VertexInputParams params) = 0;
+		virtual void DestroyVertexInput(VertexInput* vertexInput) = 0;
 	};
 }
 

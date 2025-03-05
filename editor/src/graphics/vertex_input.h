@@ -1,0 +1,37 @@
+#pragma once
+
+#include <limits>
+#include <string>
+#include <vector>
+
+#include "graphics/graphics_buffer_slots.h"
+#include "graphics/graphics_format.h"
+
+namespace editor
+{
+	struct VertexAttributeParams
+	{
+		std::string Name = "Unname vertex attribute";
+		GraphicsFormat Format = GraphicsFormat::R32G32B32A32_FLOAT;
+		size_t VertexBufferIndex = 0;
+
+		static constexpr auto cAlignedByteOffset = std::numeric_limits<size_t>::max();
+		size_t ByteOffset = cAlignedByteOffset;
+	};
+
+	struct VertexInputParams
+	{
+		GraphicsBufferSlots VertexBuffers;
+		GraphicsBuffer* IndexBuffer = nullptr;
+		std::vector<VertexAttributeParams> VertexAttributes;
+	};
+
+	class VertexInput
+	{
+	public:
+		virtual ~VertexInput() = default;
+
+		virtual const VertexInputParams& GetParams() const = 0;
+	};
+}
+
