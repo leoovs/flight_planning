@@ -20,7 +20,7 @@ namespace editor
 	size_t GraphicsBufferSlots::ConvertIteratorToSlotIndex(
 		ConstIterator it) const
 	{
-		return std::distance(it, end());
+		return std::distance(begin(), it);
 	}
 
 	GraphicsBufferSlots::Iterator GraphicsBufferSlots::begin()
