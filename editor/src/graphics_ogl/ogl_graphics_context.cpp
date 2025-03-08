@@ -82,9 +82,9 @@ namespace editor
 		delete graphicsBuffer;
 	}
 
-	VertexInput* OglGraphicsContext::CreateVertexInput(VertexInputParams params)
+	OglVertexInput* OglGraphicsContext::CreateVertexInput(VertexInputParams params)
 	{
-		return nullptr;
+		return new OglVertexInput(std::move(params));
 	}
 
 	void OglGraphicsContext::DestroyVertexInput(VertexInput* vertexInput)
@@ -97,6 +97,24 @@ namespace editor
 				"Trying to destroy nullptr vertex input");
 		}
 		delete vertexInput;
+	}
+
+	void OglGraphicsContext::SetVertexInput(VertexInput* vertexInput)
+	{
+		if (nullptr == vertexInput)
+		{
+			glBindVertexArray(0);
+			mBoundVertexInput = nullptr;
+			return;
+		}
+
+		mBoundVertexInput = dynamic_cast<OglVertexInput*>(vertexInput);
+		glBindVertexArray(mBoundVertexInput->GetNativeVertexArray());
+	}
+
+	OglVertexInput* OglGraphicsContext::GetVertexInput() const
+	{
+		return mBoundVertexInput;
 	}
 }
 

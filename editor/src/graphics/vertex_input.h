@@ -13,14 +13,17 @@ namespace editor
 	{
 		std::string Name = "Unname vertex attribute";
 		GraphicsFormat Format = GraphicsFormat::R32G32B32A32_FLOAT;
-		size_t VertexBufferIndex = 0;
+		size_t VertexBufferSlotIndex = 0;
 
-		static constexpr auto cAlignedByteOffset = std::numeric_limits<size_t>::max();
-		size_t ByteOffset = cAlignedByteOffset;
+		static constexpr auto cAppendAlignedByteOffset =
+			std::numeric_limits<size_t>::max();
+		size_t ByteOffset = cAppendAlignedByteOffset;
 	};
 
 	struct VertexInputParams
 	{
+		std::string DebugName = "Unnamed VertexInput";
+
 		GraphicsBufferSlots VertexBuffers;
 		GraphicsBuffer* IndexBuffer = nullptr;
 		std::vector<VertexAttributeParams> VertexAttributes;

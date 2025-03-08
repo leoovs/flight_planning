@@ -39,24 +39,6 @@ namespace editor
 			graphicsParams.Kind = GraphicsContextKind::Debug;
 			mGraphics = mPlatform->CreateGraphicsContext(std::move(graphicsParams));
 
-			struct Position
-			{
-				float xyz[3];
-			};
-
-			Position positions[]
-			{
-				{ 0.0f, 1.0f, 2.0f },
-				{ 3.0f, 4.0f, 5.0f },
-				{ 6.0f, 7.0f, 8.0f },
-			};
-
-			GraphicsBufferParams vertexBufferParams;
-			vertexBufferParams.DebugName = "SUPER COOL vertex buffer";
-			vertexBufferParams.StructSize = sizeof(*positions);
-			vertexBufferParams.StructCount = std::size(positions);
-			vertexBufferParams.Target = GraphicsBufferTarget::Vertex;
-
 			mGraphicsDebug = mGraphics->CreateDebugWatch();
 			mGraphicsDebug->SetWatcher(
 				[](const GraphicsDebugEntry& entry)
@@ -68,12 +50,43 @@ namespace editor
 				}
 			);
 
+			struct Vertex
+			{
+				char SomeData;
+				float Position[4];
+			};
+			Vertex triangle[3];
+
+			constexpr auto offset = offsetof(Vertex, Position);
+
+			GraphicsBufferParams vertexBufferParams;
+			vertexBufferParams.DebugName = "SUPER COOL vertex buffer";
+			vertexBufferParams.StructSize = sizeof(*triangle);
+			vertexBufferParams.StructCount = std::size(triangle);
+			vertexBufferParams.Target = GraphicsBufferTarget::Vertex;
+
 			mVertexBuffer = mGraphics->CreateBuffer(std::move(vertexBufferParams));
-			mVertexBuffer->SetData(positions, sizeof(positions));
+			mVertexBuffer->SetData(triangle, sizeof(triangle));
+
+			VertexInputParams triangleVertexInputParams;	
+			triangleVertexInputParams.DebugName = "Triangle vertex input";
+			triangleVertexInputParams.VertexBuffers[0] = mVertexBuffer;
+			triangleVertexInputParams.IndexBuffer = nullptr;
+			triangleVertexInputParams.VertexAttributes =
+			{
+				{ "Position", GraphicsFormat::R32G32B32A32_FLOAT, 0 },
+				{ "SomeData", GraphicsFormat::R8_UNORM, 0 },
+			};
+
+			mTriangleVertexInput = mGraphics->CreateVertexInput(std::move(triangleVertexInputParams));
+			mGraphics->SetVertexInput(mTriangleVertexInput);
 		}
 
 		~TestApplication()
 		{
+			mGraphics->DestroyVertexInput(mTriangleVertexInput);
+			mTriangleVertexInput = nullptr;
+
 			mGraphics->DestroyBuffer(mVertexBuffer);
 			mVertexBuffer = nullptr;
 
@@ -103,8 +116,9 @@ namespace editor
 				mPlatform->PollEvents();
 				mEvents.Dispatch();
 
+				mGraphics->SetVertexInput(mTriangleVertexInput);
 				mGraphics->ClearColor(0.7f, 0.4f, 0.3f, 0.0f);
-				mGraphics->Present();	
+				mGraphics->Present();
 
 				mPlatform->EndFrame();
 			}
@@ -174,6 +188,7 @@ namespace editor
 		GraphicsContext* mGraphics = nullptr;
 		GraphicsDebugWatch* mGraphicsDebug = nullptr;
 		GraphicsBuffer* mVertexBuffer = nullptr;
+		VertexInput* mTriangleVertexInput = nullptr;
 	};
 }
 int main()

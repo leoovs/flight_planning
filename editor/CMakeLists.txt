@@ -16,11 +16,13 @@ target_sources(
 	"src/event/event_subscriber.cpp"
 
 	"src/graphics/graphics_buffer_slots.cpp"
+	"src/graphics/graphics_format.cpp"
 
 	"src/graphics_ogl/ogl_facts.cpp"
 	"src/graphics_ogl/ogl_graphics_buffer.cpp"
 	"src/graphics_ogl/ogl_graphics_context.cpp"
 	"src/graphics_ogl/ogl_graphics_debug_watch.cpp"
+	"src/graphics_ogl/ogl_vertex_input.cpp"
 
 	"src/platform/platform_service.cpp"
 	"src/platform_sdl3/sdl3_mouse.cpp"

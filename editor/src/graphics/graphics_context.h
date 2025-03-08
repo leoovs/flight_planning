@@ -41,6 +41,9 @@ namespace editor
 
 		virtual VertexInput* CreateVertexInput(VertexInputParams params) = 0;
 		virtual void DestroyVertexInput(VertexInput* vertexInput) = 0;
+
+		virtual void SetVertexInput(VertexInput* vertexInput) = 0;
+		virtual VertexInput* GetVertexInput() const = 0;
 	};
 }
 
