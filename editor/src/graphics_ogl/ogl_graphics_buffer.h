@@ -16,6 +16,8 @@ namespace editor
 
 		void SetData(const void* data, size_t sizeOfData) override;
 
+		GLuint GetNativeBuffer() const;
+
 	private:
 		void CreateNativeBuffer();
 		void DestroyNativeBuffer();

@@ -29,6 +29,11 @@ namespace editor
 			data);
 	}
 
+	GLuint OglGraphicsBuffer::GetNativeBuffer() const
+	{
+		return mNativeBuffer;
+	}
+
 	void OglGraphicsBuffer::CreateNativeBuffer()
 	{
 		glCreateBuffers(1, &mNativeBuffer);
