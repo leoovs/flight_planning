@@ -17,5 +17,48 @@ namespace editor
 				return 0;
 		}
 	}
+
+	GLenum OglFacts::ConvertGraphicsFormatToType(GraphicsFormat format)
+	{
+		switch (format)
+		{
+			case GraphicsFormat::R8_UNORM:
+			case GraphicsFormat::R8G8_UNORM:
+			case GraphicsFormat::R8G8B8_UNORM:
+			case GraphicsFormat::R8G8B8A8_UNORM:
+				return GL_UNSIGNED_INT;
+
+			case GraphicsFormat::R32_FLOAT:
+			case GraphicsFormat::R32G32_FLOAT:
+			case GraphicsFormat::R32G32B32_FLOAT:
+			case GraphicsFormat::R32G32B32A32_FLOAT:
+				return GL_FLOAT;
+			default:
+				assert(false && "Invalid GraphicsFormat enum value");
+				return 0ull;
+		}
+	}
+
+	bool OglFacts::IsGraphicsFormatNormalized(GraphicsFormat format)
+	{
+		switch (format)
+		{
+			case GraphicsFormat::R8_UNORM:
+			case GraphicsFormat::R8G8_UNORM:
+			case GraphicsFormat::R8G8B8_UNORM:
+			case GraphicsFormat::R8G8B8A8_UNORM:
+				return true;
+
+			case GraphicsFormat::R32_FLOAT:
+			case GraphicsFormat::R32G32_FLOAT:
+			case GraphicsFormat::R32G32B32_FLOAT:
+			case GraphicsFormat::R32G32B32A32_FLOAT:
+				return false;
+
+			default:
+				assert(false && "Invalid GraphicsFormat enum value");
+				return false;
+		}
+	}
 }
 

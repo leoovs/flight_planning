@@ -3,6 +3,7 @@
 #include <GL/glew.h>
 
 #include "graphics/graphics_buffer.h"
+#include "graphics/graphics_format.h"
 
 namespace editor
 {
@@ -10,6 +11,8 @@ namespace editor
 	{
 	public:
 		static GLbitfield ConvertTargetToNative(GraphicsBufferTarget target);
+		static GLenum ConvertGraphicsFormatToType(GraphicsFormat format);
+		static bool IsGraphicsFormatNormalized(GraphicsFormat format);
 	};
 }
 
