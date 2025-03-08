@@ -55,9 +55,13 @@ namespace editor
 				char SomeData;
 				float Position[4];
 			};
-			Vertex triangle[3];
 
-			constexpr auto offset = offsetof(Vertex, Position);
+			Vertex triangle[3]
+			{
+				{ 0, { 0.0f, 1.0f, 2.0f } },
+				{ 1, { 3.0f, 4.0f, 5.0f } },
+				{ 2, { 6.0f, 7.0f, 8.0f } },
+			};
 
 			GraphicsBufferParams vertexBufferParams;
 			vertexBufferParams.DebugName = "SUPER COOL vertex buffer";
@@ -74,8 +78,8 @@ namespace editor
 			triangleVertexInputParams.IndexBuffer = nullptr;
 			triangleVertexInputParams.VertexAttributes =
 			{
-				{ "Position", GraphicsFormat::R32G32B32A32_FLOAT, 0 },
 				{ "SomeData", GraphicsFormat::R8_UNORM, 0 },
+				{ "Position", GraphicsFormat::R32G32B32A32_FLOAT, 0 },
 			};
 
 			mTriangleVertexInput = mGraphics->CreateVertexInput(std::move(triangleVertexInputParams));
