@@ -116,5 +116,10 @@ namespace editor
 	{
 		return mBoundVertexInput;
 	}
+
+	OglShaderCompiler* OglGraphicsContext::GetShaderCompiler()
+	{
+		return &mShaderCompiler;
+	} 
 }
 

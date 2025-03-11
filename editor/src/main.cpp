@@ -3,6 +3,7 @@
 #include "event/event_bus.h"
 #include "event/event_queue.h"
 #include "event/event_subscriber.h"
+#include "graphics/shader_compiler.h"
 #include "platform/platform_events.h"
 #include "platform/platform_service.h"
 #include "uavpf/debug/concise_log_formatter.h"
@@ -84,6 +85,11 @@ namespace editor
 
 			mTriangleVertexInput = mGraphics->CreateVertexInput(std::move(triangleVertexInputParams));
 			mGraphics->SetVertexInput(mTriangleVertexInput);
+
+			mShaderCompiler = mGraphics->GetShaderCompiler();
+			ShaderCompilationResult result = mShaderCompiler->Compile(
+				ShaderKind::Vertex,
+				"Test");
 		}
 
 		~TestApplication()
@@ -193,6 +199,7 @@ namespace editor
 		GraphicsDebugWatch* mGraphicsDebug = nullptr;
 		GraphicsBuffer* mVertexBuffer = nullptr;
 		VertexInput* mTriangleVertexInput = nullptr;
+		ShaderCompiler* mShaderCompiler = nullptr;
 	};
 }
 int main()

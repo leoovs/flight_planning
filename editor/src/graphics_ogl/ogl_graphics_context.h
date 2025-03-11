@@ -6,6 +6,7 @@
 #include "graphics_ogl/ogl_graphics_buffer.h"
 #include "graphics_ogl/ogl_graphics_debug_watch.h"
 #include "graphics_ogl/ogl_provider.h"
+#include "graphics_ogl/ogl_shader_compiler.h"
 #include "graphics_ogl/ogl_vertex_input.h"
 
 namespace editor
@@ -34,12 +35,15 @@ namespace editor
 		void SetVertexInput(VertexInput* vertexInput) override;
 		OglVertexInput* GetVertexInput() const override;
 
+		OglShaderCompiler* GetShaderCompiler() override;
+
 	private:
 		GraphicsContextParams mParams;
 		std::unique_ptr<OglProvider> mProvider;
 
 		OglGraphicsDebugWatch* mRegisteredDebugWatch = nullptr;
 		OglVertexInput* mBoundVertexInput = nullptr;
+		OglShaderCompiler mShaderCompiler;
 	};
 }
 

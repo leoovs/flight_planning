@@ -5,6 +5,7 @@
 #include "graphics/graphics_backend.h"
 #include "graphics/graphics_buffer.h"
 #include "graphics/graphics_debug_watch.h"
+#include "graphics/shader_compiler.h"
 #include "graphics/vertex_input.h"
 #include "platform/window.h"
 
@@ -44,6 +45,8 @@ namespace editor
 
 		virtual void SetVertexInput(VertexInput* vertexInput) = 0;
 		virtual VertexInput* GetVertexInput() const = 0;
+
+		virtual ShaderCompiler* GetShaderCompiler() = 0;
 	};
 }
 
