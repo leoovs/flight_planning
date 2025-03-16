@@ -18,6 +18,21 @@ namespace editor
 		}
 	}
 
+	GLbitfield OglFacts::ConvertShaderKindToStageBit(ShaderKind kind)
+	{
+		switch (kind)
+		{
+			case ShaderKind::Vertex:
+				return GL_VERTEX_SHADER_BIT;
+			case ShaderKind::Pixel:
+				return GL_FRAGMENT_SHADER_BIT;
+
+			default:
+				assert(false && "Invalid ShaderKind enum value");
+				return 0;
+		}
+	}
+
 	GLenum OglFacts::ConvertGraphicsFormatToType(GraphicsFormat format)
 	{
 		switch (format)
@@ -50,6 +65,21 @@ namespace editor
 
 			default:
 				assert(false && "Invalid ShaderKind enum value");
+				return 0;
+		}
+	}
+
+	GLenum OglFacts::ConvertPrimitiveModeToNative(PrimitiveMode mode)
+	{
+		switch (mode)
+		{
+			case PrimitiveMode::TriangleList:
+				return GL_TRIANGLES;
+			case PrimitiveMode::LineList:
+				return GL_LINES;
+
+			default:
+				assert(false && "Unknown PrimitiveMode enum value");
 				return 0;
 		}
 	}

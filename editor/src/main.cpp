@@ -53,15 +53,14 @@ namespace editor
 
 			struct Vertex
 			{
-				char SomeData;
-				float Position[4];
+				float position[3];
 			};
 
-			Vertex triangle[3]
+			Vertex triangle[]
 			{
-				{ 0, { 0.0f, 1.0f, 2.0f } },
-				{ 1, { 3.0f, 4.0f, 5.0f } },
-				{ 2, { 6.0f, 7.0f, 8.0f } },
+				{ -0.5f, -0.5f, 0.0f },
+				{  0.0f,  0.5f, 0.0f },
+				{  0.5f, -0.5f, 0.0f },
 			};
 
 			GraphicsBufferParams vertexBufferParams;
@@ -79,30 +78,65 @@ namespace editor
 			triangleVertexInputParams.IndexBuffer = nullptr;
 			triangleVertexInputParams.VertexAttributes =
 			{
-				{ "SomeData", GraphicsFormat::R8_UNORM, 0 },
-				{ "Position", GraphicsFormat::R32G32B32A32_FLOAT, 0 },
+				{ "Position", GraphicsFormat::R32G32B32_FLOAT, 0 },
 			};
 
 			mTriangleVertexInput = mGraphics->CreateVertexInput(std::move(triangleVertexInputParams));
-			mGraphics->SetVertexInput(mTriangleVertexInput);
 
 			mShaderCompiler = mGraphics->GetShaderCompiler();
 
-			std::string_view vsSource = "#version 460 core\nvoid main(){ }";
+			std::string_view vsSource =
+				R"(
+				#version 460 core
+
+				layout (location = 0) in vec3 aPosition;
+
+				out gl_PerVertex
+				{
+					vec4 gl_Position;
+				};
+
+				void main()
+				{
+					gl_Position = vec4(aPosition, 1.0);
+				}
+				)";
+			std::string_view psSource =
+				R"(
+				#version 460 core
+
+				out vec4 oColor;
+
+				void main()
+				{
+					oColor = vec4(1.0, 0.9, 0.6, 1.0);
+				}
+				)";
+
 			ShaderCompilation* compilation = mShaderCompiler->Compile(ShaderKind::Vertex, vsSource);	
-
-			if (compilation->GetStatus() != ShaderCompilationStatus::Success)
-			{
-				std::string_view diagnostics = compilation->GetDiagnostics();
-				UAVPF_LOG(Application, Error, "Failed to compile shader:\n%s", diagnostics.data());
-			}
-
+			mVertexShader = mGraphics->CreateShader(compilation);	
 			mShaderCompiler->DestroyCompilation(compilation);
-			compilation = nullptr;
+
+			compilation = mShaderCompiler->Compile(ShaderKind::Pixel, psSource);
+			mPixelShader = mGraphics->CreateShader(compilation);
+			mShaderCompiler->DestroyCompilation(compilation);
+
+			Viewport vp;
+			vp.Width = mWindow->GetWidth();
+			vp.Height = mWindow->GetHeight();
+
+			mGraphics->SetVertexInput(mTriangleVertexInput);
+			mGraphics->SetShader(ShaderKind::Vertex, mVertexShader);
+			mGraphics->SetShader(ShaderKind::Pixel, mPixelShader);
+			mGraphics->SetPrimitiveMode(PrimitiveMode::TriangleList);
+			mGraphics->SetViewport(vp);
 		}
 
 		~TestApplication()
 		{
+			mGraphics->DestroyShader(mPixelShader);
+			mGraphics->DestroyShader(mVertexShader);
+
 			mGraphics->DestroyVertexInput(mTriangleVertexInput);
 			mTriangleVertexInput = nullptr;
 
@@ -135,8 +169,8 @@ namespace editor
 				mPlatform->PollEvents();
 				mEvents.Dispatch();
 
-				mGraphics->SetVertexInput(mTriangleVertexInput);
 				mGraphics->ClearColor(0.7f, 0.4f, 0.3f, 0.0f);
+				mGraphics->Draw(0, 3);
 				mGraphics->Present();
 
 				mPlatform->EndFrame();
@@ -166,6 +200,11 @@ namespace editor
 				event.ResizedWindow->GetTitle().data(),
 				event.ResizedWindow->GetWidth(),
 				event.ResizedWindow->GetHeight());
+
+			Viewport vp;
+			vp.Width = event.Width;
+			vp.Height = event.Height;
+			mGraphics->SetViewport(vp);
 
 			return true;
 		}
@@ -209,6 +248,8 @@ namespace editor
 		GraphicsBuffer* mVertexBuffer = nullptr;
 		VertexInput* mTriangleVertexInput = nullptr;
 		ShaderCompiler* mShaderCompiler = nullptr;
+		Shader* mVertexShader = nullptr;
+		Shader* mPixelShader = nullptr;
 	};
 }
 int main()

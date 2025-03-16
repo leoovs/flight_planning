@@ -2,13 +2,11 @@
 
 namespace editor
 {
-	enum class ShaderKind
+	enum class PrimitiveMode
 	{
 		Unknown,
-		Vertex,
-		Pixel,
-
-		Count_,
+		TriangleList,
+		LineList,
 	};
 }
 

@@ -5,8 +5,11 @@
 #include "graphics/graphics_backend.h"
 #include "graphics/graphics_buffer.h"
 #include "graphics/graphics_debug_watch.h"
+#include "graphics/primitive_mode.h"
+#include "graphics/shader.h"
 #include "graphics/shader_compiler.h"
 #include "graphics/vertex_input.h"
+#include "graphics/viewport.h"
 #include "platform/window.h"
 
 namespace editor
@@ -43,10 +46,24 @@ namespace editor
 		virtual VertexInput* CreateVertexInput(VertexInputParams params) = 0;
 		virtual void DestroyVertexInput(VertexInput* vertexInput) = 0;
 
+		virtual Shader* CreateShader(ShaderCompilation* compilation) = 0;
+		virtual void DestroyShader(Shader* shader) = 0;
+
 		virtual void SetVertexInput(VertexInput* vertexInput) = 0;
 		virtual VertexInput* GetVertexInput() const = 0;
 
+		virtual void SetShader(ShaderKind kind, Shader* shader) = 0;
+		virtual Shader* GetShader(ShaderKind kind) const = 0;
+
+		virtual void SetPrimitiveMode(PrimitiveMode mode) = 0;
+		virtual PrimitiveMode GetPrimitiveMode() const = 0;
+
+		virtual void SetViewport(const Viewport& viewport) = 0;
+		virtual const Viewport& GetViewport() const = 0;
+
 		virtual ShaderCompiler* GetShaderCompiler() = 0;
+
+		virtual void Draw(int32_t startVertexIndex, int32_t vertexCount) = 0;
 	};
 }
 
