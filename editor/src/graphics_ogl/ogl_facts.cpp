@@ -39,6 +39,21 @@ namespace editor
 		}
 	}
 
+	GLenum OglFacts::ConvertShaderKindToNative(ShaderKind kind)
+	{
+		switch (kind)
+		{
+			case ShaderKind::Vertex:
+				return GL_VERTEX_SHADER;
+			case ShaderKind::Pixel:
+				return GL_FRAGMENT_SHADER;
+
+			default:
+				assert(false && "Invalid ShaderKind enum value");
+				return 0;
+		}
+	}
+
 	bool OglFacts::IsGraphicsFormatNormalized(GraphicsFormat format)
 	{
 		switch (format)

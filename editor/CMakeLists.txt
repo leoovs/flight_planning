@@ -22,8 +22,9 @@ target_sources(
 	"src/graphics_ogl/ogl_graphics_buffer.cpp"
 	"src/graphics_ogl/ogl_graphics_context.cpp"
 	"src/graphics_ogl/ogl_graphics_debug_watch.cpp"
-	"src/graphics_ogl/ogl_vertex_input.cpp"
+	"src/graphics_ogl/ogl_shader_compilation.cpp"
 	"src/graphics_ogl/ogl_shader_compiler.cpp"
+	"src/graphics_ogl/ogl_vertex_input.cpp"
 
 	"src/platform/platform_service.cpp"
 	"src/platform_sdl3/sdl3_mouse.cpp"

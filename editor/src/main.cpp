@@ -87,9 +87,18 @@ namespace editor
 			mGraphics->SetVertexInput(mTriangleVertexInput);
 
 			mShaderCompiler = mGraphics->GetShaderCompiler();
-			ShaderCompilationResult result = mShaderCompiler->Compile(
-				ShaderKind::Vertex,
-				"Test");
+
+			std::string_view vsSource = "#version 460 core\nvoid main(){ }";
+			ShaderCompilation* compilation = mShaderCompiler->Compile(ShaderKind::Vertex, vsSource);	
+
+			if (compilation->GetStatus() != ShaderCompilationStatus::Success)
+			{
+				std::string_view diagnostics = compilation->GetDiagnostics();
+				UAVPF_LOG(Application, Error, "Failed to compile shader:\n%s", diagnostics.data());
+			}
+
+			mShaderCompiler->DestroyCompilation(compilation);
+			compilation = nullptr;
 		}
 
 		~TestApplication()
