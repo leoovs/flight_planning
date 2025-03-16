@@ -66,7 +66,7 @@ namespace editor
 
 	GLuint OglShaderCompilation::ReleaseNativeProgram()
 	{
-		return mNativeProgram;
+		return std::exchange(mNativeProgram, 0);
 	}
 
 	GLuint OglShaderCompilation::ReleaseNativeShader()
