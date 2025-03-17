@@ -105,5 +105,23 @@ namespace editor
 				return false;
 		}
 	}
+	GLenum OglFacts::ConvertFormatPixel(GraphicsFormat format)
+	{
+		switch (format)
+		{
+			case GraphicsFormat::R32_FLOAT:
+				return GL_R32F;
+			case GraphicsFormat::R32G32_FLOAT:
+				return GL_RG32F;
+			case GraphicsFormat::R32G32B32_FLOAT:
+				return GL_RGB32F;
+			case GraphicsFormat::R32G32B32A32_FLOAT:
+				return GL_RGBA32F;
+
+			default:
+				assert(false && "Invalid GraphicsFormat enum value");
+				return false;
+		}
+	}
 }
 

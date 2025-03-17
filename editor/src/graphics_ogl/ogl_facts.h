@@ -18,6 +18,7 @@ namespace editor
 		static GLenum ConvertShaderKindToNative(ShaderKind kind);
 		static GLenum ConvertPrimitiveModeToNative(PrimitiveMode mode);
 		static bool IsGraphicsFormatNormalized(GraphicsFormat format);
+		static GLenum ConvertFormatPixel(GraphicsFormat format);
 	};
 }
 

@@ -11,6 +11,7 @@
 #include "graphics/vertex_input.h"
 #include "graphics/viewport.h"
 #include "platform/window.h"
+#include "graphics/texture_2d.h"
 
 namespace editor
 {
@@ -64,6 +65,9 @@ namespace editor
 		virtual ShaderCompiler* GetShaderCompiler() = 0;
 
 		virtual void Draw(int32_t startVertexIndex, int32_t vertexCount) = 0;
+
+		virtual Texture2D* CreateTexture2D(Texture2DParams* params) = 0;
+		virtual void DestroyTexture2D() = 0;
 	};
 }
 
