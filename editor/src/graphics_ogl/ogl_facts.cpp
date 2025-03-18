@@ -41,7 +41,7 @@ namespace editor
 			case GraphicsFormat::R8G8_UNORM:
 			case GraphicsFormat::R8G8B8_UNORM:
 			case GraphicsFormat::R8G8B8A8_UNORM:
-				return GL_UNSIGNED_INT;
+				return GL_UNSIGNED_BYTE;
 
 			case GraphicsFormat::R32_FLOAT:
 			case GraphicsFormat::R32G32_FLOAT:
@@ -51,6 +51,60 @@ namespace editor
 			default:
 				assert(false && "Invalid GraphicsFormat enum value");
 				return 0ull;
+		}
+	}
+
+	GLenum OglFacts::ConvertGraphicsFormatToInternalFormat(GraphicsFormat format)
+	{
+		switch (format)
+		{
+			case GraphicsFormat::R8_UNORM:
+				return GL_R8;
+			case GraphicsFormat::R8G8_UNORM:
+				return GL_RG8;
+			case GraphicsFormat::R8G8B8_UNORM:
+				return GL_RGB8;
+			case GraphicsFormat::R8G8B8A8_UNORM:
+				return GL_RGBA8;
+
+			case GraphicsFormat::R32_FLOAT:
+				return GL_R32F;
+			case GraphicsFormat::R32G32_FLOAT:
+				return GL_RG32F;
+			case GraphicsFormat::R32G32B32_FLOAT:
+				return GL_RGB32F;
+			case GraphicsFormat::R32G32B32A32_FLOAT:
+				return GL_RGBA32F;
+
+			default:
+				assert(false && "Invalid GraphicsFormat enum value");
+				return false;
+		}
+	}
+
+	GLenum OglFacts::ConvertGraphicsFormatToFormat(GraphicsFormat format)
+	{
+		switch (format)
+		{
+			case GraphicsFormat::R8_UNORM:
+			case GraphicsFormat::R32_FLOAT:
+				return GL_R;
+
+			case GraphicsFormat::R8G8_UNORM:
+			case GraphicsFormat::R32G32_FLOAT:
+				return GL_RG;
+
+			case GraphicsFormat::R8G8B8_UNORM:
+			case GraphicsFormat::R32G32B32_FLOAT:
+				return GL_RGB;
+
+			case GraphicsFormat::R8G8B8A8_UNORM:
+			case GraphicsFormat::R32G32B32A32_FLOAT:
+				return GL_RGBA;
+
+			default:
+				assert(false && "Invalid GraphicsFormat enum value");
+				return 0;
 		}
 	}
 
@@ -99,24 +153,6 @@ namespace editor
 			case GraphicsFormat::R32G32B32_FLOAT:
 			case GraphicsFormat::R32G32B32A32_FLOAT:
 				return false;
-
-			default:
-				assert(false && "Invalid GraphicsFormat enum value");
-				return false;
-		}
-	}
-	GLenum OglFacts::ConvertFormatPixel(GraphicsFormat format)
-	{
-		switch (format)
-		{
-			case GraphicsFormat::R32_FLOAT:
-				return GL_R32F;
-			case GraphicsFormat::R32G32_FLOAT:
-				return GL_RG32F;
-			case GraphicsFormat::R32G32B32_FLOAT:
-				return GL_RGB32F;
-			case GraphicsFormat::R32G32B32A32_FLOAT:
-				return GL_RGBA32F;
 
 			default:
 				assert(false && "Invalid GraphicsFormat enum value");

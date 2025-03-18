@@ -134,6 +134,16 @@ namespace editor
 		delete shader;
 	}
 
+	OglTexture2D* OglGraphicsContext::CreateTexture2D(Texture2DParams params)
+	{
+		return new OglTexture2D(std::move(params));
+	}
+
+	void OglGraphicsContext::DestroyTexture2D(Texture2D* texture2D)
+	{
+		delete texture2D;
+	}
+
 
 	void OglGraphicsContext::SetVertexInput(VertexInput* vertexInput)
 	{

@@ -15,10 +15,11 @@ namespace editor
 		static GLbitfield ConvertTargetToNative(GraphicsBufferTarget target);
 		static GLbitfield ConvertShaderKindToStageBit(ShaderKind kind);
 		static GLenum ConvertGraphicsFormatToType(GraphicsFormat format);
+		static GLenum ConvertGraphicsFormatToInternalFormat(GraphicsFormat format);
+		static GLenum ConvertGraphicsFormatToFormat(GraphicsFormat format);
 		static GLenum ConvertShaderKindToNative(ShaderKind kind);
 		static GLenum ConvertPrimitiveModeToNative(PrimitiveMode mode);
 		static bool IsGraphicsFormatNormalized(GraphicsFormat format);
-		static GLenum ConvertFormatPixel(GraphicsFormat format);
 	};
 }
 

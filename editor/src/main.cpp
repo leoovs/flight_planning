@@ -4,6 +4,7 @@
 #include "event/event_queue.h"
 #include "event/event_subscriber.h"
 #include "graphics/shader_compiler.h"
+#include "graphics/subresource.h"
 #include "platform/platform_events.h"
 #include "platform/platform_service.h"
 #include "uavpf/debug/concise_log_formatter.h"
@@ -125,6 +126,25 @@ namespace editor
 			vp.Width = mWindow->GetWidth();
 			vp.Height = mWindow->GetHeight();
 
+			Texture2DParams testTextureParams;
+			testTextureParams.DebugName = "Test Texture";
+			testTextureParams.Width = 2;
+			testTextureParams.Height = 2;
+			testTextureParams.MipLevelCount = 1;
+			testTextureParams.Format = GraphicsFormat::R8G8B8A8_UNORM;
+			mTestTexture = mGraphics->CreateTexture2D(std::move(testTextureParams));
+
+			uint8_t pixels[]
+			{
+				0xFF,0x00,0x00,0xFF, 0x00,0xFF,0x00,0xFF,
+				0x00,0x00,0xFF,0xFF, 0x00,0x00,0x00,0xFF,
+			};
+
+			SubresourceRegion region;
+			region.Width = 2;
+			region.Height = 2;
+			mTestTexture->SetData(region, pixels);
+
 			mGraphics->SetVertexInput(mTriangleVertexInput);
 			mGraphics->SetShader(ShaderKind::Vertex, mVertexShader);
 			mGraphics->SetShader(ShaderKind::Pixel, mPixelShader);
@@ -134,8 +154,14 @@ namespace editor
 
 		~TestApplication()
 		{
+			mGraphics->DestroyTexture2D(mTestTexture);
+			mTestTexture = nullptr;
+
 			mGraphics->DestroyShader(mPixelShader);
+			mPixelShader = nullptr;
+
 			mGraphics->DestroyShader(mVertexShader);
+			mVertexShader = nullptr;
 
 			mGraphics->DestroyVertexInput(mTriangleVertexInput);
 			mTriangleVertexInput = nullptr;
@@ -250,6 +276,7 @@ namespace editor
 		ShaderCompiler* mShaderCompiler = nullptr;
 		Shader* mVertexShader = nullptr;
 		Shader* mPixelShader = nullptr;
+		Texture2D* mTestTexture = nullptr;
 	};
 }
 int main()

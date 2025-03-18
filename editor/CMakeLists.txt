@@ -27,6 +27,7 @@ target_sources(
 	"src/graphics_ogl/ogl_shader_compiler.cpp"
 	"src/graphics_ogl/ogl_shader_pipeline.cpp"
 	"src/graphics_ogl/ogl_vertex_input.cpp"
+	"src/graphics_ogl/ogl_texture_2d.cpp"
 
 	"src/platform/platform_service.cpp"
 
@@ -34,7 +35,7 @@ target_sources(
 	"src/platform_sdl3/sdl3_ogl_provider.cpp"
 	"src/platform_sdl3/sdl3_platform_service.cpp"
 	"src/platform_sdl3/sdl3_window.cpp"
- "src/graphics/texture_2d.h")
+)
 
 target_include_directories(
 	editor

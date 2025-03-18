@@ -9,6 +9,7 @@
 #include "graphics_ogl/ogl_shader.h"
 #include "graphics_ogl/ogl_shader_compiler.h"
 #include "graphics_ogl/ogl_shader_pipeline.h"
+#include "graphics_ogl/ogl_texture_2d.h"
 #include "graphics_ogl/ogl_vertex_input.h"
 
 namespace editor
@@ -36,6 +37,9 @@ namespace editor
 
 		OglShader* CreateShader(ShaderCompilation* compilation) override;
 		void DestroyShader(Shader* shader) override;
+
+		OglTexture2D* CreateTexture2D(Texture2DParams params) override;
+		void DestroyTexture2D(Texture2D* texture2D) override;
 
 		void SetVertexInput(VertexInput* vertexInput) override;
 		OglVertexInput* GetVertexInput() const override;

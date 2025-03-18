@@ -50,6 +50,9 @@ namespace editor
 		virtual Shader* CreateShader(ShaderCompilation* compilation) = 0;
 		virtual void DestroyShader(Shader* shader) = 0;
 
+		virtual Texture2D* CreateTexture2D(Texture2DParams params) = 0;
+		virtual void DestroyTexture2D(Texture2D* texture2D) = 0;
+
 		virtual void SetVertexInput(VertexInput* vertexInput) = 0;
 		virtual VertexInput* GetVertexInput() const = 0;
 
@@ -65,9 +68,6 @@ namespace editor
 		virtual ShaderCompiler* GetShaderCompiler() = 0;
 
 		virtual void Draw(int32_t startVertexIndex, int32_t vertexCount) = 0;
-
-		virtual Texture2D* CreateTexture2D(Texture2DParams* params) = 0;
-		virtual void DestroyTexture2D() = 0;
 	};
 }
 
