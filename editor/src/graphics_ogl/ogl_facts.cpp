@@ -12,6 +12,9 @@ namespace editor
 				return GL_ARRAY_BUFFER;
 			case GraphicsBufferTarget::Index:	
 				return GL_ELEMENT_ARRAY_BUFFER;
+			case GraphicsBufferTarget::Constant:
+				return GL_UNIFORM_BUFFER;
+
 			default:
 				assert(false && "Invalid GraphicsBufferTarget enum value");
 				return 0;
@@ -48,6 +51,7 @@ namespace editor
 			case GraphicsFormat::R32G32B32_FLOAT:
 			case GraphicsFormat::R32G32B32A32_FLOAT:
 				return GL_FLOAT;
+
 			default:
 				assert(false && "Invalid GraphicsFormat enum value");
 				return 0ull;

@@ -73,6 +73,16 @@ namespace editor
 			mVertexBuffer = mGraphics->CreateBuffer(std::move(vertexBufferParams));
 			mVertexBuffer->SetData(triangle, sizeof(triangle));
 
+			GraphicsBufferParams constantBufferParams;
+			constantBufferParams.DebugName = "Test constant buffer";
+			constantBufferParams.StructSize = sizeof(float[4]);
+			constantBufferParams.StructCount = 1;
+			constantBufferParams.Target = GraphicsBufferTarget::Constant;
+
+			mConstantBuffer = mGraphics->CreateBuffer(std::move(constantBufferParams));
+			float color[4] = { 1.0f, 0.5f, 0.5f, 1.0f };
+			mConstantBuffer->SetData(color, sizeof(color));
+
 			VertexInputParams triangleVertexInputParams;	
 			triangleVertexInputParams.DebugName = "Triangle vertex input";
 			triangleVertexInputParams.VertexBuffers[0] = mVertexBuffer;
@@ -108,9 +118,14 @@ namespace editor
 
 				out vec4 oColor;
 
+				layout (std140, binding = 1) uniform CBuffer
+				{
+					vec4 color;
+				} cbuffer;
+
 				void main()
 				{
-					oColor = vec4(1.0, 0.9, 0.6, 1.0);
+					oColor = cbuffer.color;
 				}
 				)";
 
@@ -150,6 +165,7 @@ namespace editor
 			mGraphics->SetShader(ShaderKind::Pixel, mPixelShader);
 			mGraphics->SetPrimitiveMode(PrimitiveMode::TriangleList);
 			mGraphics->SetViewport(vp);
+			mGraphics->SetConstantBuffer(mConstantBuffer, 1);
 		}
 
 		~TestApplication()
@@ -165,6 +181,9 @@ namespace editor
 
 			mGraphics->DestroyVertexInput(mTriangleVertexInput);
 			mTriangleVertexInput = nullptr;
+
+			mGraphics->DestroyBuffer(mConstantBuffer);
+			mConstantBuffer = nullptr;
 
 			mGraphics->DestroyBuffer(mVertexBuffer);
 			mVertexBuffer = nullptr;
@@ -272,6 +291,7 @@ namespace editor
 		GraphicsContext* mGraphics = nullptr;
 		GraphicsDebugWatch* mGraphicsDebug = nullptr;
 		GraphicsBuffer* mVertexBuffer = nullptr;
+		GraphicsBuffer* mConstantBuffer = nullptr;
 		VertexInput* mTriangleVertexInput = nullptr;
 		ShaderCompiler* mShaderCompiler = nullptr;
 		Shader* mVertexShader = nullptr;

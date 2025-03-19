@@ -17,11 +17,13 @@ namespace editor
 	class OglGraphicsContext final : public GraphicsContext
 	{
 	public:
+		static constexpr int32_t cMaxConstantBufferSlots = 16;
+
 		OglGraphicsContext(
 			GraphicsContextParams params,
 			std::unique_ptr<OglProvider> provider);
 
-		virtual const GraphicsContextParams& GetParams() const override;
+		const GraphicsContextParams& GetParams() const override;
 
 		void Present() override;
 		void ClearColor(float r, float g, float b, float a) override;
@@ -47,6 +49,13 @@ namespace editor
 		void SetShader(ShaderKind kind, Shader* shader) override;
 		OglShader* GetShader(ShaderKind kind) const override;
 
+		int32_t GetMaxConstantBufferSlots() const override;
+		void SetConstantBuffer(
+			GraphicsBuffer* constantBuffer,
+			int32_t constantBufferSlot) override;
+		OglGraphicsBuffer* GetConstantBuffer(
+			int32_t constantBufferSlot) const override;
+
 		void SetPrimitiveMode(PrimitiveMode mode) override;
 		PrimitiveMode GetPrimitiveMode() const override;
 
@@ -60,6 +69,7 @@ namespace editor
 	private:
 		void BindGlobalShaderPipeline();
 		void SetNativeViewport(const Viewport& viewport);
+		void SetNativeUniformBuffer(OglGraphicsBuffer* constantBuffer, int32_t slot);
 
 		GraphicsContextParams mParams;
 		std::unique_ptr<OglProvider> mProvider;
@@ -68,6 +78,7 @@ namespace editor
 		OglVertexInput* mBoundVertexInput = nullptr;
 		OglShaderCompiler mShaderCompiler;
 		OglShaderPipeline mShaderPipeline;
+		std::array<OglGraphicsBuffer*, cMaxConstantBufferSlots> mConstantBuffers;
 		PrimitiveMode mPrimitiveMode = PrimitiveMode::LineList;
 		Viewport mViewport;
 	};

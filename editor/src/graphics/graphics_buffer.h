@@ -12,6 +12,7 @@ namespace editor
 		None,
 		Vertex,
 		Index,
+		Constant,
 	};
 
 	struct GraphicsBufferParams

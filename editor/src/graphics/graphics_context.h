@@ -59,6 +59,13 @@ namespace editor
 		virtual void SetShader(ShaderKind kind, Shader* shader) = 0;
 		virtual Shader* GetShader(ShaderKind kind) const = 0;
 
+		virtual int32_t GetMaxConstantBufferSlots() const = 0;
+		virtual void SetConstantBuffer(
+			GraphicsBuffer* constantBuffer,
+			int32_t constantBufferSlot) = 0;
+		virtual GraphicsBuffer* GetConstantBuffer(
+			int32_t constantBufferSlot) const = 0;
+
 		virtual void SetPrimitiveMode(PrimitiveMode mode) = 0;
 		virtual PrimitiveMode GetPrimitiveMode() const = 0;
 

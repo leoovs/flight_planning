@@ -173,6 +173,28 @@ namespace editor
 		return mShaderPipeline.Get(kind);
 	}
 
+	int32_t OglGraphicsContext::GetMaxConstantBufferSlots() const
+	{
+		return cMaxConstantBufferSlots;
+	}
+
+	void OglGraphicsContext::SetConstantBuffer(
+		GraphicsBuffer* constantBuffer,
+		int32_t constantBufferSlot)
+	{
+		assert(constantBufferSlot < cMaxConstantBufferSlots);
+		auto actualConstantBuffer = mConstantBuffers.at(constantBufferSlot)
+			= dynamic_cast<OglGraphicsBuffer*>(constantBuffer);
+		SetNativeUniformBuffer(actualConstantBuffer, constantBufferSlot);
+	}
+
+	OglGraphicsBuffer* OglGraphicsContext::GetConstantBuffer(
+		int32_t constantBufferSlot) const
+	{
+		assert(constantBufferSlot < cMaxConstantBufferSlots);
+		return mConstantBuffers.at(constantBufferSlot);
+	}
+
 	void OglGraphicsContext::SetPrimitiveMode(PrimitiveMode mode)
 	{
 		mPrimitiveMode = mode;
@@ -219,6 +241,30 @@ namespace editor
 			viewport.TopLeftY,
 			viewport.Width,
 			viewport.Height);
+	}
+
+	void OglGraphicsContext::SetNativeUniformBuffer(
+		OglGraphicsBuffer* constantBuffer,
+		int32_t slot)
+	{
+		if (nullptr == constantBuffer)
+		{
+			glBindBufferBase(GL_UNIFORM_BUFFER, slot, 0);
+			return;
+		}
+
+		const GraphicsBufferTarget bindingTarget = constantBuffer->GetParams().Target; 
+		if (bindingTarget != GraphicsBufferTarget::Constant)
+		{
+			UAVPF_LOG(
+				Application,
+				Error,
+				"Graphics buffer target mismatch");
+			return;
+		}
+
+		GLuint nativeUniformBuffer = constantBuffer->GetNativeBuffer();
+		glBindBufferBase(GL_UNIFORM_BUFFER, slot, nativeUniformBuffer);
 	}
 }
 
