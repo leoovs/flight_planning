@@ -118,14 +118,11 @@ namespace editor
 
 				out vec4 oColor;
 
-				layout (std140, binding = 1) uniform CBuffer
-				{
-					vec4 color;
-				} cbuffer;
+				uniform vec3 uColor;
 
 				void main()
 				{
-					oColor = cbuffer.color;
+					oColor = vec4(uColor, 1.0);
 				}
 				)";
 
@@ -135,6 +132,7 @@ namespace editor
 
 			compilation = mShaderCompiler->Compile(ShaderKind::Pixel, psSource);
 			mPixelShader = mGraphics->CreateShader(compilation);
+			mPixelShader->SetUniform("uColor", 1.0f, 0.5f, 1.0f);
 			mShaderCompiler->DestroyCompilation(compilation);
 
 			Viewport vp;
