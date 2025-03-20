@@ -8,11 +8,10 @@
 #include "graphics/primitive_mode.h"
 #include "graphics/shader.h"
 #include "graphics/shader_compiler.h"
-#include "graphics/shader_reflector.h"
-#include "graphics/texture_2d.h"
 #include "graphics/vertex_input.h"
 #include "graphics/viewport.h"
 #include "platform/window.h"
+#include "graphics/texture_2d.h"
 
 namespace editor
 {
@@ -50,9 +49,6 @@ namespace editor
 
 		virtual Shader* CreateShader(ShaderCompilation* compilation) = 0;
 		virtual void DestroyShader(Shader* shader) = 0;
-
-		virtual ShaderReflector* ReflectShader(Shader* shader) = 0;
-		virtual void DestroyShaderReflector(ShaderReflector* reflector) = 0;
 
 		virtual Texture2D* CreateTexture2D(Texture2DParams params) = 0;
 		virtual void DestroyTexture2D(Texture2D* texture2D) = 0;

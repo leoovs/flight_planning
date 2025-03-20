@@ -8,7 +8,6 @@
 #include "graphics_ogl/ogl_facts.h"
 #include "graphics_ogl/ogl_graphics_debug_watch.h"
 #include "graphics_ogl/ogl_shader_compilation.h"
-#include "graphics_ogl/ogl_shader_reflector.h"
 
 namespace editor
 {
@@ -135,24 +134,6 @@ namespace editor
 		delete shader;
 	}
 
-	OglShaderReflector* OglGraphicsContext::ReflectShader(
-		Shader* shader)
-	{
-		return new OglShaderReflector(dynamic_cast<OglShader*>(shader));
-	}
-
-	void OglGraphicsContext::DestroyShaderReflector(ShaderReflector* reflector)
-	{
-		if (nullptr == reflector)
-		{
-			UAVPF_LOG(
-				Application,
-				Warning,
-				"Trying to destroy shader reflector which is nullptr");
-		}
-		delete reflector;
-	}
-
 	OglTexture2D* OglGraphicsContext::CreateTexture2D(Texture2DParams params)
 	{
 		return new OglTexture2D(std::move(params));
@@ -162,6 +143,7 @@ namespace editor
 	{
 		delete texture2D;
 	}
+
 
 	void OglGraphicsContext::SetVertexInput(VertexInput* vertexInput)
 	{
