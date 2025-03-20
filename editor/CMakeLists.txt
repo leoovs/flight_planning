@@ -26,8 +26,9 @@ target_sources(
 	"src/graphics_ogl/ogl_shader_compilation.cpp"
 	"src/graphics_ogl/ogl_shader_compiler.cpp"
 	"src/graphics_ogl/ogl_shader_pipeline.cpp"
-	"src/graphics_ogl/ogl_vertex_input.cpp"
+	"src/graphics_ogl/ogl_shader_reflector.cpp"
 	"src/graphics_ogl/ogl_texture_2d.cpp"
+	"src/graphics_ogl/ogl_vertex_input.cpp"
 
 	"src/platform/platform_service.cpp"
 

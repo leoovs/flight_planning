@@ -137,6 +137,8 @@ namespace editor
 			mPixelShader = mGraphics->CreateShader(compilation);
 			mShaderCompiler->DestroyCompilation(compilation);
 
+			mShaderReflector = mGraphics->ReflectShader(mPixelShader);
+
 			Viewport vp;
 			vp.Width = mWindow->GetWidth();
 			vp.Height = mWindow->GetHeight();
@@ -172,6 +174,9 @@ namespace editor
 		{
 			mGraphics->DestroyTexture2D(mTestTexture);
 			mTestTexture = nullptr;
+
+			mGraphics->DestroyShaderReflector(mShaderReflector);
+			mShaderReflector = nullptr;
 
 			mGraphics->DestroyShader(mPixelShader);
 			mPixelShader = nullptr;
@@ -294,6 +299,7 @@ namespace editor
 		GraphicsBuffer* mConstantBuffer = nullptr;
 		VertexInput* mTriangleVertexInput = nullptr;
 		ShaderCompiler* mShaderCompiler = nullptr;
+		ShaderReflector* mShaderReflector = nullptr;
 		Shader* mVertexShader = nullptr;
 		Shader* mPixelShader = nullptr;
 		Texture2D* mTestTexture = nullptr;
