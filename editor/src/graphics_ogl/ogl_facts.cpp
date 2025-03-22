@@ -142,6 +142,21 @@ namespace editor
 		}
 	}
 
+	GLenum OglFacts::ConvertFramebufferAttachmentToNative(
+		FramebufferAttachment attachment)
+	{
+		switch (attachment)
+		{
+			case FramebufferAttachment::Color:
+				return GL_COLOR_ATTACHMENT0;
+			case FramebufferAttachment::DepthStencil:
+				return GL_DEPTH_STENCIL_ATTACHMENT;
+			default:
+				assert(false && "Invalid FramebufferAttachment enum value");
+				return 0;
+		}
+	}
+
 	bool OglFacts::IsGraphicsFormatNormalized(GraphicsFormat format)
 	{
 		switch (format)

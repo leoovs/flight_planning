@@ -19,6 +19,7 @@ target_sources(
 	"src/graphics/graphics_format.cpp"
 
 	"src/graphics_ogl/ogl_facts.cpp"
+	"src/graphics_ogl/ogl_framebuffer.cpp"
 	"src/graphics_ogl/ogl_graphics_buffer.cpp"
 	"src/graphics_ogl/ogl_graphics_context.cpp"
 	"src/graphics_ogl/ogl_graphics_debug_watch.cpp"
@@ -26,8 +27,8 @@ target_sources(
 	"src/graphics_ogl/ogl_shader_compilation.cpp"
 	"src/graphics_ogl/ogl_shader_compiler.cpp"
 	"src/graphics_ogl/ogl_shader_pipeline.cpp"
-	"src/graphics_ogl/ogl_vertex_input.cpp"
 	"src/graphics_ogl/ogl_texture_2d.cpp"
+	"src/graphics_ogl/ogl_vertex_input.cpp"
 
 	"src/platform/platform_service.cpp"
 

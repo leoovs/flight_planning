@@ -6,6 +6,7 @@
 #include <GL/glew.h>
 
 #include "graphics_ogl/ogl_facts.h"
+#include "graphics_ogl/ogl_framebuffer.h"
 #include "graphics_ogl/ogl_graphics_debug_watch.h"
 #include "graphics_ogl/ogl_shader_compilation.h"
 
@@ -31,12 +32,6 @@ namespace editor
 	void OglGraphicsContext::Present()
 	{
 		mProvider->SwapBuffers();
-	}
-
-	void OglGraphicsContext::ClearColor(float r, float g, float b, float a)
-	{
-		glClearColor(r, g, b, a);
-		glClear(GL_COLOR_BUFFER_BIT);
 	}
 
 	OglGraphicsDebugWatch* OglGraphicsContext::CreateDebugWatch()
@@ -144,6 +139,22 @@ namespace editor
 		delete texture2D;
 	}
 
+	OglFramebuffer* OglGraphicsContext::CreateFramebuffer(FramebufferParams params)
+	{
+		return new OglFramebuffer(std::move(params));
+	}
+
+	void OglGraphicsContext::DestroyFramebuffer(Framebuffer* framebuffer)
+	{
+		if (nullptr == framebuffer)
+		{
+			UAVPF_LOG(
+				Application,
+				Warning,
+				"Trying to delete Framebuffer which is nullptr");
+		}
+		delete framebuffer;
+	}
 
 	void OglGraphicsContext::SetVertexInput(VertexInput* vertexInput)
 	{
@@ -216,6 +227,17 @@ namespace editor
 		return mViewport;
 	}
 
+	void OglGraphicsContext::SetFramebuffer(Framebuffer* framebuffer)
+	{
+		mFramebuffer = dynamic_cast<OglFramebuffer*>(framebuffer);
+		SetNativeFramebuffer(mFramebuffer);
+	}
+
+	OglFramebuffer* OglGraphicsContext::GetFramebuffer() const
+	{
+		return mFramebuffer;
+	}
+
 	OglShaderCompiler* OglGraphicsContext::GetShaderCompiler()
 	{
 		return &mShaderCompiler;
@@ -227,6 +249,39 @@ namespace editor
 			OglFacts::ConvertPrimitiveModeToNative(mPrimitiveMode),
 			startVertexIndex,
 			static_cast<GLsizei>(vertexCount));
+	}
+
+	void OglGraphicsContext::ClearColor(
+		Framebuffer* framebuffer,
+		float r,
+		float g,
+		float b,
+		float a)
+	{
+		auto actualFramebuffer = dynamic_cast<OglFramebuffer*>(framebuffer);
+		GLuint nativeFramebuffer = actualFramebuffer
+			? actualFramebuffer->GetNativeFramebuffer()
+			: 0;
+
+		float clearColor[]{ r, g, b, a };
+		glClearNamedFramebufferfv(nativeFramebuffer, GL_COLOR, 0, clearColor);
+	}
+
+	void OglGraphicsContext::ClearDepthStencil(
+		Framebuffer* framebuffer,
+		float depth,
+		uint8_t stencil)
+	{
+		auto actualFramebuffer = dynamic_cast<OglFramebuffer*>(framebuffer);
+		GLuint nativeFramebuffer = actualFramebuffer
+			? actualFramebuffer->GetNativeFramebuffer()
+			: 0;
+
+		glClearNamedFramebufferfi(
+			nativeFramebuffer,
+			GL_DEPTH_STENCIL,
+			0,
+			depth, stencil);
 	}
 
 	void OglGraphicsContext::BindGlobalShaderPipeline()
@@ -265,6 +320,15 @@ namespace editor
 
 		GLuint nativeUniformBuffer = constantBuffer->GetNativeBuffer();
 		glBindBufferBase(GL_UNIFORM_BUFFER, slot, nativeUniformBuffer);
+	}
+
+	void OglGraphicsContext::SetNativeFramebuffer(OglFramebuffer* framebuffer)
+	{
+		glBindFramebuffer(
+			GL_FRAMEBUFFER,
+			framebuffer
+				? framebuffer->GetNativeFramebuffer()
+				: 0);
 	}
 }
 

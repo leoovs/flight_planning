@@ -2,16 +2,17 @@
 
 #include <cinttypes>
 
+#include "graphics/framebuffer.h"
 #include "graphics/graphics_backend.h"
 #include "graphics/graphics_buffer.h"
 #include "graphics/graphics_debug_watch.h"
 #include "graphics/primitive_mode.h"
 #include "graphics/shader.h"
 #include "graphics/shader_compiler.h"
+#include "graphics/texture_2d.h"
 #include "graphics/vertex_input.h"
 #include "graphics/viewport.h"
 #include "platform/window.h"
-#include "graphics/texture_2d.h"
 
 namespace editor
 {
@@ -36,7 +37,6 @@ namespace editor
 		virtual const GraphicsContextParams& GetParams() const = 0;
 
 		virtual void Present() = 0;
-		virtual void ClearColor(float r, float g, float b, float a) = 0;
 
 		virtual GraphicsDebugWatch* CreateDebugWatch() = 0;
 		virtual void DestroyDebugWatch(GraphicsDebugWatch* watch) = 0;
@@ -52,6 +52,9 @@ namespace editor
 
 		virtual Texture2D* CreateTexture2D(Texture2DParams params) = 0;
 		virtual void DestroyTexture2D(Texture2D* texture2D) = 0;
+
+		virtual Framebuffer* CreateFramebuffer(FramebufferParams params) = 0;
+		virtual void DestroyFramebuffer(Framebuffer* framebuffer) = 0;
 
 		virtual void SetVertexInput(VertexInput* vertexInput) = 0;
 		virtual VertexInput* GetVertexInput() const = 0;
@@ -72,9 +75,23 @@ namespace editor
 		virtual void SetViewport(const Viewport& viewport) = 0;
 		virtual const Viewport& GetViewport() const = 0;
 
+		virtual void SetFramebuffer(Framebuffer* framebuffer) = 0;
+		virtual Framebuffer* GetFramebuffer() const = 0;
+
 		virtual ShaderCompiler* GetShaderCompiler() = 0;
 
 		virtual void Draw(int32_t startVertexIndex, int32_t vertexCount) = 0;
+
+		virtual void ClearColor(
+			Framebuffer* framebuffer,
+			float r,
+			float g,
+			float b,
+			float a) = 0;
+		virtual void ClearDepthStencil(
+			Framebuffer* framebuffer,
+			float depth,
+			uint8_t stencil) = 0;
 	};
 }
 

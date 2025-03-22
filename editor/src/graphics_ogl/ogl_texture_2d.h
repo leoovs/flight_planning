@@ -18,6 +18,8 @@ namespace editor
 			const SubresourceRegion& region,
 			const void* srcData) override;
 
+		GLuint GetNativeTexture2D() const;
+
 	private:
 		void CreateNativeTexture2D();
 		void DestroyNativeTexture2D();

@@ -2,6 +2,7 @@
 
 #include <GL/glew.h>
 
+#include "graphics/framebuffer.h"
 #include "graphics/graphics_buffer.h"
 #include "graphics/graphics_format.h"
 #include "graphics/primitive_mode.h"
@@ -19,6 +20,7 @@ namespace editor
 		static GLenum ConvertGraphicsFormatToFormat(GraphicsFormat format);
 		static GLenum ConvertShaderKindToNative(ShaderKind kind);
 		static GLenum ConvertPrimitiveModeToNative(PrimitiveMode mode);
+		static GLenum ConvertFramebufferAttachmentToNative(FramebufferAttachment attachment);
 		static bool IsGraphicsFormatNormalized(GraphicsFormat format);
 	};
 }

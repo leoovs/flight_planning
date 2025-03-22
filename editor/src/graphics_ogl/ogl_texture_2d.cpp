@@ -36,6 +36,11 @@ namespace editor
 			srcData);
 	}
 
+	GLuint OglTexture2D::GetNativeTexture2D() const
+	{
+		return mNativeTexture2D;
+	}
+
 	void OglTexture2D::CreateNativeTexture2D()
 	{
 		glCreateTextures(GL_TEXTURE_2D, 1, &mNativeTexture2D);

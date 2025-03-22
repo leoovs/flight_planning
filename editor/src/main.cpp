@@ -140,23 +140,17 @@ namespace editor
 			vp.Height = mWindow->GetHeight();
 
 			Texture2DParams testTextureParams;
-			testTextureParams.DebugName = "Test Texture";
-			testTextureParams.Width = 2;
-			testTextureParams.Height = 2;
+			testTextureParams.DebugName = "Render Texture";
+			testTextureParams.Width = 720;
+			testTextureParams.Height = 720;
 			testTextureParams.MipLevelCount = 1;
 			testTextureParams.Format = GraphicsFormat::R8G8B8A8_UNORM;
 			mTestTexture = mGraphics->CreateTexture2D(std::move(testTextureParams));
 
-			uint8_t pixels[]
-			{
-				0xFF,0x00,0x00,0xFF, 0x00,0xFF,0x00,0xFF,
-				0x00,0x00,0xFF,0xFF, 0x00,0x00,0x00,0xFF,
-			};
-
-			SubresourceRegion region;
-			region.Width = 2;
-			region.Height = 2;
-			mTestTexture->SetData(region, pixels);
+			FramebufferParams offscreenFramebufferParams;
+			offscreenFramebufferParams.DebugName = "Offscreen framebuffer";
+			mOffscreenFramebuffer = mGraphics->CreateFramebuffer(std::move(offscreenFramebufferParams));
+			mOffscreenFramebuffer->AttachTexture2D(FramebufferAttachment::Color, mTestTexture, {});
 
 			mGraphics->SetVertexInput(mTriangleVertexInput);
 			mGraphics->SetShader(ShaderKind::Vertex, mVertexShader);
@@ -164,10 +158,14 @@ namespace editor
 			mGraphics->SetPrimitiveMode(PrimitiveMode::TriangleList);
 			mGraphics->SetViewport(vp);
 			mGraphics->SetConstantBuffer(mConstantBuffer, 1);
+			mGraphics->SetFramebuffer(mOffscreenFramebuffer);
 		}
 
 		~TestApplication()
 		{
+			mGraphics->DestroyFramebuffer(mOffscreenFramebuffer);
+			mOffscreenFramebuffer = nullptr;
+
 			mGraphics->DestroyTexture2D(mTestTexture);
 			mTestTexture = nullptr;
 
@@ -212,7 +210,12 @@ namespace editor
 				mPlatform->PollEvents();
 				mEvents.Dispatch();
 
-				mGraphics->ClearColor(0.7f, 0.4f, 0.3f, 0.0f);
+				mGraphics->SetFramebuffer(mOffscreenFramebuffer);
+				mGraphics->ClearColor(mOffscreenFramebuffer, 1.0f, 0.0f, 0.0f, 1.0f);
+				mGraphics->Draw(0, 3);
+
+				mGraphics->SetFramebuffer(nullptr);
+				mGraphics->ClearColor(nullptr, 0.7f, 0.4f, 0.3f, 0.0f);
 				mGraphics->Draw(0, 3);
 				mGraphics->Present();
 
@@ -295,6 +298,7 @@ namespace editor
 		Shader* mVertexShader = nullptr;
 		Shader* mPixelShader = nullptr;
 		Texture2D* mTestTexture = nullptr;
+		Framebuffer* mOffscreenFramebuffer = nullptr;
 	};
 }
 int main()
