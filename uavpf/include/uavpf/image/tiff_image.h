@@ -23,6 +23,7 @@ namespace uavpf
 		int32_t GetHeight() const;
 
 		uint32_t ReadPixelAt(int32_t x, int32_t y) const;
+		const uint32_t* GetPixels() const;
 
 		bool IsValidImage() const; 
 		explicit operator bool() const;

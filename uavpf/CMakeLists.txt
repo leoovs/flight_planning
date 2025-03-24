@@ -1,6 +1,7 @@
 set(BUILD_SHARED_LIBS OFF)
 
 cpmaddpackage("gl:libtiff/libtiff@4.7.0")
+cpmaddpackage("gh:g-truc/glm#1.0.1")
 
 add_library(uavpf STATIC)
 
@@ -40,6 +41,8 @@ target_include_directories(
 
 target_link_libraries(
 	uavpf
+	PUBLIC
+	glm::glm
 	PRIVATE
 	TIFF::tiff
 )

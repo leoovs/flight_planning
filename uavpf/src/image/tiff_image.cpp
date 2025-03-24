@@ -38,6 +38,11 @@ namespace uavpf
 		return mImageHandle->RgbaPixels.at(indexFrom2DCoords);
 	}
 
+	const uint32_t* TiffImage::GetPixels() const
+	{
+		return mImageHandle->RgbaPixels.data();
+	}
+
 	bool TiffImage::IsValidImage() const
 	{
 		return nullptr != mImageHandle;
