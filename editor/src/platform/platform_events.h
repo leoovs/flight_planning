@@ -70,5 +70,23 @@ namespace editor
 		{
 		}
 	};
+
+	struct MouseMovementEvent : public Event
+	{
+	public:
+		Mouse* RegisteredMouse = nullptr;
+		int32_t DeltaX = 0;
+		int32_t DeltaY = 0;
+
+		MouseMovementEvent(
+			Mouse* registeredMouse,
+			int32_t deltaX,
+			int32_t deltaY)
+			: RegisteredMouse(registeredMouse)
+			, DeltaX(deltaX)
+			, DeltaY(deltaY)
+		{
+		}
+	};
 }
 

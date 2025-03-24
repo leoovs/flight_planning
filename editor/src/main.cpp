@@ -25,6 +25,7 @@ namespace editor
 					.SubscribeMethod(&TestApplication::OnWindowResize)
 					.SubscribeMethod(&TestApplication::OnMouseButtonDown)
 					.SubscribeMethod(&TestApplication::OnMouseButtonUp)
+					.SubscribeMethod(&TestApplication::OnMouseMovement)
 				.EndClass();
 
 			mPlatform = CreatePlatformService();
@@ -272,6 +273,17 @@ namespace editor
 				Info,
 				"Button: '%i' is up",
 				event.ButtonUp);
+			return true;
+		}
+
+		bool OnMouseMovement(const MouseMovementEvent& event)
+		{
+			UAVPF_LOG(
+				Application,
+				Info,
+				"Mouse moved: %dx%d",
+				event.DeltaX,
+				event.DeltaY);
 			return true;
 		}
 

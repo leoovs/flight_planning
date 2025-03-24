@@ -48,6 +48,7 @@ namespace editor
 		void Native_OnWindowClose(const SDL_Event& nativeEvent);
 		void Native_OnMouseButtonDown(const SDL_Event& nativeEvent);
 		void Native_OnMouseButtonUp(const SDL_Event& nativeEvent);
+		void Native_OnMouseMovement(const SDL_Event& nativeEvent);
 
 		using NativeEventHandler = void(Sdl3PlatformService::*)(const SDL_Event&);
 

@@ -228,6 +228,7 @@ namespace editor
 			{ SDL_EVENT_WINDOW_CLOSE_REQUESTED, &Sdl3PlatformService::Native_OnWindowClose },
 			{ SDL_EVENT_MOUSE_BUTTON_DOWN, &Sdl3PlatformService::Native_OnMouseButtonDown },
 			{ SDL_EVENT_MOUSE_BUTTON_UP, &Sdl3PlatformService::Native_OnMouseButtonUp },
+			{ SDL_EVENT_MOUSE_MOTION, &Sdl3PlatformService::Native_OnMouseMovement },
 		};
 	}
 
@@ -291,5 +292,17 @@ namespace editor
 			EventPublishMode::Queued,
 			mRegisteredMouse, 
 			buttonUp);
+	}
+
+	void Sdl3PlatformService::Native_OnMouseMovement(const SDL_Event& nativeEvent)
+	{
+		int32_t deltaX = nativeEvent.motion.xrel;
+		int32_t deltaY = nativeEvent.motion.yrel;
+
+		mPlatformEventPublisher.Publish<MouseMovementEvent>(
+			EventPublishMode::Queued,
+			mRegisteredMouse,
+			deltaX,
+			deltaY);
 	}
 }
