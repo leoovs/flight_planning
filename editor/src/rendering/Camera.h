@@ -29,6 +29,8 @@ namespace editor
 		void LookAround(float polarAngle, float azimuthAngle);
 
 	private:
+		void RecalculateLookAtMatrix();
+
 		glm::mat4 mProjectionMatrix = glm::mat4(1.0f);
 		glm::mat4 mLookAtMatrix = glm::mat4(1.0f);
 

@@ -15,6 +15,7 @@ namespace editor
 	void Camera::SetPosition(const glm::vec3& position)
 	{
 		mPosition = position;
+		RecalculateLookAtMatrix();
 	}
 
 	const glm::vec3& Camera::GetPosition() const
@@ -72,7 +73,7 @@ namespace editor
 		mRightVector = glm::normalize(glm::cross(direction, glm::vec3(0.0f, 1.0f, 0.0f)));
 		mUpVector = glm::cross(mRightVector, mFrontVector);
 
-		mLookAtMatrix = glm::lookAt(mPosition, target, mUpVector);
+		RecalculateLookAtMatrix();
 	}
 
 	void Camera::LookAhead(const glm::vec3& offset)
@@ -87,6 +88,11 @@ namespace editor
 			glm::cos(polarAngle),
 			glm::sin(polarAngle) * glm::sin(azimuthAngle)
 		));
+	}
+
+	void Camera::RecalculateLookAtMatrix()
+	{
+		mLookAtMatrix = glm::lookAt(mPosition, mPosition + mFrontVector, mUpVector);
 	}
 }
 

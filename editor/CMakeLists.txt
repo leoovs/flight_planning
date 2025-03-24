@@ -39,6 +39,7 @@ target_sources(
 	"src/platform_sdl3/sdl3_window.cpp"
 
 	"src/rendering/camera.cpp"
+	"src/rendering/frame_timer.cpp"
 )
 
 target_include_directories(

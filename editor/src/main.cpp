@@ -8,8 +8,8 @@
 #include "platform/platform_events.h"
 #include "platform/platform_service.h"
 #include "rendering/camera.h"
+#include "rendering/frame_timer.h"
 #include "uavpf/debug/concise_log_formatter.h"
-
 
 namespace editor
 {
@@ -85,10 +85,6 @@ namespace editor
 			constantBufferParams.StructSize = sizeof(float[4]);
 			constantBufferParams.StructCount = 1;
 			constantBufferParams.Target = GraphicsBufferTarget::Constant;
-
-			mConstantBuffer = mGraphics->CreateBuffer(std::move(constantBufferParams));
-			float color[4] = { 1.0f, 0.5f, 0.5f, 1.0f };
-			mConstantBuffer->SetData(color, sizeof(color));
 
 			VertexInputParams triangleVertexInputParams;	
 			triangleVertexInputParams.DebugName = "Triangle vertex input";
@@ -166,12 +162,11 @@ namespace editor
 			mGraphics->SetShader(ShaderKind::Pixel, mPixelShader);
 			mGraphics->SetPrimitiveMode(PrimitiveMode::TriangleList);
 			mGraphics->SetViewport(vp);
-			mGraphics->SetConstantBuffer(mConstantBuffer, 1);
 			mGraphics->SetFramebuffer(mOffscreenFramebuffer);
 
 			mCamera.SetPosition({ 0.0f, 0.0f, 3.0f });
 			mCamera.SetProjectionMatrix(glm::perspective(
-				glm::radians(45.0f),
+				glm::radians(60.0f),
 				16.0f / 9.0f,
 				0.001f,
 				1000.0f));
@@ -194,9 +189,6 @@ namespace editor
 
 			mGraphics->DestroyVertexInput(mTriangleVertexInput);
 			mTriangleVertexInput = nullptr;
-
-			mGraphics->DestroyBuffer(mConstantBuffer);
-			mConstantBuffer = nullptr;
 
 			mGraphics->DestroyBuffer(mVertexBuffer);
 			mVertexBuffer = nullptr;
@@ -225,23 +217,43 @@ namespace editor
 			mRunning = true;
 			while (mRunning)
 			{
-				mPlatform->BeginFrame();
+				mTimer.Tick();
+				const float dt = mTimer.GetDeltaTimeSeconds();
 
 				mPlatform->PollEvents();
 				mEvents.Dispatch();
 
-				mVertexShader->SetUniform("uViewProj", mCamera.CalculateViewProjectionMatrix());
+				glm::vec3 cameraSpeed = glm::vec3(0.0f);
+				if (mKeyboard->IsKeyDown(Key::W))
+				{
+					cameraSpeed += mCamera.GetFrontVector();
+				}
+				if (mKeyboard->IsKeyDown(Key::S))
+				{
+					cameraSpeed -= mCamera.GetFrontVector();
+				}
+				if (mKeyboard->IsKeyDown(Key::A))
+				{
+					cameraSpeed -= mCamera.GetRightVector();
+				}
+				if (mKeyboard->IsKeyDown(Key::D))
+				{
+					cameraSpeed += mCamera.GetRightVector();
+				}
 
-				mGraphics->SetFramebuffer(mOffscreenFramebuffer);
-				mGraphics->ClearColor(mOffscreenFramebuffer, 1.0f, 0.0f, 0.0f, 1.0f);
-				mGraphics->Draw(0, 3);
+				cameraSpeed = glm::length(cameraSpeed) > 0.0f
+					? glm::normalize(cameraSpeed)
+					: glm::vec3(0.0f);
+
+				mCamera.SetPosition(mCamera.GetPosition() + cameraSpeed * dt);
+			
+				mVertexShader->SetUniform("uViewProj", mCamera.CalculateViewProjectionMatrix());
 
 				mGraphics->SetFramebuffer(nullptr);
 				mGraphics->ClearColor(nullptr, 0.7f, 0.4f, 0.3f, 0.0f);
 				mGraphics->Draw(0, 3);
-				mGraphics->Present();
 
-				mPlatform->EndFrame();
+				mGraphics->Present();
 			}
 		}
 
@@ -305,6 +317,16 @@ namespace editor
 				"Mouse moved: %dx%d",
 				event.DeltaX,
 				event.DeltaY);
+
+			auto [polar, azimuth] = mCamera.CalculatePolarAndAzimuth();
+			
+			polar += event.DeltaY * 0.01f;
+			azimuth += event.DeltaX * 0.01f;
+
+			polar = glm::clamp(polar, 0.1f, glm::pi<float>() - 0.1f);
+
+			mCamera.LookAround(polar, azimuth);
+
 			return true;
 		}
 
@@ -344,14 +366,15 @@ namespace editor
 		GraphicsContext* mGraphics = nullptr;
 		GraphicsDebugWatch* mGraphicsDebug = nullptr;
 		GraphicsBuffer* mVertexBuffer = nullptr;
-		GraphicsBuffer* mConstantBuffer = nullptr;
 		VertexInput* mTriangleVertexInput = nullptr;
 		ShaderCompiler* mShaderCompiler = nullptr;
 		Shader* mVertexShader = nullptr;
 		Shader* mPixelShader = nullptr;
 		Texture2D* mTestTexture = nullptr;
 		Framebuffer* mOffscreenFramebuffer = nullptr;
+
 		Camera mCamera;
+		FrameTimer mTimer;
 	};
 }
 int main()
