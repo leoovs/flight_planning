@@ -126,8 +126,11 @@ namespace editor
 			nullptr,
 			diagnosticsBuffer.data());
 
-		diagnostics << "Compiler Errors:\n"
-			<< diagnosticsBuffer.data();
+		if (!diagnosticsBuffer.empty())
+		{
+			diagnostics << "Compiler Errors:\n"
+				<< diagnosticsBuffer.data();
+		}
 
 		glGetProgramiv(nativeProgram, GL_INFO_LOG_LENGTH, &diagnosticsLogLength);
 		diagnosticsBuffer.resize(diagnosticsLogLength);
@@ -137,8 +140,11 @@ namespace editor
 			nullptr,
 			diagnosticsBuffer.data());
 
-		diagnostics << "\nLinker Errors:\n"
-			<< diagnosticsBuffer.data();
+		if (!diagnosticsBuffer.empty())
+		{
+			diagnostics << "\nLinker Errors:\n"
+				<< diagnosticsBuffer.data();
+		}
 
 		compilation->SetDiagnostics(diagnostics.str());
 	}
