@@ -112,6 +112,34 @@ namespace editor
 		mRegisteredMouse = nullptr;
 	}
 
+	Sdl3Keyboard* Sdl3PlatformService::CreateKeyboard()
+	{
+		if (nullptr != mRegisteredKeyboard)
+		{
+			UAVPF_LOG(
+				Application,
+				Warning,
+				"Trying to create second keyboard");
+			return mRegisteredKeyboard;
+		}
+
+		return mRegisteredKeyboard = new Sdl3Keyboard();
+	}
+
+	void Sdl3PlatformService::DestroyKeyboard(Keyboard* keyboard)
+	{
+		if (nullptr == keyboard)
+		{
+			UAVPF_LOG(
+				Application,
+				Warning,
+				"Trying to destroy keyboard which is nullptr");
+		}
+
+		delete keyboard;
+		mRegisteredKeyboard = nullptr;
+	}
+
 	GraphicsContext* Sdl3PlatformService::CreateGraphicsContext(
 		GraphicsContextParams params)
 	{
@@ -228,6 +256,9 @@ namespace editor
 			{ SDL_EVENT_WINDOW_CLOSE_REQUESTED, &Sdl3PlatformService::Native_OnWindowClose },
 			{ SDL_EVENT_MOUSE_BUTTON_DOWN, &Sdl3PlatformService::Native_OnMouseButtonDown },
 			{ SDL_EVENT_MOUSE_BUTTON_UP, &Sdl3PlatformService::Native_OnMouseButtonUp },
+			{ SDL_EVENT_MOUSE_MOTION, &Sdl3PlatformService::Native_OnMouseMovement },
+			{ SDL_EVENT_KEY_DOWN, &Sdl3PlatformService::Native_OnKeyDown },
+			{ SDL_EVENT_KEY_UP, &Sdl3PlatformService::Native_OnKeyUp },
 		};
 	}
 
@@ -291,5 +322,37 @@ namespace editor
 			EventPublishMode::Queued,
 			mRegisteredMouse, 
 			buttonUp);
+	}
+
+	void Sdl3PlatformService::Native_OnMouseMovement(const SDL_Event& nativeEvent)
+	{
+		int32_t deltaX = nativeEvent.motion.xrel;
+		int32_t deltaY = nativeEvent.motion.yrel;
+
+		mPlatformEventPublisher.Publish<MouseMovementEvent>(
+			EventPublishMode::Queued,
+			mRegisteredMouse,
+			deltaX,
+			deltaY);
+	}
+
+	void Sdl3PlatformService::Native_OnKeyDown(const SDL_Event& nativeEvent)
+	{
+		Key keyDown = mRegisteredKeyboard->ConvertNativeKeyToKey(nativeEvent.key.key);
+
+		mPlatformEventPublisher.Publish<KeyDownEvent>(
+			EventPublishMode::Queued,
+			mRegisteredKeyboard,
+			keyDown);
+	}
+
+	void Sdl3PlatformService::Native_OnKeyUp(const SDL_Event& nativeEvent)
+	{
+		Key keyUp = mRegisteredKeyboard->ConvertNativeKeyToKey(nativeEvent.key.key);
+
+		mPlatformEventPublisher.Publish<KeyUpEvent>(
+			EventPublishMode::Queued,
+			mRegisteredKeyboard,
+			keyUp);
 	}
 }

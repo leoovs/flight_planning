@@ -4,6 +4,7 @@
 
 #include "event/event_bus.h"
 #include "graphics/graphics_context.h"
+#include "platform/keyboard.h"
 #include "platform/mouse.h"
 #include "platform/window.h"
 
@@ -27,6 +28,9 @@ namespace editor
 
 		virtual Mouse* CreateMouse() = 0;
 		virtual void DestroyMouse(Mouse* mouse) = 0;
+
+		virtual Keyboard* CreateKeyboard() = 0;
+		virtual void DestroyKeyboard(Keyboard* keyboard) = 0;
 
 		virtual GraphicsContext* CreateGraphicsContext(GraphicsContextParams params) = 0;
 		virtual void DestroyGraphicsContext(GraphicsContext* graphicsContext) = 0;

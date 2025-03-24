@@ -27,6 +27,9 @@ namespace editor
 					.SubscribeMethod(&TestApplication::OnWindowResize)
 					.SubscribeMethod(&TestApplication::OnMouseButtonDown)
 					.SubscribeMethod(&TestApplication::OnMouseButtonUp)
+					.SubscribeMethod(&TestApplication::OnMouseMovement)
+					.SubscribeMethod(&TestApplication::OnKeyDown)
+					.SubscribeMethod(&TestApplication::OnKeyUp)
 				.EndClass();
 
 			mPlatform = CreatePlatformService();
@@ -36,6 +39,8 @@ namespace editor
 			mWindow->SetTitle("Editor");
 
 			mMouse = mPlatform->CreateMouse();
+
+			mKeyboard = mPlatform->CreateKeyboard();
 
 			GraphicsContextParams graphicsParams;
 			graphicsParams.OutputWindow = mWindow;
@@ -202,6 +207,9 @@ namespace editor
 			mPlatform->DestroyGraphicsContext(mGraphics);
 			mGraphics = nullptr;
 
+			mPlatform->DestroyKeyboard(mKeyboard);
+			mKeyboard = nullptr;
+
 			mPlatform->DestroyMouse(mMouse);
 			mMouse = nullptr;
 
@@ -289,6 +297,35 @@ namespace editor
 			return true;
 		}
 
+		bool OnMouseMovement(const MouseMovementEvent& event)
+		{
+			UAVPF_LOG(
+				Application,
+				Info,
+				"Mouse moved: %dx%d",
+				event.DeltaX,
+				event.DeltaY);
+			return true;
+		}
+
+		bool OnKeyDown(const KeyDownEvent& event)
+		{
+			UAVPF_LOG(
+				Application,
+				Info,
+				"Key down: %d", event.KeyDown);
+			return true;
+		}
+
+		bool OnKeyUp(const KeyUpEvent& event)
+		{
+			UAVPF_LOG(
+				Application,
+				Info,
+				"Key up: %d", event.KeyUp);
+			return true;
+		}
+
 		bool mRunning = true;
 
 		// Event-system
@@ -301,6 +338,7 @@ namespace editor
 		PlatformService* mPlatform = nullptr;
 		Window* mWindow = nullptr;
 		Mouse* mMouse = nullptr;
+		Keyboard* mKeyboard = nullptr;
 
 		// Graphics
 		GraphicsContext* mGraphics = nullptr;

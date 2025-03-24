@@ -1,10 +1,10 @@
 #pragma once
 
-#include <cwctype>
 #include <unordered_map>
 
 #include "event/event_publisher.h"
 #include "platform/platform_service.h"
+#include "platform_sdl3/sdl3_keyboard.h"
 #include "platform_sdl3/sdl3_mouse.h"
 #include "platform_sdl3/sdl3_window.h"
 
@@ -32,6 +32,9 @@ namespace editor
 		Sdl3Mouse* CreateMouse() override;
 		void DestroyMouse(Mouse* mouse) override;
 
+		Sdl3Keyboard* CreateKeyboard() override;
+		void DestroyKeyboard(Keyboard* keyboard) override;
+
 		GraphicsContext* CreateGraphicsContext(GraphicsContextParams params) override;
 		void DestroyGraphicsContext(GraphicsContext* graphicsContext) override;
 
@@ -48,6 +51,9 @@ namespace editor
 		void Native_OnWindowClose(const SDL_Event& nativeEvent);
 		void Native_OnMouseButtonDown(const SDL_Event& nativeEvent);
 		void Native_OnMouseButtonUp(const SDL_Event& nativeEvent);
+		void Native_OnMouseMovement(const SDL_Event& nativeEvent);
+		void Native_OnKeyDown(const SDL_Event& nativeEvent);
+		void Native_OnKeyUp(const SDL_Event& nativeEvent);
 
 		using NativeEventHandler = void(Sdl3PlatformService::*)(const SDL_Event&);
 
@@ -55,6 +61,7 @@ namespace editor
 		std::unordered_map<SDL_WindowID, Sdl3Window*> mWindowsByNativeWindowID;
 		std::unordered_map<uint32_t, NativeEventHandler> mHandlersByNativeEventType;
 		Sdl3Mouse* mRegisteredMouse = nullptr;
+		Sdl3Keyboard* mRegisteredKeyboard = nullptr;
 		GraphicsContext* mRegisteredGraphicsContext = nullptr;
 	};
 }
