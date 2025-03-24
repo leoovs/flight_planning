@@ -36,6 +36,8 @@ target_sources(
 	"src/platform_sdl3/sdl3_ogl_provider.cpp"
 	"src/platform_sdl3/sdl3_platform_service.cpp"
 	"src/platform_sdl3/sdl3_window.cpp"
+
+	"src/rendering/camera.cpp"
 )
 
 target_include_directories(

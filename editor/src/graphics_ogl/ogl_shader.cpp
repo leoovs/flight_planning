@@ -2,6 +2,8 @@
 
 #include <cassert>
 
+#include <glm/gtc/type_ptr.hpp>
+
 namespace editor
 {
 	OglShaderUniformLocator::OglShaderUniformLocator(GLuint nativeShaderProgram)
@@ -64,6 +66,27 @@ namespace editor
 			x,
 			y,
 			z);
+	}
+
+	void OglShader::SetUniform(std::string_view name, float x, float y, float z, float w)
+	{
+		glProgramUniform4f(
+			mNativeProgram,
+			mUniformLocator.GetUniformLocation(name),
+			x,
+			y,
+			z,
+			w);
+	}
+
+	void OglShader::SetUniform(std::string_view name, const glm::mat4& v)
+	{
+		glProgramUniformMatrix4fv(
+			mNativeProgram,
+			mUniformLocator.GetUniformLocation(name),
+			1,
+			GL_FALSE,
+			glm::value_ptr(v));
 	}
 
 	GLuint OglShader::GetNativeProgram() const

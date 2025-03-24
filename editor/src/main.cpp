@@ -7,7 +7,9 @@
 #include "graphics/subresource.h"
 #include "platform/platform_events.h"
 #include "platform/platform_service.h"
+#include "rendering/camera.h"
 #include "uavpf/debug/concise_log_formatter.h"
+
 
 namespace editor
 {
@@ -100,6 +102,8 @@ namespace editor
 				R"(
 				#version 460 core
 
+				uniform mat4 uViewProj;
+
 				layout (location = 0) in vec3 aPosition;
 
 				out gl_PerVertex
@@ -109,7 +113,7 @@ namespace editor
 
 				void main()
 				{
-					gl_Position = vec4(aPosition, 1.0);
+					gl_Position = uViewProj * vec4(aPosition, 1.0);
 				}
 				)";
 			std::string_view psSource =
@@ -159,6 +163,14 @@ namespace editor
 			mGraphics->SetViewport(vp);
 			mGraphics->SetConstantBuffer(mConstantBuffer, 1);
 			mGraphics->SetFramebuffer(mOffscreenFramebuffer);
+
+			mCamera.SetPosition({ 0.0f, 0.0f, 3.0f });
+			mCamera.SetProjectionMatrix(glm::perspective(
+				glm::radians(45.0f),
+				16.0f / 9.0f,
+				0.001f,
+				1000.0f));
+			mCamera.LookAt({ 0.0f, 0.0f, 0.0f });
 		}
 
 		~TestApplication()
@@ -209,6 +221,8 @@ namespace editor
 
 				mPlatform->PollEvents();
 				mEvents.Dispatch();
+
+				mVertexShader->SetUniform("uViewProj", mCamera.CalculateViewProjectionMatrix());
 
 				mGraphics->SetFramebuffer(mOffscreenFramebuffer);
 				mGraphics->ClearColor(mOffscreenFramebuffer, 1.0f, 0.0f, 0.0f, 1.0f);
@@ -299,6 +313,7 @@ namespace editor
 		Shader* mPixelShader = nullptr;
 		Texture2D* mTestTexture = nullptr;
 		Framebuffer* mOffscreenFramebuffer = nullptr;
+		Camera mCamera;
 	};
 }
 int main()

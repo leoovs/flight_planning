@@ -32,6 +32,8 @@ namespace editor
 		void SetUniform(std::string_view name, float x) override;
 		void SetUniform(std::string_view name, float x, float y) override;
 		void SetUniform(std::string_view name, float x, float y, float z) override;
+		void SetUniform(std::string_view name, float x, float y, float z, float w) override;
+		void SetUniform(std::string_view name, const glm::mat4& v) override;
 
 		GLuint GetNativeProgram() const;
 
