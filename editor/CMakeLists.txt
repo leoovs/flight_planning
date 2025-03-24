@@ -32,6 +32,7 @@ target_sources(
 
 	"src/platform/platform_service.cpp"
 
+	"src/platform_sdl3/sdl3_keyboard.cpp"
 	"src/platform_sdl3/sdl3_mouse.cpp"
 	"src/platform_sdl3/sdl3_ogl_provider.cpp"
 	"src/platform_sdl3/sdl3_platform_service.cpp"

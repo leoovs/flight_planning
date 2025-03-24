@@ -3,6 +3,7 @@
 #include <cinttypes>
 
 #include "event/event.h"
+#include "platform/key.h"
 #include "platform/mouse_button.h"
 
 namespace editor
@@ -43,6 +44,34 @@ namespace editor
 		}
 	};
 
+	class Keyboard;
+
+	class KeyDownEvent : public Event
+	{
+	public:
+		Keyboard* RegisteredKeyboard = nullptr;
+		Key KeyDown = Key::Unknown;
+
+		KeyDownEvent(Keyboard* registeredKeyboard, Key keyDown)
+			: RegisteredKeyboard(registeredKeyboard)
+			, KeyDown(keyDown)
+		{
+		}
+	};
+
+	class KeyUpEvent : public Event
+	{
+	public:
+		Keyboard* RegisteredKeyboard = nullptr;
+		Key KeyUp = Key::Unknown;
+
+		KeyUpEvent(Keyboard* registeredKeyboard, Key keyUp)
+			: RegisteredKeyboard(registeredKeyboard)
+			, KeyUp(keyUp)
+		{
+		}
+	};
+
 	class Mouse;
 
 	class MouseButtonDownEvent : public Event
@@ -71,7 +100,7 @@ namespace editor
 		}
 	};
 
-	struct MouseMovementEvent : public Event
+	class MouseMovementEvent : public Event
 	{
 	public:
 		Mouse* RegisteredMouse = nullptr;
