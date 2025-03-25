@@ -14,24 +14,24 @@ namespace uavpf
 		class RowAccessor
 		{
 		public:
-			RowAccessor(T* heightMatrix, int32_t x, int32_t width, size_t size)
+			RowAccessor(T* heightMatrix, int32_t row, int32_t width, size_t size)
 				: mHeightMatrix(heightMatrix)
-				, mOffsetX(x)
+				, mRow(row)
 				, mWidth(width)
 				, mSize(size)
 			{
 			}
 
-			T& operator[](int32_t y) const
+			T& operator[](int32_t column) const
 			{
-				int32_t index = y * mWidth + mOffsetX;
+				int32_t index = mRow * mWidth + column;
 				assert(index < mSize);
 				return mHeightMatrix[index];
 			}
 
 		private:
 			T* mHeightMatrix = nullptr;
-			int32_t mOffsetX = 0;
+			int32_t mRow = 0;
 			int32_t mWidth = 0;
 			size_t mSize = 0;
 		};
@@ -39,8 +39,8 @@ namespace uavpf
 		HeightMap() = default;
 		HeightMap(int32_t width, int32_t height);
 
-		RowAccessor<float> operator[](int32_t x);
-		RowAccessor<const float> operator[](int32_t x) const;
+		RowAccessor<float> operator[](int32_t row);
+		RowAccessor<const float> operator[](int32_t row) const;
 
 		size_t GetSize() const;
 		int32_t GetWidth() const;

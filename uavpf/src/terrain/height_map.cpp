@@ -10,21 +10,21 @@ namespace uavpf
 	}
 
 	HeightMap::RowAccessor<float>
-	HeightMap::operator[](int32_t x)
+	HeightMap::operator[](int32_t row)
 	{
 		return RowAccessor<float>(
 			mHeightMatrix.data(), 
-			x,
+			row,
 			mWidth,
 			mHeightMatrix.size());
 	}
 
 	HeightMap::RowAccessor<const float>
-	HeightMap::operator[](int32_t x) const
+	HeightMap::operator[](int32_t row) const
 	{
 		return RowAccessor<const float>(
 			mHeightMatrix.data(), 
-			x,
+			row,
 			mWidth,
 			mHeightMatrix.size());
 	}

@@ -10,6 +10,8 @@ target_sources(
 	"src/debug/test_logger.cpp"
 
 	"src/id/test_id_allocator.cpp"
+
+	"src/terrain/test_height_map.cpp"
 )
 
 target_link_libraries(
