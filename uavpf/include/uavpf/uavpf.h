@@ -20,3 +20,5 @@
 #include "uavpf/image/tiff_image.h"
 #include "uavpf/image/tiff_loader.h"
 
+#include "uavpf/terrain/height_map.h"
+

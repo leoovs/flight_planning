@@ -28,6 +28,8 @@ target_sources(
 
 	"src/image/tiff_image.cpp"
 	"src/image/tiff_loader.cpp"
+
+	"src/terrain/height_map.cpp"
 )
 
 target_include_directories(
