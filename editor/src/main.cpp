@@ -45,7 +45,7 @@ namespace editor
 			mKeyboard = mPlatform->CreateKeyboard();
 
 			{
-				uavpf::TiffImage image = uavpf::TiffLoader().LoadImageFromFile("C:/Users/Leonid/Desktop/terrain.tif");
+				uavpf::TiffImage image = uavpf::TiffLoader().LoadImageFromFile("Image here..");
 				uavpf::ImageLuminance lum(image);
 				mHeights = uavpf::HeightMap::FromLuminance(lum);
 				mTerrain = uavpf::TerrainMeshBuilder(mHeights)
