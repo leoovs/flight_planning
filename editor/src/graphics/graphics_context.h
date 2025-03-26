@@ -7,6 +7,7 @@
 #include "graphics/graphics_buffer.h"
 #include "graphics/graphics_debug_watch.h"
 #include "graphics/primitive_mode.h"
+#include "graphics/depth_stencil_state.h"
 #include "graphics/shader.h"
 #include "graphics/shader_compiler.h"
 #include "graphics/texture_2d.h"
@@ -78,9 +79,13 @@ namespace editor
 		virtual void SetFramebuffer(Framebuffer* framebuffer) = 0;
 		virtual Framebuffer* GetFramebuffer() const = 0;
 
+		virtual void SetDepthStencilState(const DepthStencilState& state) = 0;
+		virtual const DepthStencilState& GetDepthStencilState() const = 0;
+
 		virtual ShaderCompiler* GetShaderCompiler() = 0;
 
 		virtual void Draw(int32_t startVertexIndex, int32_t vertexCount) = 0;
+		virtual void DrawIndexed(int32_t startIndexOffset, int32_t indexCount) = 0;
 
 		virtual void ClearColor(
 			Framebuffer* framebuffer,

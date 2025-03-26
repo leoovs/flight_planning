@@ -6,9 +6,14 @@
 
 namespace uavpf
 {
-	ImageLuminance::ImageLuminance(TiffImage* accessedImage)
-		: mAccessedImage(accessedImage)
+	ImageLuminance::ImageLuminance(TiffImage& accessedImage)
+		: mAccessedImage(&accessedImage)
 	{}
+
+	TiffImage* ImageLuminance::GetImage() const
+	{
+		return mAccessedImage;
+	}
 
 	float ImageLuminance::FromRgb(int32_t x, int32_t y) const
 	{
@@ -21,11 +26,9 @@ namespace uavpf
 		float normG = static_cast<float>(g) / RgbaFacts::cMaxChannelValue; 
 		float normB = static_cast<float>(b) / RgbaFacts::cMaxChannelValue; 
 
-		float luminance = 0.2126f * normR
-			+ 0.7152f * normG
-			+ 0.0722f * normB;
+		float greyscale = 0.33f * normR + 0.33f * normG + 0.33f * normB;
 
-		return luminance;
+		return greyscale;
 	}
 
 	ImageLuminance::operator bool() const

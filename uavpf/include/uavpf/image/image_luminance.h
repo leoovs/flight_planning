@@ -8,8 +8,9 @@ namespace uavpf
 	{
 	public:
 		ImageLuminance() = default;
-		ImageLuminance(TiffImage* accessedImage);
+		ImageLuminance(TiffImage& accessedImage);
 
+		TiffImage* GetImage() const;
 		float FromRgb(int32_t x, int32_t y) const;
 
 		explicit operator bool() const;

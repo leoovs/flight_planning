@@ -7,9 +7,13 @@
 
 namespace uavpf 
 {
+	class ImageLuminance;
+
 	class HeightMap
 	{
 	public:
+		static HeightMap FromLuminance(const ImageLuminance& luminance);
+
 		template<typename T>
 		class RowAccessor
 		{

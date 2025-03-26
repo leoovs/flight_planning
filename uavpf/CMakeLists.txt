@@ -31,6 +31,8 @@ target_sources(
 	"src/image/tiff_loader.cpp"
 
 	"src/terrain/height_map.cpp"
+	"src/terrain/terrain_mesh.cpp"
+	"src/terrain/terrain_mesh_builder.cpp"
 )
 
 target_include_directories(

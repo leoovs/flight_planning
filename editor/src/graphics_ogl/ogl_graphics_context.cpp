@@ -22,6 +22,7 @@ namespace editor
 
 		BindGlobalShaderPipeline();
 		SetNativeViewport(mViewport);
+		SetNativeDepthStencilState(mDepthStencilState);
 	}
 
 	const GraphicsContextParams& OglGraphicsContext::GetParams() const
@@ -238,6 +239,16 @@ namespace editor
 		return mFramebuffer;
 	}
 
+	void OglGraphicsContext::SetDepthStencilState(const DepthStencilState& state)
+	{
+		SetNativeDepthStencilState(mDepthStencilState = state);
+	}
+
+	const DepthStencilState& OglGraphicsContext::GetDepthStencilState() const
+	{
+		return mDepthStencilState;
+	}
+
 	OglShaderCompiler* OglGraphicsContext::GetShaderCompiler()
 	{
 		return &mShaderCompiler;
@@ -249,6 +260,15 @@ namespace editor
 			OglFacts::ConvertPrimitiveModeToNative(mPrimitiveMode),
 			startVertexIndex,
 			static_cast<GLsizei>(vertexCount));
+	}
+
+	void OglGraphicsContext::DrawIndexed(int32_t startIndexOffset, int32_t indexCount)
+	{
+		glDrawElements(
+			OglFacts::ConvertPrimitiveModeToNative(mPrimitiveMode),
+			static_cast<GLsizei>(indexCount),
+			GL_UNSIGNED_INT,
+			reinterpret_cast<void*>(sizeof(uint32_t)*startIndexOffset));
 	}
 
 	void OglGraphicsContext::ClearColor(
@@ -329,6 +349,11 @@ namespace editor
 			framebuffer
 				? framebuffer->GetNativeFramebuffer()
 				: 0);
+	}
+
+	void OglGraphicsContext::SetNativeDepthStencilState(const DepthStencilState& state)
+	{
+		(state.DepthTestEnabled ? glEnable : glDisable)(GL_DEPTH_TEST);
 	}
 }
 

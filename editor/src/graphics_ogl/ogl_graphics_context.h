@@ -69,9 +69,13 @@ namespace editor
 		void SetFramebuffer(Framebuffer* framebuffer) override;
 		OglFramebuffer* GetFramebuffer() const override;
 
+		void SetDepthStencilState(const DepthStencilState& state) override;
+		const DepthStencilState& GetDepthStencilState() const override;
+
 		OglShaderCompiler* GetShaderCompiler() override;
 
 		void Draw(int32_t startVertexIndex, int32_t vertexCount) override;
+		void DrawIndexed(int32_t startIndexOffset, int32_t indexCount) override;
 
 		void ClearColor(
 			Framebuffer* framebuffer,
@@ -89,6 +93,7 @@ namespace editor
 		void SetNativeViewport(const Viewport& viewport);
 		void SetNativeUniformBuffer(OglGraphicsBuffer* constantBuffer, int32_t slot);
 		void SetNativeFramebuffer(OglFramebuffer* framebuffer);
+		void SetNativeDepthStencilState(const DepthStencilState& state);
 
 		GraphicsContextParams mParams;
 		std::unique_ptr<OglProvider> mProvider;
@@ -101,6 +106,7 @@ namespace editor
 		PrimitiveMode mPrimitiveMode = PrimitiveMode::LineList;
 		Viewport mViewport;
 		OglFramebuffer* mFramebuffer = nullptr;
+		DepthStencilState mDepthStencilState;
 	};
 }
 

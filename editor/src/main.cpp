@@ -10,6 +10,8 @@
 #include "rendering/camera.h"
 #include "rendering/frame_timer.h"
 #include "uavpf/debug/concise_log_formatter.h"
+#include "uavpf/terrain/height_map.h"
+#include "uavpf/terrain/terrain_mesh.h"
 
 namespace editor
 {
@@ -42,6 +44,14 @@ namespace editor
 
 			mKeyboard = mPlatform->CreateKeyboard();
 
+			{
+				uavpf::TiffImage image = uavpf::TiffLoader().LoadImageFromFile("C:/Users/Leonid/Desktop/terrain.tif");
+				uavpf::ImageLuminance lum(image);
+				mHeights = uavpf::HeightMap::FromLuminance(lum);
+				mTerrain = uavpf::TerrainMeshBuilder(mHeights)
+					.Build();
+			}
+
 			GraphicsContextParams graphicsParams;
 			graphicsParams.OutputWindow = mWindow;
 			graphicsParams.Backend = GraphicsBackend::OpenGL;
@@ -59,43 +69,34 @@ namespace editor
 				}
 			);
 
-			struct Vertex
-			{
-				float position[3];
-			};
-
-			Vertex triangle[]
-			{
-				{ -0.5f, -0.5f, 0.0f },
-				{  0.0f,  0.5f, 0.0f },
-				{  0.5f, -0.5f, 0.0f },
-			};
-
 			GraphicsBufferParams vertexBufferParams;
-			vertexBufferParams.DebugName = "SUPER COOL vertex buffer";
-			vertexBufferParams.StructSize = sizeof(*triangle);
-			vertexBufferParams.StructCount = std::size(triangle);
+			vertexBufferParams.DebugName = "Terrain vertices";
+			vertexBufferParams.StructSize = sizeof(float[4]);
+			vertexBufferParams.StructCount = mTerrain.GetPositionCount();
 			vertexBufferParams.Target = GraphicsBufferTarget::Vertex;
 
 			mVertexBuffer = mGraphics->CreateBuffer(std::move(vertexBufferParams));
-			mVertexBuffer->SetData(triangle, sizeof(triangle));
+			mVertexBuffer->SetData(mTerrain.GetPositionData(), mTerrain.GetPositionCount() * sizeof(glm::vec4));
 
-			GraphicsBufferParams constantBufferParams;
-			constantBufferParams.DebugName = "Test constant buffer";
-			constantBufferParams.StructSize = sizeof(float[4]);
-			constantBufferParams.StructCount = 1;
-			constantBufferParams.Target = GraphicsBufferTarget::Constant;
+			GraphicsBufferParams indexBufferParams;
+			indexBufferParams.DebugName = "Terrain indices";
+			indexBufferParams.StructSize = sizeof(uint32_t);
+			indexBufferParams.StructCount = mTerrain.GetIndexCount();
+			indexBufferParams.Target = GraphicsBufferTarget::Index;
+
+			mIndexBuffer = mGraphics->CreateBuffer(std::move(indexBufferParams));
+			mIndexBuffer->SetData(mTerrain.GetIndexData(), mTerrain.GetIndexCount() * sizeof(uint32_t));
 
 			VertexInputParams triangleVertexInputParams;	
-			triangleVertexInputParams.DebugName = "Triangle vertex input";
+			triangleVertexInputParams.DebugName = "Terrain vertex input";
 			triangleVertexInputParams.VertexBuffers[0] = mVertexBuffer;
-			triangleVertexInputParams.IndexBuffer = nullptr;
+			triangleVertexInputParams.IndexBuffer = mIndexBuffer;
 			triangleVertexInputParams.VertexAttributes =
 			{
-				{ "Position", GraphicsFormat::R32G32B32_FLOAT, 0 },
+				{ "Position", GraphicsFormat::R32G32B32A32_FLOAT, 0 },
 			};
 
-			mTriangleVertexInput = mGraphics->CreateVertexInput(std::move(triangleVertexInputParams));
+			mVertexInput = mGraphics->CreateVertexInput(std::move(triangleVertexInputParams));
 
 			mShaderCompiler = mGraphics->GetShaderCompiler();
 
@@ -103,9 +104,12 @@ namespace editor
 				R"(
 				#version 460 core
 
+				uniform mat4 uModel;
 				uniform mat4 uViewProj;
 
 				layout (location = 0) in vec3 aPosition;
+
+				out vec4 modelSpacePosition;
 
 				out gl_PerVertex
 				{
@@ -114,20 +118,21 @@ namespace editor
 
 				void main()
 				{
-					gl_Position = uViewProj * vec4(aPosition, 1.0);
+					modelSpacePosition = vec4(aPosition, 1.0);
+					gl_Position = uViewProj * uModel * vec4(aPosition, 1.0);
 				}
 				)";
 			std::string_view psSource =
 				R"(
 				#version 460 core
 
-				out vec4 oColor;
+				in vec4 modelSpacePosition;
 
-				uniform vec3 uColor;
+				out vec4 oColor;
 
 				void main()
 				{
-					oColor = vec4(uColor, 1.0);
+					oColor = vec4(vec3(modelSpacePosition.y), 1.0);
 				}
 				)";
 
@@ -137,58 +142,48 @@ namespace editor
 
 			compilation = mShaderCompiler->Compile(ShaderKind::Pixel, psSource);
 			mPixelShader = mGraphics->CreateShader(compilation);
-			mPixelShader->SetUniform("uColor", 1.0f, 0.5f, 1.0f);
 			mShaderCompiler->DestroyCompilation(compilation);
 
 			Viewport vp;
 			vp.Width = mWindow->GetWidth();
 			vp.Height = mWindow->GetHeight();
 
-			Texture2DParams testTextureParams;
-			testTextureParams.DebugName = "Render Texture";
-			testTextureParams.Width = 720;
-			testTextureParams.Height = 720;
-			testTextureParams.MipLevelCount = 1;
-			testTextureParams.Format = GraphicsFormat::R8G8B8A8_UNORM;
-			mTestTexture = mGraphics->CreateTexture2D(std::move(testTextureParams));
+			DepthStencilState depthStencilState;
+			depthStencilState.DepthTestEnabled = true;
 
-			FramebufferParams offscreenFramebufferParams;
-			offscreenFramebufferParams.DebugName = "Offscreen framebuffer";
-			mOffscreenFramebuffer = mGraphics->CreateFramebuffer(std::move(offscreenFramebufferParams));
-			mOffscreenFramebuffer->AttachTexture2D(FramebufferAttachment::Color, mTestTexture, {});
-
-			mGraphics->SetVertexInput(mTriangleVertexInput);
+			mGraphics->SetVertexInput(mVertexInput);
 			mGraphics->SetShader(ShaderKind::Vertex, mVertexShader);
 			mGraphics->SetShader(ShaderKind::Pixel, mPixelShader);
-			mGraphics->SetPrimitiveMode(PrimitiveMode::TriangleList);
+			mGraphics->SetPrimitiveMode(PrimitiveMode::TriangleStrip);
 			mGraphics->SetViewport(vp);
-			mGraphics->SetFramebuffer(mOffscreenFramebuffer);
+			mGraphics->SetDepthStencilState(depthStencilState);
+
+			glm::mat4 scale(1.0f);
+			scale = glm::scale(scale, glm::vec3(0.01f, 1.7f, 0.01f));
+			mVertexShader->SetUniform("uModel", scale);
 
 			mCamera.SetPosition({ 0.0f, 0.0f, 3.0f });
 			mCamera.SetProjectionMatrix(glm::perspective(
 				glm::radians(60.0f),
 				16.0f / 9.0f,
-				0.001f,
+				0.1f,
 				1000.0f));
 			mCamera.LookAt({ 0.0f, 0.0f, 0.0f });
 		}
 
 		~TestApplication()
 		{
-			mGraphics->DestroyFramebuffer(mOffscreenFramebuffer);
-			mOffscreenFramebuffer = nullptr;
-
-			mGraphics->DestroyTexture2D(mTestTexture);
-			mTestTexture = nullptr;
-
 			mGraphics->DestroyShader(mPixelShader);
 			mPixelShader = nullptr;
 
 			mGraphics->DestroyShader(mVertexShader);
 			mVertexShader = nullptr;
 
-			mGraphics->DestroyVertexInput(mTriangleVertexInput);
-			mTriangleVertexInput = nullptr;
+			mGraphics->DestroyVertexInput(mVertexInput);
+			mVertexInput = nullptr;
+
+			mGraphics->DestroyBuffer(mIndexBuffer);
+			mIndexBuffer = nullptr;
 
 			mGraphics->DestroyBuffer(mVertexBuffer);
 			mVertexBuffer = nullptr;
@@ -251,7 +246,14 @@ namespace editor
 
 				mGraphics->SetFramebuffer(nullptr);
 				mGraphics->ClearColor(nullptr, 0.7f, 0.4f, 0.3f, 0.0f);
-				mGraphics->Draw(0, 3);
+				mGraphics->ClearDepthStencil(nullptr, 1.0f, 0);
+
+				for (int strip = 0; strip < mTerrain.GetNumberOfTriangleStrips(); strip++)
+				{
+					mGraphics->DrawIndexed(
+						mTerrain.GetNumberOfVerticesPerTriangleStrip() * strip,
+						mTerrain.GetNumberOfVerticesPerTriangleStrip());
+				}
 
 				mGraphics->Present();
 			}
@@ -362,16 +364,19 @@ namespace editor
 		Mouse* mMouse = nullptr;
 		Keyboard* mKeyboard = nullptr;
 
+		// Terrain
+		uavpf::HeightMap mHeights;
+		uavpf::TerrainMesh mTerrain;
+
 		// Graphics
 		GraphicsContext* mGraphics = nullptr;
 		GraphicsDebugWatch* mGraphicsDebug = nullptr;
 		GraphicsBuffer* mVertexBuffer = nullptr;
-		VertexInput* mTriangleVertexInput = nullptr;
+		GraphicsBuffer* mIndexBuffer = nullptr;
+		VertexInput* mVertexInput = nullptr;
 		ShaderCompiler* mShaderCompiler = nullptr;
 		Shader* mVertexShader = nullptr;
 		Shader* mPixelShader = nullptr;
-		Texture2D* mTestTexture = nullptr;
-		Framebuffer* mOffscreenFramebuffer = nullptr;
 
 		Camera mCamera;
 		FrameTimer mTimer;

@@ -1,7 +1,30 @@
 #include "uavpf/terrain/height_map.h"
 
+#include <cassert>
+
+#include "uavpf/image/image_luminance.h"
+
 namespace uavpf
 {
+	HeightMap HeightMap::FromLuminance(const ImageLuminance& luminance)
+	{
+		assert(luminance);
+
+		int32_t rows = luminance.GetImage()->GetHeight();
+		int32_t cols = luminance.GetImage()->GetWidth();
+		HeightMap result(rows, cols);
+
+		for (int32_t i = 0; i < cols; i++)
+		{
+			for (int32_t j = 0; j < rows; j++)
+			{
+				result[i][j] = luminance.FromRgb(j, i);
+			}
+		}
+
+		return result;
+	}
+
 	HeightMap::HeightMap(int32_t width, int32_t height)
 		: mWidth(width)
 		, mHeight(height)
