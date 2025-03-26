@@ -6,6 +6,7 @@ namespace editor
 	{
 		Unknown,
 		TriangleList,
+		TriangleStrip,
 		LineList,
 	};
 }

@@ -133,6 +133,8 @@ namespace editor
 		{
 			case PrimitiveMode::TriangleList:
 				return GL_TRIANGLES;
+			case PrimitiveMode::TriangleStrip:
+				return GL_TRIANGLE_STRIP;
 			case PrimitiveMode::LineList:
 				return GL_LINES;
 
