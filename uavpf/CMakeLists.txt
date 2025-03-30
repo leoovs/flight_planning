@@ -29,8 +29,10 @@ target_sources(
 	"src/image/image_grayscale.cpp"
 	"src/image/tiff_image.cpp"
 	"src/image/tiff_loader.cpp"
+	"src/image/tiff_tag_accessor_impl.cpp"
 
 	"src/terrain/height_map.cpp"
+	"src/terrain/height_map_builder.cpp"
 	"src/terrain/terrain_mesh.cpp"
 	"src/terrain/terrain_mesh_builder.cpp"
 )

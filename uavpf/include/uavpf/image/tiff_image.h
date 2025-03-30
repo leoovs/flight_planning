@@ -4,6 +4,8 @@
 
 #include <memory>
 
+#include "uavpf/image/tiff_tag_accessor.h"
+
 namespace uavpf
 {
 	struct TiffImageHandle;
@@ -24,6 +26,8 @@ namespace uavpf
 
 		uint32_t ReadPixelAt(int32_t x, int32_t y) const;
 		const uint32_t* GetPixels() const;
+
+		std::unique_ptr<TiffTagAccessor> GetTag(TiffTag tag);
 
 		bool IsValidImage() const; 
 		explicit operator bool() const;

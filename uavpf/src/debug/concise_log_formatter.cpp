@@ -19,6 +19,8 @@ namespace uavpf
 				return "Mock";
 			case LogSource::Application:
 				return "App";
+			case LogSource::ImageOperation:
+				return "ImOp";
 			default:
 				assert(false && "Unknown LogSource");
 				return "?";

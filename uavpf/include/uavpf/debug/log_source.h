@@ -7,6 +7,7 @@ namespace uavpf
 		Unspecified,
 		Mock,
 		Application,
+		ImageOperation,	
 
 		Count_,
 	};

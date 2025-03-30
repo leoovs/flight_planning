@@ -4,16 +4,32 @@
 
 namespace uavpf
 {
-	TerrainMeshBuilder::TerrainMeshBuilder(HeightMap& heightMap)
-		: mHeightMap(&heightMap)
-		, mNumberOfTriangleStrips(heightMap.GetHeight() - 1)
-		, mNumberOfVerticesPerTriangleStrip(heightMap.GetWidth() * 2)
+	TerrainMeshBuilder::TerrainMeshBuilder()
 	{
 		GeneratePositionsAndIndices();
 	}
 
+	TerrainMeshBuilder& TerrainMeshBuilder::SetHeight(
+		const HeightMap& heightMap)
+	{
+		mHeightMap = &heightMap;
+		return *this;
+	}
+
+	TerrainMeshBuilder& TerrainMeshBuilder::SetTransformation(
+		const glm::mat4& transformation)
+	{
+		mTransformation = transformation;
+		return *this;
+	}
+
 	TerrainMesh TerrainMeshBuilder::Build()
 	{
+		GeneratePositionsAndIndices();
+
+		mNumberOfTriangleStrips = mHeightMap->GetHeight() - 1;
+		mNumberOfVerticesPerTriangleStrip = mHeightMap->GetWidth() * 2;
+
 		return TerrainMesh(
 			std::move(mPositions),
 			std::move(mIndices),
@@ -41,9 +57,11 @@ namespace uavpf
 		{
 			for (int32_t j = 0; j < width; j++)
 			{
-				float elevation = (*mHeightMap)[i][j];
-				glm::vec4 position(-height / 2.0f + i, elevation, -width / 2.0f + j, 1.0f);
-				mPositions.push_back(position);
+				float k = (*mHeightMap)[i][j];
+				glm::vec4 rasterSpacePosition(i, k, j, 1.0f);
+				glm::vec4 modelSpacePosition(mTransformation * rasterSpacePosition);
+
+				mPositions.push_back(modelSpacePosition);
 
 				if (i < height - 1)
 				{

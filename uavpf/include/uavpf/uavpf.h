@@ -22,6 +22,7 @@
 #include "uavpf/image/image_grayscale.h"
 
 #include "uavpf/terrain/height_map.h"
+#include "uavpf/terrain/height_map_builder.h"
 #include "uavpf/terrain/terrain_mesh.h"
 #include "uavpf/terrain/terrain_mesh_builder.h"
 

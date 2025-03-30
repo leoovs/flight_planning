@@ -12,8 +12,6 @@ namespace uavpf
 	class HeightMap
 	{
 	public:
-		static HeightMap FromLuminance(const ImageGrayscale& luminance);
-
 		template<typename T>
 		class RowAccessor
 		{
@@ -42,6 +40,7 @@ namespace uavpf
 
 		HeightMap() = default;
 		HeightMap(int32_t width, int32_t height);
+		HeightMap(int32_t width, int32_t height, std::vector<float> heightMatrix);
 
 		RowAccessor<float> operator[](int32_t row);
 		RowAccessor<const float> operator[](int32_t row) const;
@@ -51,6 +50,9 @@ namespace uavpf
 		int32_t GetHeight() const;
 
 		void Resize(int32_t width, int32_t height);
+
+		std::vector<float>::iterator begin();
+		std::vector<float>::iterator end();
 
 	private:
 		int32_t mWidth = 0;

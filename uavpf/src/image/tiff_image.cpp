@@ -3,6 +3,7 @@
 #include <cassert>
 
 #include "image/tiff_image_handle.h"
+#include "image/tiff_tag_accessor_impl.h"
 
 namespace uavpf
 {
@@ -31,7 +32,7 @@ namespace uavpf
 
 	uint32_t TiffImage::ReadPixelAt(int32_t x, int32_t y) const
 	{
-		size_t indexFrom2DCoords = x * mImageHandle->Width + y;
+		size_t indexFrom2DCoords = y * mImageHandle->Width + x;
 
 		assert(indexFrom2DCoords < mImageHandle->RgbaPixels.size());
 
@@ -41,6 +42,20 @@ namespace uavpf
 	const uint32_t* TiffImage::GetPixels() const
 	{
 		return mImageHandle->RgbaPixels.data();
+	}
+
+	std::unique_ptr<TiffTagAccessor> TiffImage::GetTag(TiffTag tag)
+	{
+		switch (tag)
+		{
+		case TiffTag::Unknown:
+			return nullptr;
+		case TiffTag::Geo_ModelTransformationTag:
+			return std::make_unique<MatrixTiffTagAccessor>(mImageHandle.get(), tag);
+		}
+		
+		assert(false && "Unknown TiffTag enum value");
+		return nullptr;
 	}
 
 	bool TiffImage::IsValidImage() const

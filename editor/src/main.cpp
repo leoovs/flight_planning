@@ -1,4 +1,7 @@
+
 #include <uavpf/uavpf.h>
+
+#include <glm/ext.hpp>
 
 #include "event/event_bus.h"
 #include "event/event_queue.h"
@@ -45,10 +48,19 @@ namespace editor
 			mKeyboard = mPlatform->CreateKeyboard();
 
 			{
-				uavpf::TiffImage image = uavpf::TiffLoader().LoadImageFromFile("Image here..");
-				uavpf::ImageGrayscale lum(image);
-				mHeights = uavpf::HeightMap::FromLuminance(lum);
-				mTerrain = uavpf::TerrainMeshBuilder(mHeights)
+				uavpf::TiffImage image = uavpf::TiffLoader().LoadImageFromFile("C:/Users/Leonid/Desktop/viz.hh_color-relief.tiff");
+				glm::mat4 rasterToModel = image
+					.GetTag(uavpf::TiffTag::Geo_ModelTransformationTag)
+					->AsMatrix();
+
+				mHeights = uavpf::HeightMapBuilder()
+					.SetRasterSpace(uavpf::RasterSpace::RasterIsPoint)
+					.SetGrayscale(image)
+					.Build();
+
+				mTerrain = uavpf::TerrainMeshBuilder()
+					.SetHeight(mHeights)
+					.SetTransformation(rasterToModel)
 					.Build();
 			}
 
@@ -159,7 +171,7 @@ namespace editor
 			mGraphics->SetDepthStencilState(depthStencilState);
 
 			glm::mat4 scale(1.0f);
-			scale = glm::scale(scale, glm::vec3(0.01f, 1.7f, 0.01f));
+			scale = glm::scale(scale, glm::vec3(0.01f, 0.4f, 0.01f));
 			mVertexShader->SetUniform("uModel", scale);
 
 			mCamera.SetPosition({ 0.0f, 0.0f, 3.0f });
