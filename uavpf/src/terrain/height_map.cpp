@@ -2,11 +2,11 @@
 
 #include <cassert>
 
-#include "uavpf/image/image_luminance.h"
+#include "uavpf/image/image_grayscale.h"
 
 namespace uavpf
 {
-	HeightMap HeightMap::FromLuminance(const ImageLuminance& luminance)
+	HeightMap HeightMap::FromLuminance(const ImageGrayscale& luminance)
 	{
 		assert(luminance);
 
@@ -18,7 +18,7 @@ namespace uavpf
 		{
 			for (int32_t j = 0; j < rows; j++)
 			{
-				result[i][j] = luminance.FromRgb(j, i);
+				result[i][j] = luminance.Get(j, i);
 			}
 		}
 

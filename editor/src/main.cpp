@@ -46,7 +46,7 @@ namespace editor
 
 			{
 				uavpf::TiffImage image = uavpf::TiffLoader().LoadImageFromFile("Image here..");
-				uavpf::ImageLuminance lum(image);
+				uavpf::ImageGrayscale lum(image);
 				mHeights = uavpf::HeightMap::FromLuminance(lum);
 				mTerrain = uavpf::TerrainMeshBuilder(mHeights)
 					.Build();

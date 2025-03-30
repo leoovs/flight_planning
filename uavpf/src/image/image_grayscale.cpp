@@ -1,4 +1,4 @@
-#include "uavpf/image/image_luminance.h"
+#include "uavpf/image/image_grayscale.h"
 
 #include <cassert>
 
@@ -6,16 +6,16 @@
 
 namespace uavpf
 {
-	ImageLuminance::ImageLuminance(TiffImage& accessedImage)
+	ImageGrayscale::ImageGrayscale(TiffImage& accessedImage)
 		: mAccessedImage(&accessedImage)
 	{}
 
-	TiffImage* ImageLuminance::GetImage() const
+	TiffImage* ImageGrayscale::GetImage() const
 	{
 		return mAccessedImage;
 	}
 
-	float ImageLuminance::FromRgb(int32_t x, int32_t y) const
+	float ImageGrayscale::Get(int32_t x, int32_t y) const
 	{
 		assert(nullptr != mAccessedImage);
 
@@ -31,7 +31,7 @@ namespace uavpf
 		return greyscale;
 	}
 
-	ImageLuminance::operator bool() const
+	ImageGrayscale::operator bool() const
 	{
 		return nullptr != mAccessedImage;
 	}

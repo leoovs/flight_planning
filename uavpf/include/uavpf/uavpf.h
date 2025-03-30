@@ -19,7 +19,7 @@
 
 #include "uavpf/image/tiff_image.h"
 #include "uavpf/image/tiff_loader.h"
-#include "uavpf/image/image_luminance.h"
+#include "uavpf/image/image_grayscale.h"
 
 #include "uavpf/terrain/height_map.h"
 #include "uavpf/terrain/terrain_mesh.h"

@@ -26,7 +26,7 @@ target_sources(
 
 	"src/id/id_allocator.cpp"
 
-	"src/image/image_luminance.cpp"
+	"src/image/image_grayscale.cpp"
 	"src/image/tiff_image.cpp"
 	"src/image/tiff_loader.cpp"
 

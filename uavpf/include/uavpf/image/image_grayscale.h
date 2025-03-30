@@ -4,14 +4,14 @@
 
 namespace uavpf
 {
-	class ImageLuminance
+	class ImageGrayscale
 	{
 	public:
-		ImageLuminance() = default;
-		ImageLuminance(TiffImage& accessedImage);
+		ImageGrayscale() = default;
+		ImageGrayscale(TiffImage& accessedImage);
 
 		TiffImage* GetImage() const;
-		float FromRgb(int32_t x, int32_t y) const;
+		float Get(int32_t x, int32_t y) const;
 
 		explicit operator bool() const;
 
