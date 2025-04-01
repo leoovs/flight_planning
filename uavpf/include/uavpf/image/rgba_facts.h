@@ -10,7 +10,7 @@ namespace uavpf
 	{
 	public:
 		inline static constexpr uint32_t cMinChannelValue = 0;
-		inline static constexpr uint32_t cMaxChannelValue = 255;
+		inline static constexpr uint32_t cMaxChannelValue = 256;
 
 		inline static constexpr uint32_t cChannelMask = 0xFF;
 

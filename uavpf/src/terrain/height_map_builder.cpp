@@ -70,17 +70,5 @@ namespace uavpf
 			}
 		}
 	}
-
-	void HeightMapBuilder::Minimize()
-	{
-		float minHeight = *std::min_element(mHeightMap.begin(), mHeightMap.end());
-		std::for_each(mHeightMap.begin(), mHeightMap.end(),
-			[&minHeight](float& height)
-			{
-				height -= minHeight;
-			}
-		);
-	}
-
 }
 

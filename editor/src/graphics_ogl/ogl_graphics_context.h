@@ -72,6 +72,9 @@ namespace editor
 		void SetDepthStencilState(const DepthStencilState& state) override;
 		const DepthStencilState& GetDepthStencilState() const override;
 
+		void SetRasterizerState(const RasterizerState& state) override;
+		const RasterizerState& GetRasterizerState() const override;
+
 		OglShaderCompiler* GetShaderCompiler() override;
 
 		void Draw(int32_t startVertexIndex, int32_t vertexCount) override;
@@ -94,6 +97,7 @@ namespace editor
 		void SetNativeUniformBuffer(OglGraphicsBuffer* constantBuffer, int32_t slot);
 		void SetNativeFramebuffer(OglFramebuffer* framebuffer);
 		void SetNativeDepthStencilState(const DepthStencilState& state);
+		void SetNativeRasterizerState(const RasterizerState& state);
 
 		GraphicsContextParams mParams;
 		std::unique_ptr<OglProvider> mProvider;
@@ -107,6 +111,7 @@ namespace editor
 		Viewport mViewport;
 		OglFramebuffer* mFramebuffer = nullptr;
 		DepthStencilState mDepthStencilState;
+		RasterizerState mRasterizerState;
 	};
 }
 

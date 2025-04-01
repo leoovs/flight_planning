@@ -20,13 +20,9 @@ namespace uavpf
 		assert(nullptr != mAccessedImage);
 
 		uint32_t rgba = mAccessedImage->ReadPixelAt(x, y);
-		auto [r, g, b, a] = RgbaFacts::DecomposeRgba(rgba);
+		auto [a, b, g, r] = RgbaFacts::DecomposeRgba(rgba);
 
-		float normR = static_cast<float>(r) / RgbaFacts::cMaxChannelValue; 
-		float normG = static_cast<float>(g) / RgbaFacts::cMaxChannelValue; 
-		float normB = static_cast<float>(b) / RgbaFacts::cMaxChannelValue; 
-
-		float greyscale = 0.33f * normR + 0.33f * normG + 0.33f * normB;
+		float greyscale = (0.2126*r + 0.7152*g + 0.0722*b) / 256.0f;
 
 		return greyscale;
 	}

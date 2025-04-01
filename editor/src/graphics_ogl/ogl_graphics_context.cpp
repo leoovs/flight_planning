@@ -249,6 +249,16 @@ namespace editor
 		return mDepthStencilState;
 	}
 
+	void OglGraphicsContext::SetRasterizerState(const RasterizerState& state)
+	{
+		SetNativeRasterizerState(mRasterizerState = state);
+	}
+
+	const RasterizerState& OglGraphicsContext::GetRasterizerState() const
+	{
+		return mRasterizerState;
+	}
+
 	OglShaderCompiler* OglGraphicsContext::GetShaderCompiler()
 	{
 		return &mShaderCompiler;
@@ -354,6 +364,17 @@ namespace editor
 	void OglGraphicsContext::SetNativeDepthStencilState(const DepthStencilState& state)
 	{
 		(state.DepthTestEnabled ? glEnable : glDisable)(GL_DEPTH_TEST);
+	}
+
+	void OglGraphicsContext::SetNativeRasterizerState(const RasterizerState& state)
+	{
+		glPolygonMode(
+			GL_FRONT_AND_BACK,
+			OglFacts::ConvertFillModeToNative(state.FillMode));
+
+		glEnable(GL_CULL_FACE);
+		glFrontFace(GL_CW);
+		glCullFace(OglFacts::ConvertCullModeToNative(state.CullMode));
 	}
 }
 

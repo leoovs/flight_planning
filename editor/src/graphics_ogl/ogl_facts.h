@@ -6,6 +6,7 @@
 #include "graphics/graphics_buffer.h"
 #include "graphics/graphics_format.h"
 #include "graphics/primitive_mode.h"
+#include "graphics/rasterizer_state.h"
 #include "graphics/shader_kind.h"
 
 namespace editor
@@ -21,6 +22,8 @@ namespace editor
 		static GLenum ConvertShaderKindToNative(ShaderKind kind);
 		static GLenum ConvertPrimitiveModeToNative(PrimitiveMode mode);
 		static GLenum ConvertFramebufferAttachmentToNative(FramebufferAttachment attachment);
+		static GLenum ConvertFillModeToNative(FillMode mode);
+		static GLenum ConvertCullModeToNative(CullMode mode);
 		static bool IsGraphicsFormatNormalized(GraphicsFormat format);
 	};
 }

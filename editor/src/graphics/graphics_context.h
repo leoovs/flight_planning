@@ -2,12 +2,13 @@
 
 #include <cinttypes>
 
+#include "graphics/depth_stencil_state.h"
 #include "graphics/framebuffer.h"
 #include "graphics/graphics_backend.h"
 #include "graphics/graphics_buffer.h"
 #include "graphics/graphics_debug_watch.h"
 #include "graphics/primitive_mode.h"
-#include "graphics/depth_stencil_state.h"
+#include "graphics/rasterizer_state.h"
 #include "graphics/shader.h"
 #include "graphics/shader_compiler.h"
 #include "graphics/texture_2d.h"
@@ -81,6 +82,9 @@ namespace editor
 
 		virtual void SetDepthStencilState(const DepthStencilState& state) = 0;
 		virtual const DepthStencilState& GetDepthStencilState() const = 0;
+
+		virtual void SetRasterizerState(const RasterizerState& state) = 0;
+		virtual const RasterizerState& GetRasterizerState() const = 0;
 
 		virtual ShaderCompiler* GetShaderCompiler() = 0;
 

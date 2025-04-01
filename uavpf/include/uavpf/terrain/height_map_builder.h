@@ -22,7 +22,6 @@ namespace uavpf
 	private:
 		void GenerateHeightFromAreas();
 		void GenerateHeightFromPoints();
-		void Minimize();
 
 		ImageGrayscale mGrayscale;	
 		RasterSpace mRasterSpace = RasterSpace::RasterIsArea;

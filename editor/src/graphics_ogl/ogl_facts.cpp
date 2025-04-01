@@ -158,6 +158,34 @@ namespace editor
 				return 0;
 		}
 	}
+	
+	GLenum OglFacts::ConvertFillModeToNative(FillMode mode)
+	{
+		switch (mode)
+		{
+			case FillMode::Solid:
+				return GL_FILL;
+			case FillMode::Wireframe:
+				return GL_LINE;
+			default:
+				assert(false && "Invalid FillMode enum value");
+		}
+	}
+
+	GLenum OglFacts::ConvertCullModeToNative(CullMode mode)
+	{
+		switch (mode)
+		{
+			case CullMode::None:
+				return GL_NONE;
+			case CullMode::Front:
+				return GL_FRONT;
+			case CullMode::Back:
+				return GL_BACK;
+			default:
+				assert(false && "Invalid CullMode enum value");
+		}
+	}
 
 	bool OglFacts::IsGraphicsFormatNormalized(GraphicsFormat format)
 	{

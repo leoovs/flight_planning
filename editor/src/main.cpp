@@ -48,13 +48,13 @@ namespace editor
 			mKeyboard = mPlatform->CreateKeyboard();
 
 			{
-				uavpf::TiffImage image = uavpf::TiffLoader().LoadImageFromFile("C:/Users/Leonid/Desktop/viz.hh_color-relief.tiff");
+				uavpf::TiffImage image = uavpf::TiffLoader().LoadImageFromFile("C:/Users/Leonid/Desktop/mountain.tif");
 				glm::mat4 rasterToModel = image
 					.GetTag(uavpf::TiffTag::Geo_ModelTransformationTag)
 					->AsMatrix();
 
 				mHeights = uavpf::HeightMapBuilder()
-					.SetRasterSpace(uavpf::RasterSpace::RasterIsPoint)
+					.SetRasterSpace(mRasterSpace)
 					.SetGrayscale(image)
 					.Build();
 
@@ -118,10 +118,13 @@ namespace editor
 
 				uniform mat4 uModel;
 				uniform mat4 uViewProj;
+				uniform vec3 uEyePosition;
 
 				layout (location = 0) in vec3 aPosition;
 
 				out vec4 modelSpacePosition;
+				out vec4 worldSpacePosition;
+				out vec3 eyeRelativePosition;
 
 				out gl_PerVertex
 				{
@@ -131,20 +134,44 @@ namespace editor
 				void main()
 				{
 					modelSpacePosition = vec4(aPosition, 1.0);
-					gl_Position = uViewProj * uModel * vec4(aPosition, 1.0);
+					worldSpacePosition = uModel * modelSpacePosition;
+
+					eyeRelativePosition = worldSpacePosition.xyz - uEyePosition;
+					
+					gl_Position = uViewProj * worldSpacePosition;
 				}
 				)";
 			std::string_view psSource =
 				R"(
 				#version 460 core
 
+				uniform vec3 uEyePosition;
+
 				in vec4 modelSpacePosition;
+				in vec4 worldSpacePosition;
+				in vec3 eyeRelativePosition;
 
 				out vec4 oColor;
 
+				vec3 getNormal()
+				{
+					vec3 dPosdX = dFdx(eyeRelativePosition);
+					vec3 dPosdY = dFdy(eyeRelativePosition);
+					
+					vec3 faceNormal = normalize(cross(dPosdX, dPosdY));
+					return faceNormal;	
+				}
+
 				void main()
 				{
-					oColor = vec4(vec3(modelSpacePosition.y), 1.0);
+					vec3 normal = getNormal();
+					vec3 lightDirection =  normalize(uEyePosition - vec3(worldSpacePosition));
+
+					float height = modelSpacePosition.y;
+					float light = dot(lightDirection, normal);
+					vec3 color = vec3(0.0, height, 1 - height) * light;
+
+					oColor = vec4(color, 1.0);
 				}
 				)";
 
@@ -163,23 +190,37 @@ namespace editor
 			DepthStencilState depthStencilState;
 			depthStencilState.DepthTestEnabled = true;
 
+			RasterizerState rasterizerState;
+			rasterizerState.FillMode = FillMode::Solid;
+			rasterizerState.CullMode = CullMode::Back;
+
 			mGraphics->SetVertexInput(mVertexInput);
 			mGraphics->SetShader(ShaderKind::Vertex, mVertexShader);
 			mGraphics->SetShader(ShaderKind::Pixel, mPixelShader);
 			mGraphics->SetPrimitiveMode(PrimitiveMode::TriangleStrip);
 			mGraphics->SetViewport(vp);
 			mGraphics->SetDepthStencilState(depthStencilState);
+			mGraphics->SetRasterizerState(rasterizerState);
 
-			glm::mat4 scale(1.0f);
-			scale = glm::scale(scale, glm::vec3(0.01f, 0.4f, 0.01f));
-			mVertexShader->SetUniform("uModel", scale);
+			glm::vec3 scale(0.01f, 3.5f, 0.01f);
+			if (mRasterSpace == uavpf::RasterSpace::RasterIsArea)
+			{
+				scale.x /= 2;
+				scale.z /= 2;
+			}
+			mVertexShader->SetUniform("uModel", glm::scale(glm::mat4(1.0f), scale));
 
-			mCamera.SetPosition({ 0.0f, 0.0f, 3.0f });
+			float aspectRatio = 16 / 9.0f;
+			float width = 10.0f;
+			float height = width / aspectRatio;
+
+			mCamera.SetPosition({ 0.0f, 3.0f, 3.0f });
 			mCamera.SetProjectionMatrix(glm::perspective(
 				glm::radians(60.0f),
-				16.0f / 9.0f,
+				aspectRatio,
 				0.1f,
 				1000.0f));
+
 			mCamera.LookAt({ 0.0f, 0.0f, 0.0f });
 		}
 
@@ -252,12 +293,16 @@ namespace editor
 					? glm::normalize(cameraSpeed)
 					: glm::vec3(0.0f);
 
+				cameraSpeed *= 2.5f;
+
 				mCamera.SetPosition(mCamera.GetPosition() + cameraSpeed * dt);
 			
 				mVertexShader->SetUniform("uViewProj", mCamera.CalculateViewProjectionMatrix());
+				mVertexShader->SetUniform("uEyePosition", mCamera.GetPosition());
+				mPixelShader->SetUniform("uEyePosition", mCamera.GetPosition());
 
 				mGraphics->SetFramebuffer(nullptr);
-				mGraphics->ClearColor(nullptr, 0.7f, 0.4f, 0.3f, 0.0f);
+				mGraphics->ClearColor(nullptr, 0.2f, 0.2f, 0.2f, 0.0f);
 				mGraphics->ClearDepthStencil(nullptr, 1.0f, 0);
 
 				for (int strip = 0; strip < mTerrain.GetNumberOfTriangleStrips(); strip++)
@@ -390,6 +435,7 @@ namespace editor
 		Shader* mVertexShader = nullptr;
 		Shader* mPixelShader = nullptr;
 
+		uavpf::RasterSpace mRasterSpace = uavpf::RasterSpace::RasterIsPoint;
 		Camera mCamera;
 		FrameTimer mTimer;
 	};
