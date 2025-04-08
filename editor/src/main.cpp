@@ -3,6 +3,7 @@
 #include <glm/ext.hpp>
 #include <glm/gtx/string_cast.hpp>
 
+#include "application.h"
 #include "event/event_bus.h"
 #include "event/event_queue.h"
 #include "event/event_subscriber.h"
@@ -209,7 +210,7 @@ namespace editor
 			mGraphics->SetRasterizerState(rasterizerState);
 
 			glm::vec3 scale(0.01f, 3.5f, 0.01f);
-			if (mRasterSpace == uavpf::RasterSpace::RasterIsArea)
+			if (mRasterSpace == uavpf::RasterSpace::RasterIsPoint)
 			{
 				scale.x /= 2;
 				scale.z /= 2;
@@ -456,6 +457,6 @@ int main()
 		std::move(formatter),
 		std::move(emitter));
 
-	editor::TestApplication().StartMainLoop();
+	editor::Application().Run();
 }
 

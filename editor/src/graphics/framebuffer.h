@@ -32,6 +32,8 @@ namespace editor
 			Texture2D* texture2D,
 			SubresourceRegion region) = 0;
 
+		virtual bool HasAttachment(FramebufferAttachment attachment) const = 0;
+
 		virtual void Detach(FramebufferAttachment attachment) = 0;
 	};
 }

@@ -22,6 +22,8 @@ namespace editor
 			Texture2D* texture2D,
 			SubresourceRegion region) override;
 
+		bool HasAttachment(FramebufferAttachment attachment) const override;
+
 		void Detach(FramebufferAttachment attachment) override;
 
 		GLuint GetNativeFramebuffer() const;

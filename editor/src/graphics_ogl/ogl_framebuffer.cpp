@@ -26,6 +26,12 @@ namespace editor
 		Texture2D* texture2D,
 		SubresourceRegion region)
 	{
+		if (nullptr == texture2D)
+		{
+			Detach(attachment);
+			return;
+		}
+
 		auto actualTexture2D = dynamic_cast<OglTexture2D*>(texture2D);
 		GLenum nativeAttachment = OglFacts::ConvertFramebufferAttachmentToNative(attachment);
 
@@ -34,6 +40,11 @@ namespace editor
 			nativeAttachment,
 			actualTexture2D->GetNativeTexture2D(),
 			region.MipLevelIndex);
+	}
+
+	bool OglFramebuffer::HasAttachment(FramebufferAttachment attachment) const
+	{
+		return nullptr != mAttachments.at(size_t(attachment));
 	}
 
 	void OglFramebuffer::Detach(FramebufferAttachment attachment)

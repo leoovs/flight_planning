@@ -7,6 +7,7 @@ add_executable(editor)
 target_sources(
 	editor
 	PRIVATE
+	"src/application.cpp"
 	"src/main.cpp"
 
 	"src/event/event_bus.cpp"
@@ -40,6 +41,8 @@ target_sources(
 
 	"src/rendering/camera.cpp"
 	"src/rendering/frame_timer.cpp"
+	"src/rendering/terrain_render_mesh.cpp"
+	"src/rendering/terrain_renderer.cpp"
 )
 
 target_include_directories(
