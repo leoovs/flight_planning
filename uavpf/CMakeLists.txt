@@ -54,6 +54,12 @@ target_link_libraries(
 	TIFF::tiff
 )
 
+target_compile_definitions(
+	uavpf
+	PUBLIC
+	"GLM_ENABLE_EXPERIMENTAL"
+)
+
 set_target_properties(
 	uavpf
 	PROPERTIES

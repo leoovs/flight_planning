@@ -1,7 +1,7 @@
-
 #include <uavpf/uavpf.h>
 
 #include <glm/ext.hpp>
+#include <glm/gtx/string_cast.hpp>
 
 #include "event/event_bus.h"
 #include "event/event_queue.h"
@@ -52,6 +52,12 @@ namespace editor
 				glm::mat4 rasterToModel = image
 					.GetTag(uavpf::TiffTag::Geo_ModelTransformationTag)
 					->AsMatrix();
+
+				UAVPF_LOG(
+					Application,
+					Info,
+					"Raster to model matrix:\n%s",
+					glm::to_string(rasterToModel).data());
 
 				mHeights = uavpf::HeightMapBuilder()
 					.SetRasterSpace(mRasterSpace)
