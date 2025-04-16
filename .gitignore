@@ -10,4 +10,5 @@
 
 # Clangd LSP
 **/.cache/**
+compile_commands.json
 
