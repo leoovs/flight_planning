@@ -77,12 +77,12 @@ namespace editor
 
 		mOverlay->SetCamera(mCamera);
 		// mRenderer->SetCamera(mCamera);
-		mOverlay->RenderLine3D(glm::vec3(0.5f), glm::vec3(-0.5f));
-		mOverlay->RenderLine3D(glm::vec3(-0.5f), glm::vec3(-1.0f, 0.5f, 1.0f));
-		mOverlay->RenderLine3D(glm::vec3(-1.0f, 0.5f, 1.0f), glm::vec3(0.5f));
-		mOverlay->RenderCircle3D(glm::vec3( 0.5f), 0.1f);
-		mOverlay->RenderCircle3D(glm::vec3(-0.5f), 0.1f);
-		mOverlay->RenderCircle3D(glm::vec3(-1.0f, 0.5f, 1.0f), 0.1f);
+		mOverlay->RenderLine3D(glm::vec3(0.5f), glm::vec3(-0.5f), glm::vec3(1.0f));
+		mOverlay->RenderLine3D(glm::vec3(-0.5f), glm::vec3(-1.0f, 0.5f, 1.0f), glm::vec3(1.0f));
+		mOverlay->RenderLine3D(glm::vec3(-1.0f, 0.5f, 1.0f), glm::vec3(0.5f), glm::vec3(1.0f));
+		mOverlay->RenderCircle3D(glm::vec3( 0.5f), 0.1f, glm::vec3(1.0f));
+		mOverlay->RenderCircle3D(glm::vec3(-0.5f), 0.1f, glm::vec3(1.0f));
+		mOverlay->RenderCircle3D(glm::vec3(-1.0f, 0.5f, 1.0f), 0.1f, glm::vec3(1.0f));
 		// mRenderer->Render(mRenderMesh, glm::scale(glm::mat4(1.0f), glm::vec3(0.01f, 3.0f, 0.01f)));
 
 		mGraphics->Present();

@@ -15,8 +15,8 @@ namespace editor
 
 		void SetCamera(const Camera& camera);
 
-		void RenderLine3D(const glm::vec3& a, const glm::vec3& b);
-		void RenderCircle3D(const glm::vec3& position, float radius);
+		void RenderLine3D(const glm::vec3& a, const glm::vec3& b, const glm::vec3& color);
+		void RenderCircle3D(const glm::vec3& position, float radius, const glm::vec3& color);
 
 	private:
 		enum ShaderIndex

@@ -24,7 +24,7 @@ namespace editor
 		mCamera = camera;
 	}
 
-	void OverlayRenderer::RenderLine3D(const glm::vec3& a, const glm::vec3& b)
+	void OverlayRenderer::RenderLine3D(const glm::vec3& a, const glm::vec3& b, const glm::vec3& color)
 	{
 		glm::mat4 model(1.0f);
 		glm::mat4 modelA = glm::translate(model, a);
@@ -52,6 +52,7 @@ namespace editor
 		mShaders.at(LinePS)->SetUniform("uPointA", ndcA);
 		mShaders.at(LinePS)->SetUniform("uPointB", ndcB);
 		mShaders.at(LinePS)->SetUniform("uViewport", width, height);
+		mShaders.at(LinePS)->SetUniform("uColor", color);
 
 		mGraphics->SetVertexInput(mLineVertexInput);
 		mGraphics->SetPrimitiveMode(PrimitiveMode::TriangleList);
@@ -63,7 +64,8 @@ namespace editor
 
 	void OverlayRenderer::RenderCircle3D(
 		const glm::vec3& position,
-		float radius)
+		float radius,
+		const glm::vec3& color)
 	{
 		glm::mat4 model(1.0f);
 		model = glm::translate(model, position);
@@ -77,6 +79,7 @@ namespace editor
 		mShaders.at(CircleVS)->SetUniform("uModel", model);
 		mShaders.at(CircleVS)->SetUniform("uView", view);
 		mShaders.at(CircleVS)->SetUniform("uProj", proj);
+		mShaders.at(CirclePS)->SetUniform("uColor", color);
 
 		mGraphics->SetVertexInput(mLineVertexInput);
 		mGraphics->SetPrimitiveMode(PrimitiveMode::TriangleList);
@@ -120,6 +123,7 @@ namespace editor
 			uniform vec4 uPointA;
 			uniform vec4 uPointB;
 			uniform vec2 uViewport;
+			uniform vec3 uColor;
 
 			out vec4 oColor;
 
@@ -176,7 +180,7 @@ namespace editor
 					discard;
 				}
 
-				oColor = vec4(1.0f);
+				oColor = vec4(uColor, 1.0f);
 			}
 		)";
 		sources.at(LinePS).Kind = ShaderKind::Pixel;
@@ -253,6 +257,8 @@ namespace editor
 		sources.at(CirclePS).Code = R"(
 			#version 460 core
 
+			uniform vec3 uColor;
+
 			in vec2 uv;
 
 			out vec4 oColor;
@@ -265,7 +271,7 @@ namespace editor
 					discard;
 				}
 
-				oColor = vec4(uv, 0.0f, 1.0f);
+				oColor = vec4(uColor, 1.0f);
 			}
 		)";
 		sources.at(CirclePS).Kind = ShaderKind::Pixel;
