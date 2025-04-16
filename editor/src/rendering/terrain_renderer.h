@@ -19,6 +19,8 @@ namespace editor
 
 		~TerrainRenderer();
 
+		// TODO: add clear method
+
 		TerrainRenderMesh* CreateTerrainRenderMesh(const uavpf::TerrainMesh& mesh);
 		void DestroyTerrainRenderMesh(TerrainRenderMesh* mesh);
 

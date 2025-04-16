@@ -8,6 +8,7 @@
 #include "platform/platform_events.h"
 #include "platform/platform_service.h"
 #include "rendering/frame_timer.h"
+#include "rendering/overlay_renderer.h"
 #include "rendering/terrain_renderer.h"
 
 namespace editor
@@ -20,7 +21,7 @@ namespace editor
 
 		void Run();
 		void Quit();
-		void Update(float dt);
+		void Update();
 		void Render();
 
 	private:
@@ -55,6 +56,7 @@ namespace editor
 		Texture2D* mDepthBuffer = nullptr;
 
 		TerrainRenderer* mRenderer = nullptr;
+		OverlayRenderer* mOverlay = nullptr;
 		uavpf::TerrainMesh mMesh;
 		TerrainRenderMesh* mRenderMesh = nullptr;
 		FrameTimer mFrameTimer;

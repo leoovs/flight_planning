@@ -178,9 +178,9 @@ namespace editor
 			utilizedFramebuffer = mFramebuffer;
 		}
 
-		mGraphics->SetFramebuffer(utilizedFramebuffer);
-		mGraphics->ClearColor(utilizedFramebuffer, 0.3f, 0.3f, 0.3f, 0.3f);
-		mGraphics->ClearDepthStencil(utilizedFramebuffer, 1.0f, 0);
+		//mGraphics->SetFramebuffer(utilizedFramebuffer);
+		//mGraphics->ClearColor(utilizedFramebuffer, 0.3f, 0.3f, 0.3f, 0.3f);
+		//mGraphics->ClearDepthStencil(utilizedFramebuffer, 1.0f, 0);
 
 		mGraphics->SetPrimitiveMode(PrimitiveMode::TriangleStrip);
 		mGraphics->SetVertexInput(mesh->GetTerrainInput());

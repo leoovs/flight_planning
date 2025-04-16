@@ -41,6 +41,7 @@ target_sources(
 
 	"src/rendering/camera.cpp"
 	"src/rendering/frame_timer.cpp"
+	"src/rendering/overlay_renderer.cpp"
 	"src/rendering/terrain_render_mesh.cpp"
 	"src/rendering/terrain_renderer.cpp"
 )

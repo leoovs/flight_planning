@@ -1,5 +1,6 @@
 #include "application.h"
 #include "platform/platform_service.h"
+#include "rendering/overlay_renderer.h"
 #include "uavpf/debug/logger_provider.h"
 
 namespace editor 
@@ -27,7 +28,7 @@ namespace editor
 		while (mRunning)
 		{
 			mFrameTimer.Tick();
-			Update(mFrameTimer.GetDeltaTimeSeconds());
+			Update();
 			Render();
 		}
 	}
@@ -37,7 +38,7 @@ namespace editor
 		mRunning = false;
 	}
 
-	void Application::Update(float dt)
+	void Application::Update()
 	{
 		mPlatform->PollEvents();
 		mEvents.Dispatch();
@@ -62,14 +63,28 @@ namespace editor
 		speed = glm::length(speed) > glm::epsilon<float>()
 			? glm::normalize(speed)
 			: speed;
-		mCamera.SetPosition(mCamera.GetPosition() + speed * dt);
+		mCamera.SetPosition(mCamera.GetPosition() + speed * mFrameTimer.GetDeltaTimeSeconds());
 	}
 
 	void Application::Render()
 	{
 		mGraphics->SetViewport({ 0, 0, mWindow->GetWidth(), mWindow->GetHeight() });
-		mRenderer->SetCamera(mCamera);
-		mRenderer->Render(mRenderMesh, glm::scale(glm::mat4(1.0f), glm::vec3(0.01f, 4.0f, 0.01f)));
+		mGraphics->ClearColor(nullptr, 0.3f, 0.3f, 0.3f, 1.0f);
+		mGraphics->ClearDepthStencil(nullptr, 1.0f, 0);
+
+		// mRenderer->SetCamera(mCamera);
+		// mRenderer->Render(mRenderMesh, glm::scale(glm::mat4(1.0f), glm::vec3(0.01f, 4.0f, 0.01f)));
+
+		mOverlay->SetCamera(mCamera);
+		// mRenderer->SetCamera(mCamera);
+		mOverlay->RenderLine3D(glm::vec3(0.5f), glm::vec3(-0.5f));
+		mOverlay->RenderLine3D(glm::vec3(-0.5f), glm::vec3(-1.0f, 0.5f, 1.0f));
+		mOverlay->RenderLine3D(glm::vec3(-1.0f, 0.5f, 1.0f), glm::vec3(0.5f));
+		mOverlay->RenderCircle3D(glm::vec3( 0.5f), 0.1f);
+		mOverlay->RenderCircle3D(glm::vec3(-0.5f), 0.1f);
+		mOverlay->RenderCircle3D(glm::vec3(-1.0f, 0.5f, 1.0f), 0.1f);
+		// mRenderer->Render(mRenderMesh, glm::scale(glm::mat4(1.0f), glm::vec3(0.01f, 3.0f, 0.01f)));
+
 		mGraphics->Present();
 	}
 
@@ -118,6 +133,7 @@ namespace editor
 	void Application::SetupRenderer()
 	{
 		mRenderer = new TerrainRenderer(mGraphics);
+		mOverlay = new OverlayRenderer(mGraphics);
 
 		uavpf::TiffImage image = uavpf::TiffLoader()
 			.LoadImageFromFile("C:/Users/Leonid/Desktop/mountain.tif");
@@ -143,6 +159,7 @@ namespace editor
 
 	void Application::ShutDownRenderer()
 	{
+		delete mOverlay;
 		delete mRenderer;
 	}
 
