@@ -6,44 +6,23 @@
 
 namespace uavpf
 {
-	HeightMap::HeightMap(int32_t width, int32_t height)
+	HeightMap::HeightMap(int32_t width, int32_t depth)
 		: mWidth(width)
-		, mHeight(height)
-		, mHeightMatrix(width * height)
+		, mDepth(depth)
+		, mElevation(width * depth)
 	{
 	}
 
-	HeightMap::HeightMap(int32_t width, int32_t height, std::vector<float> heightMatrix)
+	HeightMap::HeightMap(int32_t width, int32_t depth, std::vector<float> heightMatrix)
 		: mWidth(width)
-		, mHeight(height)
-		, mHeightMatrix(std::move(heightMatrix))
+		, mDepth(depth)
+		, mElevation(std::move(heightMatrix))
 	{
-		assert(width * height == mHeightMatrix.size());
+		assert(width * depth == mElevation.size());
 	}
-
-	HeightMap::RowAccessor<float>
-	HeightMap::operator[](int32_t row)
-	{
-		return RowAccessor<float>(
-			mHeightMatrix.data(), 
-			row,
-			mWidth,
-			mHeightMatrix.size());
-	}
-
-	HeightMap::RowAccessor<const float>
-	HeightMap::operator[](int32_t row) const
-	{
-		return RowAccessor<const float>(
-			mHeightMatrix.data(), 
-			row,
-			mWidth,
-			mHeightMatrix.size());
-	}
-
 	size_t HeightMap::GetSize() const
 	{
-		return mHeightMatrix.size();
+		return mElevation.size();
 	}
 
 	int32_t HeightMap::GetWidth() const
@@ -51,26 +30,40 @@ namespace uavpf
 		return mWidth;
 	}
 
-	int32_t HeightMap::GetHeight() const
+	int32_t HeightMap::GetDepth() const
 	{
-		return mHeight;
+		return mDepth;
 	}
 
-	void HeightMap::Resize(int32_t width, int32_t height)
+	float HeightMap::GetElevation(int32_t x, int32_t z) const
+	{
+		int32_t index = z * mWidth + x;
+		assert(index < mElevation.size());
+		return mElevation.at(index);
+	}
+
+	float& HeightMap::At(int32_t x, int32_t z)
+	{
+		int32_t index = z * mWidth + x;
+		assert(index < mElevation.size());
+		return mElevation.at(index);
+	}
+
+	void HeightMap::Resize(int32_t width, int32_t depth)
 	{
 		mWidth = width;
-		mHeight = height;
-		mHeightMatrix.resize(width * height);
+		mDepth = depth;
+		mElevation.resize(width * depth);
 	}
 
 	std::vector<float>::iterator HeightMap::begin()
 	{
-		return mHeightMatrix.begin();
+		return mElevation.begin();
 	}
 
 	std::vector<float>::iterator HeightMap::end()
 	{
-		return mHeightMatrix.end();
+		return mElevation.end();
 	}
 }
 

@@ -18,6 +18,9 @@ target_sources(
 	"src/format_str.cpp"
 	"src/version.cpp"
 
+	"src/algo/astar_algorithm.cpp"
+	"src/algo/navgrid.cpp"
+
 	"src/debug/concise_log_formatter.cpp"
 	"src/debug/console_log_emitter.cpp"
 	"src/debug/log_record.cpp"

@@ -1,7 +1,11 @@
 #include "application.h"
 #include "platform/platform_service.h"
 #include "rendering/overlay_renderer.h"
+#include "uavpf/algo/astar_algorithm.h"
+#include "uavpf/algo/navgrid.h"
 #include "uavpf/debug/logger_provider.h"
+
+#include <glm/gtx/string_cast.hpp>
 
 namespace editor 
 {
@@ -12,10 +16,12 @@ namespace editor
 		SetupPlatform();
 		SetupGraphics();
 		SetupRenderer();
+		SetupAlgorithm();
 	}
 
 	Application::~Application()
 	{
+		ShutDownAlgorithm();
 		ShutDownRenderer();
 		ShutDownGraphics();
 		ShutDownPlatform();
@@ -63,7 +69,19 @@ namespace editor
 		speed = glm::length(speed) > glm::epsilon<float>()
 			? glm::normalize(speed)
 			: speed;
-		mCamera.SetPosition(mCamera.GetPosition() + speed * mFrameTimer.GetDeltaTimeSeconds());
+		mCamera.SetPosition(mCamera.GetPosition() + 4.0f * speed * mFrameTimer.GetDeltaTimeSeconds());
+
+		uavpf::AStarAlgorithm algo;
+		
+		while (algo.IsExplorable())
+		{
+			algo.ExploreNext();
+
+			if (algo.IsGoal())
+			{
+				break;
+			}
+		}
 	}
 
 	void Application::Render()
@@ -72,18 +90,25 @@ namespace editor
 		mGraphics->ClearColor(nullptr, 0.3f, 0.3f, 0.3f, 1.0f);
 		mGraphics->ClearDepthStencil(nullptr, 1.0f, 0);
 
-		// mRenderer->SetCamera(mCamera);
-		// mRenderer->Render(mRenderMesh, glm::scale(glm::mat4(1.0f), glm::vec3(0.01f, 4.0f, 0.01f)));
+		glm::mat4 scale(1.0f);
+		scale = glm::scale(scale, glm::vec3(0.01f, 4.0f, 0.01f));
 
+		mRenderer->SetCamera(mCamera);
 		mOverlay->SetCamera(mCamera);
-		// mRenderer->SetCamera(mCamera);
-		mOverlay->RenderLine3D(glm::vec3(0.5f), glm::vec3(-0.5f), glm::vec3(1.0f));
-		mOverlay->RenderLine3D(glm::vec3(-0.5f), glm::vec3(-1.0f, 0.5f, 1.0f), glm::vec3(1.0f));
-		mOverlay->RenderLine3D(glm::vec3(-1.0f, 0.5f, 1.0f), glm::vec3(0.5f), glm::vec3(1.0f));
-		mOverlay->RenderCircle3D(glm::vec3( 0.5f), 0.1f, glm::vec3(1.0f));
-		mOverlay->RenderCircle3D(glm::vec3(-0.5f), 0.1f, glm::vec3(1.0f));
-		mOverlay->RenderCircle3D(glm::vec3(-1.0f, 0.5f, 1.0f), 0.1f, glm::vec3(1.0f));
-		// mRenderer->Render(mRenderMesh, glm::scale(glm::mat4(1.0f), glm::vec3(0.01f, 3.0f, 0.01f)));
+
+		for (uavpf::NavNode* node : mPath)
+		{
+			glm::ivec2 navCoords = mGrid->GetCoordinates(node);
+			float elevation = mGrid->GetElevation(navCoords.x, navCoords.y);
+			glm::ivec2 imageCoords = mGrid->ConvertCoordinates(navCoords);
+
+			glm::vec3 coords(imageCoords.x, elevation, imageCoords.y);
+			glm::vec3 worldCoords = scale * glm::vec4(coords, 1.0f);
+
+			mOverlay->RenderCircle3D(worldCoords + glm::vec3(0.0f, 0.03f, 0.0f), 0.03f, glm::vec3(1.0f));
+		}
+
+		mRenderer->Render(mRenderMesh, scale);
 
 		mGraphics->Present();
 	}
@@ -138,13 +163,13 @@ namespace editor
 		uavpf::TiffImage image = uavpf::TiffLoader()
 			.LoadImageFromFile("C:/Users/Leonid/Desktop/mountain.tif");
 
-		uavpf::HeightMap heightMap = uavpf::HeightMapBuilder()
-			.SetRasterSpace(uavpf::RasterSpace::RasterIsArea)
+		mHeightMap = uavpf::HeightMapBuilder()
+			.SetRasterSpace(uavpf::RasterSpace::RasterIsPoint)
 			.SetGrayscale(uavpf::ImageGrayscale(image))
 			.Build();
 
 		uavpf::TerrainMesh mesh = uavpf::TerrainMeshBuilder()
-			.SetHeight(heightMap)
+			.SetHeight(mHeightMap)
 			.SetTransformation(glm::mat4(1.0f))
 			.Build();
 
@@ -155,6 +180,70 @@ namespace editor
 			16.0f / 9.0f,
 			0.01f,
 			100.0f));
+	}
+
+	void Application::SetupAlgorithm()
+	{
+		uavpf::NavGridSpecification spec;
+		spec.Width = 100;
+		spec.Depth = 100;
+
+		mGrid = new uavpf::NavGrid(spec);
+		mGrid->SetHeightMap(&mHeightMap);
+
+		mPathFinder.Initialize(mGrid, { 0, 0 }, { 50, 50 });
+
+		bool pathFound = false;
+		while (mPathFinder.IsExplorable())
+		{
+			mPathFinder.ExploreNext();
+			if (mPathFinder.IsGoal())
+			{
+				pathFound = true;
+				break;
+			}
+
+			glm::ivec2 directions[]
+			{
+				{ 0, 1 },
+				{ 1, 0 },
+				{ -1, 0 },
+				{ 0, -1 },
+				{ 1, 1 },
+				{ -1, -1 },
+				{ 1, -1 },
+				{ -1, 1 },
+			};
+
+			for (const auto& direction : directions)
+			{
+				mPathFinder.ExploreNeighbour(direction);
+			}
+		}
+
+		if (!pathFound)
+		{
+			UAVPF_LOG(Application, Info, "Path not found");
+		}
+
+		mPath = mPathFinder.ConstructPath();
+
+		for (uavpf::NavNode* node : mPath)
+		{
+			auto navCoords = mGrid->GetCoordinates(node);
+			auto imageCoords = mGrid->ConvertCoordinates(navCoords); 
+
+			UAVPF_LOG(
+				Application,
+				Info,
+				"%s",
+				glm::to_string(imageCoords).data());
+		}
+	}
+
+	void Application::ShutDownAlgorithm()
+	{
+		delete mGrid;
 	}
 
 	void Application::ShutDownRenderer()

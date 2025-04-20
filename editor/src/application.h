@@ -10,6 +10,8 @@
 #include "rendering/frame_timer.h"
 #include "rendering/overlay_renderer.h"
 #include "rendering/terrain_renderer.h"
+#include "uavpf/algo/astar_algorithm.h"
+#include "uavpf/algo/navgrid.h"
 
 namespace editor
 {
@@ -30,7 +32,9 @@ namespace editor
 		void SetupPlatform();
 		void SetupGraphics();
 		void SetupRenderer();
+		void SetupAlgorithm();
 
+		void ShutDownAlgorithm();
 		void ShutDownRenderer();
 		void ShutDownGraphics();
 		void ShutDownPlatform();
@@ -61,6 +65,11 @@ namespace editor
 		TerrainRenderMesh* mRenderMesh = nullptr;
 		FrameTimer mFrameTimer;
 		Camera mCamera;
+
+		uavpf::HeightMap mHeightMap;
+		uavpf::NavGrid* mGrid = nullptr;
+		uavpf::AStarAlgorithm mPathFinder;
+		std::vector<uavpf::NavNode*> mPath;
 	};
 }
 

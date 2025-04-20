@@ -47,10 +47,10 @@ namespace uavpf
 				int32_t row = j * 2;
 				float elevation = mGrayscale.Get(i, j);
 
-				mHeightMap[row+0][col+0] = elevation;
-				mHeightMap[row+1][col+0] = elevation;
-				mHeightMap[row+0][col+1] = elevation;
-				mHeightMap[row+1][col+1] = elevation;
+				mHeightMap.At(col, row) = elevation;
+				mHeightMap.At(col, row) = elevation;
+				mHeightMap.At(col, row) = elevation;
+				mHeightMap.At(col, row) = elevation;
 			}
 		}
 	}
@@ -66,7 +66,7 @@ namespace uavpf
 		{
 			for (int32_t j = 0; j < rows; j++)
 			{
-				mHeightMap[j][i] = mGrayscale.Get(i, j);
+				mHeightMap.At(i, j) = mGrayscale.Get(i, j);
 			}
 		}
 	}
