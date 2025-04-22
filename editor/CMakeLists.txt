@@ -10,6 +10,9 @@ target_sources(
 	"src/application.cpp"
 	"src/main.cpp"
 
+	"src/app/app_service.cpp"
+	"src/app/editor_app.cpp"
+
 	"src/event/event_bus.cpp"
 	"src/event/event_dispatcher.cpp"
 	"src/event/event_publisher.cpp"
