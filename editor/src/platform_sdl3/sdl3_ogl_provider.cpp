@@ -32,6 +32,16 @@ namespace editor
 		return mParams;
 	}
 
+	SDL_Window* Sdl3OglProvider::GetNativeWindow() const
+	{
+		return mNativeWindow;
+	}
+
+	SDL_GLContext Sdl3OglProvider::GetNativeContext() const
+	{
+		return mNativeContext;
+	}
+
 	void Sdl3OglProvider::AcquireNativeContext()
 	{
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);	

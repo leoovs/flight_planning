@@ -6,6 +6,7 @@
 #include "event/event_bus.h"
 #include "platform/platform_events.h"
 #include "graphics_ogl/ogl_graphics_context.h"
+#include "platform_sdl3/sdl3_imgui_platform_backend.h"
 #include "platform_sdl3/sdl3_ogl_provider.h"
 
 namespace editor
@@ -53,6 +54,11 @@ namespace editor
 	{
 		for (SDL_Event event; SDL_PollEvent(&event);)
 		{
+			if (mRegisteredImGuiBackend)
+			{
+				mRegisteredImGuiBackend->HandleNativeEvent(&event);
+			}
+
 			uint32_t nativeEventType = event.type;
 
 			if (mHandlersByNativeEventType.count(nativeEventType) != 0)
@@ -186,6 +192,34 @@ namespace editor
 
 		delete graphicsContext;
 		mRegisteredGraphicsContext = nullptr;
+	}
+
+	Sdl3ImGuiPlatformBackend* Sdl3PlatformService::CreateImGuiBackend()
+	{
+		if (nullptr != mRegisteredImGuiBackend)
+		{
+			UAVPF_LOG(
+				Application,
+				Warning,
+				"Trying to create multiple imgui platforms");
+			return mRegisteredImGuiBackend;
+		}
+		return mRegisteredImGuiBackend = new Sdl3ImGuiPlatformBackend();
+	}
+
+	void Sdl3PlatformService::DestroyImGuiBackend(ImGuiPlatformBackend* backend)
+	{
+		if (nullptr == mRegisteredImGuiBackend)
+		{
+			UAVPF_LOG(
+				Application,
+				Warning,
+				"Trying to destroy imgui platform which is nullptr");
+			return;
+		}
+
+		delete backend;
+		mRegisteredImGuiBackend = nullptr;
 	}
 
 	void Sdl3PlatformService::RegisterWindow(Sdl3Window* window)

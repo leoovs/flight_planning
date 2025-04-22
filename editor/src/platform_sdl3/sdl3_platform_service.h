@@ -7,6 +7,7 @@
 #include "platform_sdl3/sdl3_keyboard.h"
 #include "platform_sdl3/sdl3_mouse.h"
 #include "platform_sdl3/sdl3_window.h"
+#include "platform_sdl3/sdl3_imgui_platform_backend.h"
 
 namespace editor
 {
@@ -38,6 +39,9 @@ namespace editor
 		GraphicsContext* CreateGraphicsContext(GraphicsContextParams params) override;
 		void DestroyGraphicsContext(GraphicsContext* graphicsContext) override;
 
+		Sdl3ImGuiPlatformBackend* CreateImGuiBackend() override;
+		void DestroyImGuiBackend(ImGuiPlatformBackend* backend) override;
+
 	private:
 		void RegisterWindow(Sdl3Window* window);
 		void UnregisterWindow(Sdl3Window* window);
@@ -63,5 +67,6 @@ namespace editor
 		Sdl3Mouse* mRegisteredMouse = nullptr;
 		Sdl3Keyboard* mRegisteredKeyboard = nullptr;
 		GraphicsContext* mRegisteredGraphicsContext = nullptr;
+		Sdl3ImGuiPlatformBackend* mRegisteredImGuiBackend = nullptr;
 	};
 }

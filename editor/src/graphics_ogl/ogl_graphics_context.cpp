@@ -30,6 +30,11 @@ namespace editor
 		return mParams;
 	}
 
+	OglProvider* OglGraphicsContext::GetProvider() const
+	{
+		return mProvider.get();
+	}
+
 	void OglGraphicsContext::Present()
 	{
 		mProvider->SwapBuffers();

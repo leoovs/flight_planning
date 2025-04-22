@@ -23,6 +23,8 @@ namespace editor
 		void SwapBuffers() override;
 
 		const Sdl3OglProviderParams& GetParams() const;
+		SDL_Window* GetNativeWindow() const;
+		SDL_GLContext GetNativeContext() const;
 
 	private:
 		void AcquireNativeContext();

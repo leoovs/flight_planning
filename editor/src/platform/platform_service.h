@@ -7,6 +7,7 @@
 #include "platform/keyboard.h"
 #include "platform/mouse.h"
 #include "platform/window.h"
+#include "platform/imgui_platform_backend.h"
 
 namespace editor
 {
@@ -34,6 +35,9 @@ namespace editor
 
 		virtual GraphicsContext* CreateGraphicsContext(GraphicsContextParams params) = 0;
 		virtual void DestroyGraphicsContext(GraphicsContext* graphicsContext) = 0;
+
+		virtual ImGuiPlatformBackend* CreateImGuiBackend() = 0;
+		virtual void DestroyImGuiBackend(ImGuiPlatformBackend* backend) = 0;
 	};
 
 	PlatformService* CreatePlatformService();

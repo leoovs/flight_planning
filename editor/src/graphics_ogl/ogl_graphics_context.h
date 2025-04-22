@@ -26,6 +26,7 @@ namespace editor
 			std::unique_ptr<OglProvider> provider);
 
 		const GraphicsContextParams& GetParams() const override;
+		OglProvider* GetProvider() const;
 
 		void Present() override;
 
