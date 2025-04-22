@@ -26,6 +26,30 @@ namespace editor
 
 	void OverlayRenderer::RenderLine3D(const glm::vec3& a, const glm::vec3& b, const glm::vec3& color)
 	{
+		glm::mat4 modelPointA = glm::translate(glm::mat4(1.0f), a);
+		glm::mat4 modelPointB = glm::translate(glm::mat4(1.0f), b);
+
+		glm::mat4 viewProj = mCamera.CalculateViewProjectionMatrix();
+		mShaders.at(LineVS2)->SetUniform("uViewProj", viewProj);
+		mShaders.at(LineVS2)->SetUniform("uPointA", modelPointA * glm::vec4(glm::vec3(0.0f), 1.0f));
+		mShaders.at(LineVS2)->SetUniform("uPointB", modelPointB * glm::vec4(glm::vec3(0.0f), 1.0f));
+		mShaders.at(LinePS2)->SetUniform("uColor", glm::vec4(color, 1.0f));
+
+		glm::vec4 lines[2]
+		{
+			glm::vec4(a, 1.0f),
+			glm::vec4(b, 1.0f),
+		};
+		mLinesBuffer->SetData(lines, sizeof(lines));
+		mGraphics->SetVertexInput(mLineVertexInput);
+		mGraphics->SetPrimitiveMode(PrimitiveMode::LineList);
+		mGraphics->SetShader(ShaderKind::Vertex, mShaders.at(LineVS2));
+		mGraphics->SetShader(ShaderKind::Pixel, mShaders.at(LinePS2));
+
+		mGraphics->Draw(0, 2);
+
+		return;
+
 		glm::mat4 model(1.0f);
 		glm::mat4 modelA = glm::translate(model, a);
 		glm::mat4 modelB = glm::translate(model, b);
@@ -38,12 +62,6 @@ namespace editor
 
 		glm::vec4 ndcA = clipSpaceA / clipSpaceA.w;
 		glm::vec4 ndcB = clipSpaceB / clipSpaceB.w;
-
-		UAVPF_LOG(
-			Application,
-			Trace,
-			"Pos: %s",
-			glm::to_string(ndcA).data());
 
 		const Viewport& vp = mGraphics->GetViewport();
 		float width = float(vp.Width - vp.TopLeftX);
@@ -185,6 +203,37 @@ namespace editor
 		)";
 		sources.at(LinePS).Kind = ShaderKind::Pixel;
 
+		sources.at(LineVS2).Kind = ShaderKind::Vertex;
+		sources.at(LineVS2).Code = R"(
+			#version 460 core
+
+			in vec4 aPosition;
+
+			out gl_PerVertex
+			{
+				vec4 gl_Position;
+			};
+
+			uniform mat4 uViewProj;
+
+			void main()
+			{
+				gl_Position = uViewProj * aPosition;
+			}
+		)";
+		sources.at(LinePS2).Kind = ShaderKind::Pixel;
+		sources.at(LinePS2).Code = R"(
+			#version 460 core
+
+			uniform vec4 uColor;
+			out vec4 oColor;
+
+			void main()
+			{
+				oColor = uColor;
+			}
+		)";
+
 		sources.at(CircleVS).Code = R"(
 			#version 460 core
 
@@ -314,8 +363,20 @@ namespace editor
 
 	void OverlayRenderer::CreateLineVertexInput()
 	{
+		GraphicsBufferParams lineBufferParams;
+		lineBufferParams.DebugName = "Line buffer";
+		lineBufferParams.StructSize = sizeof(float[4]);
+		lineBufferParams.StructCount = 2;
+		lineBufferParams.Target = GraphicsBufferTarget::Vertex;
+
+		mLinesBuffer = mGraphics->CreateBuffer(std::move(lineBufferParams));
+
 		VertexInputParams params;
-		params.DebugName = "Overlay renderer vertex input";
+		params.VertexBuffers[0] = mLinesBuffer;
+		params.DebugName = "Lines vertex input for overlay renderer";
+		params.VertexAttributes = {
+			VertexAttributeParams{ "Position", GraphicsFormat::R32G32B32A32_FLOAT, 0, 0 }
+		};
 
 		mLineVertexInput = mGraphics->CreateVertexInput(std::move(params));
 	}

@@ -23,6 +23,8 @@ namespace editor
 		{
 			LineVS,
 			LinePS,
+			LineVS2,
+			LinePS2,
 			CircleVS,
 			CirclePS,
 			ShaderIndexCount
@@ -46,6 +48,7 @@ namespace editor
 		Camera mCamera;
 		std::array<ShaderSource, ShaderIndexCount> mShaderSources = GetShaderSources();
 		std::array<Shader*, ShaderIndexCount> mShaders{};
+		GraphicsBuffer* mLinesBuffer = nullptr;
 		VertexInput* mLineVertexInput = nullptr;
 	};
 }

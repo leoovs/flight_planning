@@ -12,11 +12,13 @@ namespace uavpf
 {
 	class NavGrid;
 	class NavNode;
+	class AStarCost;
 
 	class AStarAlgorithm
 	{
 	public:
-		void Initialize(
+		AStarAlgorithm(
+			AStarCost* heuristic,
 			NavGrid* grid,
 			const glm::ivec2& start,
 			const glm::ivec2& end);
@@ -30,6 +32,7 @@ namespace uavpf
 		std::vector<NavNode*> ConstructPath() const;
 
 	private:
+		AStarCost* mCost = nullptr;
 		NavGrid* mGrid = nullptr;
 		std::deque<NavNode*> mToExplore;
 		std::unordered_set<NavNode*> mExplored;

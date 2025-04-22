@@ -19,6 +19,7 @@ target_sources(
 	"src/version.cpp"
 
 	"src/algo/astar_algorithm.cpp"
+	"src/algo/astar_cost.cpp"
 	"src/algo/navgrid.cpp"
 
 	"src/debug/concise_log_formatter.cpp"

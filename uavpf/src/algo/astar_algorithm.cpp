@@ -1,25 +1,31 @@
 #include "uavpf/algo/astar_algorithm.h"
 
 #include "uavpf/algo/navgrid.h"
+#include "uavpf/algo/astar_cost.h"
 
 #include <algorithm>
 
 namespace uavpf
 {
-	void AStarAlgorithm::Initialize(
+	AStarAlgorithm::AStarAlgorithm(
+		AStarCost* cost,
 		NavGrid* grid,
 		const glm::ivec2& start,
 		const glm::ivec2& end)
+		: mCost(cost)
+		, mGrid(grid)
+		, mStart(start)
+		, mEnd(end)
 	{
-		mGrid = grid;
 		mToExplore.clear();
-		mStart = start;
-		mEnd = end;
 		mTargetNode = mGrid->GetNode(end.x, end.y);
+
+		mCost->SetGrid(mGrid);
+		mCost->SetTarget(mTargetNode);
 
 		NavNode* startNode = mGrid->GetNode(start.x, start.y);
 		startNode->TotalCost = 0.0f;
-		startNode->HeuristicCost = glm::length(glm::vec2(start - end));
+		startNode->HeuristicCost = mCost->CalculateHeuristic(startNode);
 		mToExplore.push_back(startNode);
 	}
 
@@ -59,18 +65,18 @@ namespace uavpf
 		glm::ivec2 currentCoords = mGrid->GetCoordinates(mCurrentNode);					
 		glm::ivec2 neighbourCoords = currentCoords + direction;
 
-		NavNode* neighbour = mGrid->GetNode(neighbourCoords.x, neighbourCoords.y);
+		NavNode* neighbour = mGrid->GetNode(neighbourCoords);
 		if (neighbour == nullptr)
 		{
 			return;
 		}
 
-		float totalScoreFromStart = mCurrentNode->TotalCost + glm::length(glm::vec2(direction));
+		float totalScoreFromStart = mCurrentNode->TotalCost + mCost->CalculateCost(mCurrentNode, neighbour);
 		if (totalScoreFromStart < neighbour->TotalCost)
 		{
 			neighbour->Parent = mCurrentNode;
 			neighbour->TotalCost = totalScoreFromStart;
-			neighbour->HeuristicCost = glm::length(glm::vec2(neighbourCoords - mEnd));
+			neighbour->HeuristicCost = mCost->CalculateHeuristic(neighbour);
 
 			auto it = std::find(mToExplore.begin(), mToExplore.end(), neighbour);
 			if (it == mToExplore.end())

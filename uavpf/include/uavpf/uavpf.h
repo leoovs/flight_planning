@@ -4,6 +4,10 @@
 #include "uavpf/format_str.h"
 #include "uavpf/version.h"
 
+#include "uavpf/algo/astar_algorithm.h"
+#include "uavpf/algo/astar_cost.h"
+#include "uavpf/algo/navgrid.h"
+
 #include "uavpf/debug/concise_log_formatter.h"
 #include "uavpf/debug/console_log_emitter.h"
 #include "uavpf/debug/formatted_log.h"

@@ -67,9 +67,9 @@ namespace editor
 		Camera mCamera;
 
 		uavpf::HeightMap mHeightMap;
-		uavpf::NavGrid* mGrid = nullptr;
-		uavpf::AStarAlgorithm mPathFinder;
+		uavpf::NavGrid mGrid;
 		std::vector<uavpf::NavNode*> mPath;
+		float mTargetElevation = 0.35f;
 	};
 }
 

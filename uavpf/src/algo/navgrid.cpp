@@ -35,14 +35,29 @@ namespace uavpf
 		return mHeightMap->GetElevation(imageCoords.x, imageCoords.y);
 	}
 
-	NavNode* NavGrid::GetNode(int32_t navX, int32_t navY)
+	float NavGrid::GetElevation(const glm::ivec2& navCoords) const
 	{
-		int32_t index = navY * mSpec.Width + navX;
+		return GetElevation(navCoords.x, navCoords.y);
+	}
+
+	NavNode* NavGrid::GetNode(int32_t navX, int32_t navZ)
+	{
+		if (navX < 0 || navX >= mSpec.Width || navZ < 0 || navZ >= mSpec.Depth)
+		{
+			return nullptr;
+		}
+
+		int32_t index = navZ * mSpec.Width + navX;
 		if (index < 0 || index >= mGraph.size())
 		{
 			return nullptr;
 		}
 		return &mGraph.at(index);			
+	}
+
+	NavNode* NavGrid::GetNode(const glm::ivec2& navCoords)
+	{
+		return GetNode(navCoords.x, navCoords.y);
 	}
 
 	glm::ivec2 NavGrid::GetCoordinates(const NavNode* node) const
@@ -53,11 +68,11 @@ namespace uavpf
 
 	glm::ivec2 NavGrid::ConvertCoordinates(const glm::ivec2& navCoords) const
 	{
+		assert(navCoords.x < mSpec.Width);
+		assert(navCoords.y < mSpec.Depth);
+
 		auto relativeX = float(navCoords.x) / mSpec.Width;
 		auto relativeZ = float(navCoords.y) / mSpec.Depth;
-
-		assert(relativeX <= 1.0f);
-		assert(relativeZ <= 1.0f);
 
 		int32_t trueX = relativeX * mHeightMap->GetWidth();
 		int32_t trueZ = relativeZ * mHeightMap->GetDepth();

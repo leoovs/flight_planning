@@ -2,9 +2,8 @@
 #include "platform/platform_service.h"
 #include "rendering/overlay_renderer.h"
 #include "uavpf/algo/astar_algorithm.h"
+#include "uavpf/algo/astar_cost.h"
 #include "uavpf/algo/navgrid.h"
-#include "uavpf/debug/logger_provider.h"
-
 #include <glm/gtx/string_cast.hpp>
 
 namespace editor 
@@ -70,18 +69,6 @@ namespace editor
 			? glm::normalize(speed)
 			: speed;
 		mCamera.SetPosition(mCamera.GetPosition() + 4.0f * speed * mFrameTimer.GetDeltaTimeSeconds());
-
-		uavpf::AStarAlgorithm algo;
-		
-		while (algo.IsExplorable())
-		{
-			algo.ExploreNext();
-
-			if (algo.IsGoal())
-			{
-				break;
-			}
-		}
 	}
 
 	void Application::Render()
@@ -94,21 +81,48 @@ namespace editor
 		scale = glm::scale(scale, glm::vec3(0.01f, 4.0f, 0.01f));
 
 		mRenderer->SetCamera(mCamera);
+		mRenderer->Render(mRenderMesh, scale);
+
 		mOverlay->SetCamera(mCamera);
 
-		for (uavpf::NavNode* node : mPath)
+		int32_t iPath = 0;
+		for (; iPath < mPath.size() - 1; iPath++)
 		{
-			glm::ivec2 navCoords = mGrid->GetCoordinates(node);
-			float elevation = mGrid->GetElevation(navCoords.x, navCoords.y);
-			glm::ivec2 imageCoords = mGrid->ConvertCoordinates(navCoords);
+			glm::vec3 nodeCoords[2];
+			for (int32_t iNode = 0; iNode < 2; iNode++)
+			{
+				uavpf::NavNode* node = mPath.at(iPath + iNode);
 
-			glm::vec3 coords(imageCoords.x, elevation, imageCoords.y);
-			glm::vec3 worldCoords = scale * glm::vec4(coords, 1.0f);
+				glm::ivec2 navCoords = mGrid.GetCoordinates(node);
+				float elevation = mGrid.GetElevation(navCoords.x, navCoords.y);
+				glm::ivec2 imageCoords = mGrid.ConvertCoordinates(navCoords);
 
-			mOverlay->RenderCircle3D(worldCoords + glm::vec3(0.0f, 0.03f, 0.0f), 0.03f, glm::vec3(1.0f));
+				// elevation = std::max(mTargetElevation, elevation + 0.05f);
+				elevation += 0.065;
+
+				glm::vec3 coords(imageCoords.x, elevation, imageCoords.y);
+				glm::vec3 worldCoords = scale * glm::vec4(coords, 1.0f);
+				nodeCoords[iNode] = worldCoords + glm::vec3(0.0f, 0.03f, 0.0f);
+
+				glm::vec3 color;
+				if (iPath == 0 && iNode == 0)
+				{
+					color = glm::vec3(0.0f, 1.0f, 0.0f);
+				}
+				else if (iPath == mPath.size() - 2 && iNode == 1)
+				{
+					color = glm::vec3(1.0f, 0.0f, 0.0f);
+				}
+				else
+				{
+					color = glm::vec3(1.0f);
+				}
+
+				mOverlay->RenderCircle3D(nodeCoords[iNode], 0.03f, color);
+			}
+
+			mOverlay->RenderLine3D(nodeCoords[0], nodeCoords[1], glm::vec3(1.0f));
 		}
-
-		mRenderer->Render(mRenderMesh, scale);
 
 		mGraphics->Present();
 	}
@@ -185,21 +199,21 @@ namespace editor
 	void Application::SetupAlgorithm()
 	{
 		uavpf::NavGridSpecification spec;
-		spec.Width = 100;
-		spec.Depth = 100;
+		spec.Width = 50;
+		spec.Depth = 50;
 
-		mGrid = new uavpf::NavGrid(spec);
-		mGrid->SetHeightMap(&mHeightMap);
+		mGrid = uavpf::NavGrid(spec);
+		mGrid.SetHeightMap(&mHeightMap);
 
-		mPathFinder.Initialize(mGrid, { 0, 0 }, { 50, 50 });
+		uavpf::ElevationConservingCost cost(mTargetElevation);
+		// uavpf::ContourMatchingCost cost;
+		uavpf::AStarAlgorithm pathFinder(&cost, &mGrid, { 0, 0 }, { 0.7 * 50, 0.5 * 50 });
 
-		bool pathFound = false;
-		while (mPathFinder.IsExplorable())
+		while (pathFinder.IsExplorable())
 		{
-			mPathFinder.ExploreNext();
-			if (mPathFinder.IsGoal())
+			pathFinder.ExploreNext();
+			if (pathFinder.IsGoal())
 			{
-				pathFound = true;
 				break;
 			}
 
@@ -217,33 +231,15 @@ namespace editor
 
 			for (const auto& direction : directions)
 			{
-				mPathFinder.ExploreNeighbour(direction);
+				pathFinder.ExploreNeighbour(direction);
 			}
 		}
 
-		if (!pathFound)
-		{
-			UAVPF_LOG(Application, Info, "Path not found");
-		}
-
-		mPath = mPathFinder.ConstructPath();
-
-		for (uavpf::NavNode* node : mPath)
-		{
-			auto navCoords = mGrid->GetCoordinates(node);
-			auto imageCoords = mGrid->ConvertCoordinates(navCoords); 
-
-			UAVPF_LOG(
-				Application,
-				Info,
-				"%s",
-				glm::to_string(imageCoords).data());
-		}
+		mPath = pathFinder.ConstructPath();
 	}
 
 	void Application::ShutDownAlgorithm()
 	{
-		delete mGrid;
 	}
 
 	void Application::ShutDownRenderer()

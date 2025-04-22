@@ -10,8 +10,8 @@ namespace uavpf
 {
 	struct NavGridSpecification
 	{
-		int32_t Width = 1000;
-		int32_t Depth = 1000;
+		int32_t Width = 0;
+		int32_t Depth = 0;
 	};
 
 	struct NavNode
@@ -33,6 +33,7 @@ namespace uavpf
 	class NavGrid
 	{
 	public:
+		NavGrid() = default;
 		NavGrid(NavGridSpecification spec);
 
 		const HeightMap* GetHeightMap() const;
@@ -41,7 +42,10 @@ namespace uavpf
 		const NavGridSpecification& GetSpecification() const;
 
 		float GetElevation(int32_t navX, int32_t navZ) const;
+		float GetElevation(const glm::ivec2& navCoords) const;
+
 		NavNode* GetNode(int32_t navX, int32_t navZ); 
+		NavNode* GetNode(const glm::ivec2& navCoords); 
 
 		glm::ivec2 GetCoordinates(const NavNode* node) const;
 		glm::ivec2 ConvertCoordinates(const glm::ivec2& navCoords) const;
