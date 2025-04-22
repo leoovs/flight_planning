@@ -25,6 +25,7 @@ namespace editor
 		void Quit();
 		void Update();
 		void Render();
+		void DoGui();
 
 	private:
 		void SubscribeEvents();
@@ -32,9 +33,11 @@ namespace editor
 		void SetupPlatform();
 		void SetupGraphics();
 		void SetupRenderer();
+		void SetupImGui();
 		void SetupAlgorithm();
 
 		void ShutDownAlgorithm();
+		void ShutDownImGui();
 		void ShutDownRenderer();
 		void ShutDownGraphics();
 		void ShutDownPlatform();
@@ -65,6 +68,9 @@ namespace editor
 		TerrainRenderMesh* mRenderMesh = nullptr;
 		FrameTimer mFrameTimer;
 		Camera mCamera;
+
+		ImGuiPlatformBackend* mImGuiPlatform = nullptr;
+		ImGuiGraphicsBackend* mImGuiGraphics = nullptr;
 
 		uavpf::HeightMap mHeightMap;
 		uavpf::NavGrid mGrid;

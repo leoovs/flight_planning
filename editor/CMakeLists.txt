@@ -24,6 +24,7 @@ target_sources(
 	"src/graphics_ogl/ogl_graphics_buffer.cpp"
 	"src/graphics_ogl/ogl_graphics_context.cpp"
 	"src/graphics_ogl/ogl_graphics_debug_watch.cpp"
+	"src/graphics_ogl/ogl_imgui_graphics_backend.cpp"
 	"src/graphics_ogl/ogl_shader.cpp"
 	"src/graphics_ogl/ogl_shader_compilation.cpp"
 	"src/graphics_ogl/ogl_shader_compiler.cpp"
@@ -33,6 +34,7 @@ target_sources(
 
 	"src/platform/platform_service.cpp"
 
+	"src/platform_sdl3/sdl3_imgui_platform_backend.cpp"
 	"src/platform_sdl3/sdl3_keyboard.cpp"
 	"src/platform_sdl3/sdl3_mouse.cpp"
 	"src/platform_sdl3/sdl3_ogl_provider.cpp"
@@ -57,6 +59,7 @@ target_link_libraries(
 	PRIVATE
 	uavpf
 	glew
+	imgui
 	SDL3::SDL3-static
 )
 

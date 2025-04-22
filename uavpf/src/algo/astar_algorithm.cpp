@@ -96,6 +96,8 @@ namespace uavpf
 			current = current->Parent;
 		}
 
+		std::reverse(path.begin(), path.end());
+
 		return path;
 	}
 }

@@ -1,4 +1,5 @@
 #include "application.h"
+#include "imgui.h"
 #include "platform/platform_service.h"
 #include "rendering/overlay_renderer.h"
 #include "uavpf/algo/astar_algorithm.h"
@@ -15,12 +16,14 @@ namespace editor
 		SetupPlatform();
 		SetupGraphics();
 		SetupRenderer();
+		SetupImGui();
 		SetupAlgorithm();
 	}
 
 	Application::~Application()
 	{
 		ShutDownAlgorithm();
+		ShutDownImGui();
 		ShutDownRenderer();
 		ShutDownGraphics();
 		ShutDownPlatform();
@@ -34,6 +37,7 @@ namespace editor
 		{
 			mFrameTimer.Tick();
 			Update();
+			DoGui();
 			Render();
 		}
 	}
@@ -65,6 +69,10 @@ namespace editor
 		{
 			speed += mCamera.GetRightVector();
 		}
+		if (ImGui::GetIO().WantCaptureKeyboard)
+		{
+			speed = glm::vec3(0.0f);
+		}
 		speed = glm::length(speed) > glm::epsilon<float>()
 			? glm::normalize(speed)
 			: speed;
@@ -86,6 +94,7 @@ namespace editor
 		mOverlay->SetCamera(mCamera);
 
 		int32_t iPath = 0;
+		float maxElevation = 0.0f;
 		for (; iPath < mPath.size() - 1; iPath++)
 		{
 			glm::vec3 nodeCoords[2];
@@ -95,23 +104,23 @@ namespace editor
 
 				glm::ivec2 navCoords = mGrid.GetCoordinates(node);
 				float elevation = mGrid.GetElevation(navCoords.x, navCoords.y);
+				elevation += 0.065;
 				glm::ivec2 imageCoords = mGrid.ConvertCoordinates(navCoords);
 
-				// elevation = std::max(mTargetElevation, elevation + 0.05f);
-				elevation += 0.065;
+				maxElevation = std::max(elevation, maxElevation);
 
-				glm::vec3 coords(imageCoords.x, elevation, imageCoords.y);
+				glm::vec3 coords(imageCoords.x, maxElevation, imageCoords.y);
 				glm::vec3 worldCoords = scale * glm::vec4(coords, 1.0f);
 				nodeCoords[iNode] = worldCoords + glm::vec3(0.0f, 0.03f, 0.0f);
 
 				glm::vec3 color;
 				if (iPath == 0 && iNode == 0)
 				{
-					color = glm::vec3(0.0f, 1.0f, 0.0f);
+					color = glm::vec3(1.0f, 0.0f, 0.0f);
 				}
 				else if (iPath == mPath.size() - 2 && iNode == 1)
 				{
-					color = glm::vec3(1.0f, 0.0f, 0.0f);
+					color = glm::vec3(0.0f, 1.0f, 0.0f);
 				}
 				else
 				{
@@ -124,7 +133,20 @@ namespace editor
 			mOverlay->RenderLine3D(nodeCoords[0], nodeCoords[1], glm::vec3(1.0f));
 		}
 
+		mImGuiGraphics->RenderDrawData(ImGui::GetDrawData());
+
 		mGraphics->Present();
+	}
+
+	void Application::DoGui()
+	{
+		mImGuiPlatform->NewFrame();
+		mImGuiGraphics->NewFrame();
+		ImGui::NewFrame();
+
+		ImGui::ShowDemoWindow();
+
+		ImGui::Render();
 	}
 
 	void Application::SubscribeEvents()
@@ -195,6 +217,14 @@ namespace editor
 			0.01f,
 			100.0f));
 	}
+	
+	void Application::SetupImGui()
+	{
+		ImGui::CreateContext();
+
+		mImGuiPlatform = mPlatform->CreateImGuiBackend();	
+		mImGuiGraphics = mImGuiPlatform->CreateGraphicsBackend(mGraphics);
+	}
 
 	void Application::SetupAlgorithm()
 	{
@@ -242,6 +272,12 @@ namespace editor
 	{
 	}
 
+	void Application::ShutDownImGui()
+	{
+		mImGuiPlatform->DestroyGraphicsBackend(mImGuiGraphics);
+		mPlatform->DestroyImGuiBackend(mImGuiPlatform);
+	}
+
 	void Application::ShutDownRenderer()
 	{
 		delete mOverlay;
@@ -268,6 +304,11 @@ namespace editor
 
 	bool Application::OnMouseMove(const MouseMovementEvent& event)
 	{
+		if (ImGui::GetIO().WantCaptureMouse)
+		{
+			return true;
+		}
+
 		auto [polar, azimuth] = mCamera.CalculatePolarAndAzimuth();
 
 		polar = glm::clamp(polar + event.DeltaY * 0.01f, 0.01f, glm::pi<float>() - 0.1f);

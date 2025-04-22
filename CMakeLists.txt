@@ -11,6 +11,7 @@ option(FP_BUILD_TESTS OFF "Build flight_planning unit-tests")
 add_subdirectory("editor")
 add_subdirectory("uavpf")
 add_subdirectory("external/glew")
+add_subdirectory("external/imgui")
 
 if(FP_BUILD_TESTS)
 	enable_testing()
