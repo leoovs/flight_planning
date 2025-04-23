@@ -3,6 +3,7 @@
 #include <memory>
 #include <type_traits>
 
+#include "app/task_executor.h"
 #include "event/event_bus.h"
 #include "event/event_queue.h"
 #include "event/event_subscriber.h"
@@ -33,6 +34,10 @@ namespace editor
 		Mouse* GetMouse() const;
 		Keyboard* GetKeyboard() const;
 		GraphicsContext* GetGraphics() const;
+
+		float GetDeltaTime() const;
+
+		void AddTask(TaskExecutor::TaskFn fn, std::function<void()> onComplete = nullptr);
 		
 	private:
 		void Initialize();
@@ -57,6 +62,7 @@ namespace editor
 		std::shared_ptr<ImGuiGraphicsBackend> mImGuiGraphics;
 
 		std::unique_ptr<App> mRuntimeApp = nullptr;
+		TaskExecutor mTasks;
 	};
 }
 

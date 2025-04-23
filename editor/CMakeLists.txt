@@ -12,6 +12,7 @@ target_sources(
 
 	"src/app/app_service.cpp"
 	"src/app/editor_app.cpp"
+	"src/app/task_executor.cpp"
 
 	"src/event/event_bus.cpp"
 	"src/event/event_dispatcher.cpp"

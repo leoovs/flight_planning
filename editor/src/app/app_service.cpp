@@ -14,6 +14,7 @@ namespace editor
 
 	void AppService::Run()
 	{
+		mTasks.Start();
 		mRunning = true;
 
 		mRuntimeApp->Bind(mEvents);
@@ -43,6 +44,7 @@ namespace editor
 		}
 
 		mRuntimeApp->OnQuit();
+		mTasks.Finish();
 	}
 
 	PlatformService* AppService::GetPlatform() const
@@ -68,6 +70,16 @@ namespace editor
 	GraphicsContext* AppService::GetGraphics() const
 	{
 		return mGraphics.get();
+	}
+	
+	float AppService::GetDeltaTime() const
+	{
+		return mDeltaTime;
+	}
+
+	void AppService::AddTask(TaskExecutor::TaskFn fn, std::function<void()> onComplete)
+	{
+		mTasks.Execute(fn, onComplete);
 	}
 
 	void AppService::Initialize()

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <uavpf/uavpf.h>
+
 #include "app/app.h"
 #include "app/app_service.h"
 #include "event/event_publisher.h"
@@ -7,6 +9,12 @@
 
 namespace editor
 {
+	enum class EditorState
+	{
+		WaitingOnLoad,
+		Operating,
+	};
+
 	class EditorApp final : public App
 	{
 	public:
@@ -18,10 +26,14 @@ namespace editor
 
 	private:
 		bool OnWindowClose(const WindowCloseEvent& event);
+		bool OnPathFound(const class PathFoundEvent& event);
 
 		AppService* mService = nullptr;
 		EventSubscriber mEventSubscriber;
 		EventPublisher mEventPublisher;
+
+		EditorState mState = EditorState::Operating;
+		std::vector<uavpf::NavNode*> mPath;
 	};
 }
 
