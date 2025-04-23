@@ -25,6 +25,8 @@ namespace editor
 		void Render() override;
 
 	private:
+		void ShowDockspace();
+
 		bool OnWindowClose(const WindowCloseEvent& event);
 		bool OnPathFound(const class PathFoundEvent& event);
 

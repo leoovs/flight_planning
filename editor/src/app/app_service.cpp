@@ -115,6 +115,8 @@ namespace editor
 		);
 
 		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO();
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
 		mImGuiPlatform.reset(
 			mPlatform->CreateImGuiBackend(),

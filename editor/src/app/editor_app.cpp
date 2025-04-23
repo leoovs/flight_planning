@@ -39,6 +39,7 @@ namespace editor
 
 	void EditorApp::OnUI()
 	{
+		ShowDockspace();
 		std::string name = "";
 		switch (mState)
 		{
@@ -102,8 +103,6 @@ namespace editor
 
 						pathFinder.ExploreNeighbour({ 1, 0, });
 						pathFinder.ExploreNeighbour({ 0, 1, });
-						pathFinder.ExploreNeighbour({ 0, -1, });
-						pathFinder.ExploreNeighbour({ -1, 0, });
 					}
 
 					mState = EditorState::Operating;
@@ -116,6 +115,28 @@ namespace editor
 	void EditorApp::Render()
 	{
 		mService->GetGraphics()->ClearColor(nullptr, 0.3f, 0.3f, 0.3f, 1.0f);
+	}
+
+	void EditorApp::ShowDockspace()
+	{
+		ImGuiWindowFlags dockspaceWindowFlags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar
+			| ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove
+			| ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+		const ImGuiViewport* vp = ImGui::GetMainViewport();
+
+		ImGui::SetNextWindowPos(vp->WorkPos);
+		ImGui::SetNextWindowSize(vp->WorkSize);
+		ImGui::SetNextWindowViewport(vp->ID);
+
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+
+		ImGui::Begin("###EditorDockspaceWindow", nullptr, dockspaceWindowFlags);
+		ImGui::DockSpace(ImGui::GetID("###EditorDockspace"));
+		ImGui::End();
+
+		ImGui::PopStyleVar(3);
 	}
 
 	bool EditorApp::OnWindowClose(const WindowCloseEvent& event)
