@@ -12,6 +12,8 @@ namespace editor
 		Initialize();
 	}
 
+	AppService::~AppService() = default;
+
 	void AppService::Run()
 	{
 		mTasks.Start();

@@ -2,27 +2,16 @@
 
 #include "app/app_events.h"
 #include "event/event_subscriber.h"
-#include "imgui_internal.h"
 
-#include <uavpf/uavpf.h>
 #include <imgui.h>
+#include <uavpf/uavpf.h>
 
 namespace editor
 {
-	class PathFoundEvent : public Event
-	{
-	public:
-		std::vector<uavpf::NavNode*> Path;
-
-		PathFoundEvent(std::vector<uavpf::NavNode*> path)
-			: Path(std::move(path))
-		{
-		}
-	};
-
 	void EditorApp::RegisterService(AppService* service)
 	{
 		mService = service;
+		mContext = std::make_unique<AppContext>(service);
 	}
 
 	void EditorApp::Bind(EventBus& bus)
@@ -31,7 +20,6 @@ namespace editor
 		mEventSubscriber
 			.BeginClass(*this)
 				.SubscribeMethod(&EditorApp::OnWindowClose)
-				.SubscribeMethod(&EditorApp::OnPathFound)
 			.EndClass();
 
 		mEventPublisher = EventPublisher(bus);
@@ -40,76 +28,6 @@ namespace editor
 	void EditorApp::OnUI()
 	{
 		ShowDockspace();
-		std::string name = "";
-		switch (mState)
-		{
-			case EditorState::WaitingOnLoad:
-				name = "In progress";
-				break;
-			case EditorState::Operating:
-				name = "Operating";
-				break;
-		}
-
-		ImGui::Begin((name + "###Operation").data());
-
-		bool start = false;
-		if (mState == EditorState::WaitingOnLoad)
-		{
-			ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
-			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.5f);
-			ImGui::Button("Start");
-			ImGui::PopStyleVar();
-			ImGui::PopItemFlag();
-		}
-		else
-		{
-			start = ImGui::Button("Start");
-		}
-
-		if (start)
-		{
-			mState = EditorState::WaitingOnLoad;
-			mService->AddTask(
-				[this]()
-				{
-					uavpf::TiffImage image = uavpf::TiffLoader()
-						.LoadImageFromFile("C:/Users/Leonid/Desktop/mountain.tif");
-					uavpf::HeightMap hm = uavpf::HeightMapBuilder()
-						.SetGrayscale(uavpf::ImageGrayscale(image))
-						.SetRasterSpace(uavpf::RasterSpace::RasterIsPoint)
-						.Build();
-					uavpf::TerrainMesh mesh = uavpf::TerrainMeshBuilder()
-						.SetHeight(hm)
-						.Build();
-
-					uavpf::NavGridSpecification spec;
-					spec.Width = 50;
-					spec.Depth = 50;
-
-					uavpf::NavGrid ng(spec);
-					ng.SetHeightMap(&hm);
-
-					uavpf::ElevationConservingCost cost(0.45f);
-					uavpf::AStarAlgorithm pathFinder(&cost, &ng, { 0, 0 }, { 0.7 * 50, 0.5 * 50 });
-
-					while (pathFinder.IsExplorable())
-					{
-						pathFinder.ExploreNext();
-						if (pathFinder.IsGoal())
-						{
-							break;
-						}
-
-						pathFinder.ExploreNeighbour({ 1, 0, });
-						pathFinder.ExploreNeighbour({ 0, 1, });
-					}
-
-					mState = EditorState::Operating;
-				}
-			);
-		}
-		ImGui::End();
 	}
 
 	void EditorApp::Render()
@@ -121,9 +39,10 @@ namespace editor
 	{
 		ImGuiWindowFlags dockspaceWindowFlags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar
 			| ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove
-			| ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-		const ImGuiViewport* vp = ImGui::GetMainViewport();
+			| ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus
+			| ImGuiWindowFlags_MenuBar;
 
+		const ImGuiViewport* vp = ImGui::GetMainViewport();
 		ImGui::SetNextWindowPos(vp->WorkPos);
 		ImGui::SetNextWindowSize(vp->WorkSize);
 		ImGui::SetNextWindowViewport(vp->ID);
@@ -131,24 +50,34 @@ namespace editor
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
 		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-
 		ImGui::Begin("###EditorDockspaceWindow", nullptr, dockspaceWindowFlags);
-		ImGui::DockSpace(ImGui::GetID("###EditorDockspace"));
-		ImGui::End();
-
 		ImGui::PopStyleVar(3);
+
+		ImGui::DockSpace(ImGui::GetID("###EditorDockspace"));
+		ShowMenu();
+
+		ImGui::End();
+	}
+
+	void EditorApp::ShowMenu()
+	{
+		if (ImGui::BeginMenuBar())
+		{
+			if (ImGui::BeginMenu("File"))
+			{
+				if (ImGui::MenuItem("Open TIFF map", nullptr))
+				{
+				}
+				ImGui::EndMenu();
+			}
+
+			ImGui::EndMenuBar();
+		}
 	}
 
 	bool EditorApp::OnWindowClose(const WindowCloseEvent& event)
 	{
 		mEventPublisher.Publish<AppQuitEvent>(EventPublishMode::Queued);	
-		return true;
-	}
-
-	bool EditorApp::OnPathFound(const PathFoundEvent& event)
-	{
-		mPath = event.Path;
-		mState = EditorState::Operating;
 		return true;
 	}
 }

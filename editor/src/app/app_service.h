@@ -19,6 +19,7 @@ namespace editor
 	{
 	public:
 		AppService();
+		~AppService();
 
 		template<typename AppT, typename = std::enable_if_t<std::is_base_of_v<App, AppT>>>
 		AppService& Bind()
@@ -61,7 +62,7 @@ namespace editor
 		std::shared_ptr<ImGuiPlatformBackend> mImGuiPlatform;
 		std::shared_ptr<ImGuiGraphicsBackend> mImGuiGraphics;
 
-		std::unique_ptr<App> mRuntimeApp = nullptr;
+		std::unique_ptr<App> mRuntimeApp;
 		TaskExecutor mTasks;
 	};
 }

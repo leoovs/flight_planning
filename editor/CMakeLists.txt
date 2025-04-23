@@ -10,7 +10,9 @@ target_sources(
 	"src/application.cpp"
 	"src/main.cpp"
 
+	"src/app/app_context.cpp"
 	"src/app/app_service.cpp"
+	"src/app/asset_storage.cpp"
 	"src/app/editor_app.cpp"
 	"src/app/task_executor.cpp"
 

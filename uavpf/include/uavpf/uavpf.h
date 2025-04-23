@@ -20,6 +20,7 @@
 #include "uavpf/debug/logger_provider.h"
 
 #include "uavpf/id/base_id.h"
+#include "uavpf/id/id_allocator.h"
 
 #include "uavpf/image/tiff_image.h"
 #include "uavpf/image/tiff_loader.h"
