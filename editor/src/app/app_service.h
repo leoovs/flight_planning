@@ -29,12 +29,14 @@ namespace editor
 		}
 
 		void Run();
+		void Render();
 
 		PlatformService* GetPlatform() const;
 		Window* GetWindow() const;
 		Mouse* GetMouse() const;
 		Keyboard* GetKeyboard() const;
 		GraphicsContext* GetGraphics() const;
+		ImGuiGraphicsBackend* GetImGuiGraphicsBackend() const;
 
 		float GetDeltaTime() const;
 

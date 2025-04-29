@@ -165,25 +165,21 @@ namespace editor
 			camera.GetPosition());
 	}
 
+	void TerrainRenderer::Clear()
+	{
+		mGraphics->ClearColor(mFramebuffer, 0.1f, 0.1f, 0.1f, 1.0f);
+		mGraphics->ClearDepthStencil(mFramebuffer, 1.0f, 0);
+	}
+
 	void TerrainRenderer::Render(TerrainRenderMesh* mesh, const glm::mat4& modelMatrix)
 	{
 		DepthStencilState dsState;
 		dsState.DepthTestEnabled = true;
 		mGraphics->SetDepthStencilState(dsState);
 
-		Framebuffer* utilizedFramebuffer = nullptr;
-		if (mFramebuffer->HasAttachment(FramebufferAttachment::Color)
-			&& mFramebuffer->HasAttachment(FramebufferAttachment::DepthStencil))
-		{
-			utilizedFramebuffer = mFramebuffer;
-		}
-
-		//mGraphics->SetFramebuffer(utilizedFramebuffer);
-		//mGraphics->ClearColor(utilizedFramebuffer, 0.3f, 0.3f, 0.3f, 0.3f);
-		//mGraphics->ClearDepthStencil(utilizedFramebuffer, 1.0f, 0);
-
 		mGraphics->SetPrimitiveMode(PrimitiveMode::TriangleStrip);
 		mGraphics->SetVertexInput(mesh->GetTerrainInput());
+		mGraphics->SetFramebuffer(mFramebuffer);
 
 		mShaders.at(TerrainVS)->SetUniform("uModel", modelMatrix);
 

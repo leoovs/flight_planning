@@ -1,5 +1,6 @@
 #include "rendering/overlay_renderer.h"
 #include "graphics/shader_compiler.h"
+#include "graphics/subresource.h"
 #include "uavpf/debug/logger_provider.h"
 
 #include <glm/gtx/string_cast.hpp>
@@ -11,10 +12,12 @@ namespace editor
 	{
 		CreateShaders();
 		CreateLineVertexInput();
+		CreateFramebuffer();
 	}
 
 	OverlayRenderer::~OverlayRenderer()
 	{
+		DestroyFramebuffer();
 		DestroyLineVertexInput();
 		DestroyShaders();
 	}
@@ -22,6 +25,14 @@ namespace editor
 	void OverlayRenderer::SetCamera(const Camera& camera)
 	{
 		mCamera = camera;
+	}
+
+	void OverlayRenderer::SetTargetTextures(Texture2D* colorBuffer, Texture2D* depthStencilBuffer)
+	{
+		SubresourceRegion region;
+		region.MipLevelIndex = 0;
+		mFramebuffer->AttachTexture2D(FramebufferAttachment::Color, colorBuffer, region);
+		mFramebuffer->AttachTexture2D(FramebufferAttachment::DepthStencil, depthStencilBuffer, region);
 	}
 
 	void OverlayRenderer::RenderLine3D(const glm::vec3& a, const glm::vec3& b, const glm::vec3& color)
@@ -45,6 +56,7 @@ namespace editor
 		mGraphics->SetPrimitiveMode(PrimitiveMode::LineList);
 		mGraphics->SetShader(ShaderKind::Vertex, mShaders.at(LineVS2));
 		mGraphics->SetShader(ShaderKind::Pixel, mShaders.at(LinePS2));
+		mGraphics->SetFramebuffer(mFramebuffer);
 
 		mGraphics->Draw(0, 2);
 
@@ -103,6 +115,7 @@ namespace editor
 		mGraphics->SetPrimitiveMode(PrimitiveMode::TriangleList);
 		mGraphics->SetShader(ShaderKind::Vertex, mShaders.at(CircleVS));
 		mGraphics->SetShader(ShaderKind::Pixel, mShaders.at(CirclePS));
+		mGraphics->SetFramebuffer(mFramebuffer);
 
 		mGraphics->Draw(0, 6);
 	}
@@ -385,5 +398,19 @@ namespace editor
 	{
 		mGraphics->DestroyVertexInput(mLineVertexInput);
 	}
+
+	void OverlayRenderer::CreateFramebuffer()
+	{
+		FramebufferParams params;
+		params.DebugName = "Overlay renderer framebuffer";
+		mFramebuffer = mGraphics->CreateFramebuffer(std::move(params));
+	}
+
+	void OverlayRenderer::DestroyFramebuffer()
+	{
+		mGraphics->DestroyFramebuffer(mFramebuffer);
+		mFramebuffer = nullptr;
+	}
+
 }
 

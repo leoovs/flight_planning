@@ -20,6 +20,7 @@ namespace uavpf
 	{
 		assert(width * depth == mElevation.size());
 	}
+
 	size_t HeightMap::GetSize() const
 	{
 		return mElevation.size();

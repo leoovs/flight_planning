@@ -26,6 +26,9 @@ namespace editor
 				return sizeof(float[3]);
 			case GraphicsFormat::R32G32B32A32_FLOAT:
 				return sizeof(float[4]);
+
+			case GraphicsFormat::D32_FLOAT:
+				return sizeof(float[1]);
 			default:
 				assert(false && "Invalid GraphicsFormat enum value");
 				return 0;
@@ -38,6 +41,7 @@ namespace editor
 		{
 			case GraphicsFormat::R8_UNORM:
 			case GraphicsFormat::R32_FLOAT:
+			case GraphicsFormat::D32_FLOAT:
 				return 1;
 			case GraphicsFormat::R8G8_UNORM:
 			case GraphicsFormat::R32G32_FLOAT:
@@ -64,6 +68,7 @@ namespace editor
 			case GraphicsFormat::R8G8B8A8_UNORM:
 				return alignof(uint8_t);
 
+			case GraphicsFormat::D32_FLOAT:
 			case GraphicsFormat::R32_FLOAT:
 			case GraphicsFormat::R32G32_FLOAT:
 			case GraphicsFormat::R32G32B32_FLOAT:

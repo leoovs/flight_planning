@@ -15,6 +15,8 @@ namespace editor
 		R32G32_FLOAT,
 		R32G32B32_FLOAT,
 		R32G32B32A32_FLOAT,
+
+		D32_FLOAT,
 	};
 
 	size_t GetGraphicsFormatByteWidth(GraphicsFormat format);

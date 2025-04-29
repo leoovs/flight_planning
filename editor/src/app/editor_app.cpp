@@ -16,23 +16,85 @@ namespace editor
 
 	void EditorApp::Bind(EventBus& bus)
 	{
+		mEventBus = &bus;
+
 		mEventSubscriber = EventSubscriber(bus);
 		mEventSubscriber
 			.BeginClass(*this)
 				.SubscribeMethod(&EditorApp::OnWindowClose)
+				.SubscribeMethod(&EditorApp::OnWindowResize)
 			.EndClass();
 
 		mEventPublisher = EventPublisher(bus);
 	}
 
+	void EditorApp::OnRun()
+	{
+		SetupStates();
+		Push(EditorStateKind::Idle);
+		GetCurrentState()->OnAttach(this);
+	}
+
 	void EditorApp::OnUI()
 	{
 		ShowDockspace();
+		GetCurrentState()->ShowUI();
+	}
+
+	void EditorApp::Update()
+	{
+		if (mStateQueue.size() > 1)
+		{
+			GetCurrentState()->OnDetach();
+			mStateQueue.pop();
+			GetCurrentState()->OnAttach(this);
+		}
+		GetCurrentState()->Update();
 	}
 
 	void EditorApp::Render()
 	{
-		mService->GetGraphics()->ClearColor(nullptr, 0.3f, 0.3f, 0.3f, 1.0f);
+		mService->GetGraphics()->ClearColor(nullptr, 0.1f, 0.1f, 0.1f, 1.0f);
+		GetCurrentState()->Render();
+	}
+
+	void EditorApp::Push(EditorStateKind kind)
+	{
+		mStateQueue.push(kind);
+	}
+
+	EventBus& EditorApp::GetEvents() const
+	{
+		return *mEventBus;
+	}
+
+	AppService* EditorApp::GetService() const
+	{
+		return mService;
+	}
+
+	AppContext* EditorApp::GetContext() const
+	{
+		return mContext.get();
+	}
+
+	void EditorApp::SetupStates()
+	{
+		std::unique_ptr<EditorState> states[]
+		{
+			std::make_unique<Editor_Idle>(),
+			std::make_unique<Editor_PathBuilder>(),
+		};
+
+		for (std::unique_ptr<EditorState>& state : states)
+		{
+			mStates.at(size_t(state->GetKind())) = std::move(state);
+		}
+	}
+
+	EditorState* EditorApp::GetCurrentState() const
+	{
+		return mStates.at(size_t(mStateQueue.front())).get();
 	}
 
 	void EditorApp::ShowDockspace()
@@ -53,31 +115,25 @@ namespace editor
 		ImGui::Begin("###EditorDockspaceWindow", nullptr, dockspaceWindowFlags);
 		ImGui::PopStyleVar(3);
 
+		GetCurrentState()->ShowMenu();
 		ImGui::DockSpace(ImGui::GetID("###EditorDockspace"));
-		ShowMenu();
 
 		ImGui::End();
 	}
 
 	void EditorApp::ShowMenu()
 	{
-		if (ImGui::BeginMenuBar())
-		{
-			if (ImGui::BeginMenu("File"))
-			{
-				if (ImGui::MenuItem("Open TIFF map", nullptr))
-				{
-				}
-				ImGui::EndMenu();
-			}
-
-			ImGui::EndMenuBar();
-		}
 	}
 
 	bool EditorApp::OnWindowClose(const WindowCloseEvent& event)
 	{
 		mEventPublisher.Publish<AppQuitEvent>(EventPublishMode::Queued);	
+		return true;
+	}
+
+	bool EditorApp::OnWindowResize(const WindowResizeEvent& event)
+	{
+		mService->Render();
 		return true;
 	}
 }

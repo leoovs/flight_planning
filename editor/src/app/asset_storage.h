@@ -10,6 +10,8 @@
 
 namespace editor
 {
+	class AppService;
+
 	using AssetID = uavpf::BaseID;
 
 	enum class AssetKind
@@ -88,12 +90,16 @@ namespace editor
 	class AssetStorage
 	{
 	public:
+		AssetStorage(AppService* service);
+
 		AssetID LoadAsset(const std::filesystem::path& assetPath, AssetKind kind);
-		std::future<AssetID> LoadAssetAsync(const std::filesystem::path& assetPath, AssetKind kind);
+		void LoadAssetAsync(const std::filesystem::path& assetPath, AssetKind kind, std::function<void(AssetID)> onComplete);
 
 		AssetID CreateAsset(AssetKind kind);
 		void UnloadAsset(AssetID id);
 
+		bool Exists(AssetID id) const;
+		bool IsOfKind(AssetID id, AssetKind kind) const;
 		Asset* GetAssetFromPath(const std::filesystem::path& assetPath) const;
 		Asset* GetAssetFromID(AssetID id) const;
 
@@ -113,6 +119,8 @@ namespace editor
 		void Save(AssetID id, std::unique_ptr<Asset> asset);
 
 		AssetID LoadAsset_Image(const std::filesystem::path& imagePath);
+
+		AppService* mService = nullptr;
 
 		uavpf::IDAllocator mAssetIDs;
 		std::unordered_map<std::filesystem::path, AssetID> mAssetIDByPath;

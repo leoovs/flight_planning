@@ -39,14 +39,18 @@ namespace editor
 			mRuntimeApp->OnUI();
 			ImGui::Render();
 
-			mRuntimeApp->Render();
-
-			mImGuiGraphics->RenderDrawData(ImGui::GetDrawData());
-			mGraphics->Present();
+			Render();
 		}
 
 		mRuntimeApp->OnQuit();
 		mTasks.Finish();
+	}
+
+	void AppService::Render()
+	{
+		mRuntimeApp->Render();
+		mImGuiGraphics->RenderDrawData(ImGui::GetDrawData());
+		mGraphics->Present();
 	}
 
 	PlatformService* AppService::GetPlatform() const
@@ -72,6 +76,11 @@ namespace editor
 	GraphicsContext* AppService::GetGraphics() const
 	{
 		return mGraphics.get();
+	}
+
+	ImGuiGraphicsBackend* AppService::GetImGuiGraphicsBackend() const
+	{
+		return mImGuiGraphics.get();
 	}
 	
 	float AppService::GetDeltaTime() const

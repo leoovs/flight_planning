@@ -12,6 +12,9 @@ namespace editor
 		~OglImGuiGraphicsBackend() override;
 
 		OglGraphicsContext* GetContext() const override;
+
+		void* GetTextureID(const Texture2D* texture) const override;
+
 		void NewFrame() override;
 		void RenderDrawData(ImDrawData* data) override;
 

@@ -14,6 +14,8 @@ target_sources(
 	"src/app/app_service.cpp"
 	"src/app/asset_storage.cpp"
 	"src/app/editor_app.cpp"
+	"src/app/editor_state.cpp"
+	"src/app/path_mission.cpp"
 	"src/app/task_executor.cpp"
 
 	"src/event/event_bus.cpp"
@@ -66,6 +68,7 @@ target_link_libraries(
 	uavpf
 	glew
 	imgui
+	tinyfiledialogs	
 	SDL3::SDL3-static
 )
 

@@ -12,6 +12,7 @@ add_subdirectory("editor")
 add_subdirectory("uavpf")
 add_subdirectory("external/glew")
 add_subdirectory("external/imgui")
+add_subdirectory("external/tinyfiledialogs")
 
 if(FP_BUILD_TESTS)
 	enable_testing()

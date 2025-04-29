@@ -20,6 +20,13 @@ namespace editor
 		return mContext;
 	}
 
+	void* OglImGuiGraphicsBackend::GetTextureID(const Texture2D* texture) const
+	{
+		return reinterpret_cast<void*>(
+			dynamic_cast<const OglTexture2D*>(
+				texture)->GetNativeTexture2D());
+	}
+
 	void OglImGuiGraphicsBackend::NewFrame()
 	{
 		ImGui_ImplOpenGL3_NewFrame();

@@ -46,6 +46,7 @@ namespace editor
 			case GraphicsFormat::R8G8B8A8_UNORM:
 				return GL_UNSIGNED_BYTE;
 
+			case GraphicsFormat::D32_FLOAT:
 			case GraphicsFormat::R32_FLOAT:
 			case GraphicsFormat::R32G32_FLOAT:
 			case GraphicsFormat::R32G32B32_FLOAT:
@@ -80,6 +81,9 @@ namespace editor
 			case GraphicsFormat::R32G32B32A32_FLOAT:
 				return GL_RGBA32F;
 
+			case GraphicsFormat::D32_FLOAT:
+				return GL_DEPTH_COMPONENT32F;
+
 			default:
 				assert(false && "Invalid GraphicsFormat enum value");
 				return false;
@@ -92,6 +96,7 @@ namespace editor
 		{
 			case GraphicsFormat::R8_UNORM:
 			case GraphicsFormat::R32_FLOAT:
+			case GraphicsFormat::D32_FLOAT:
 				return GL_R;
 
 			case GraphicsFormat::R8G8_UNORM:

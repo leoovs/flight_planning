@@ -14,7 +14,8 @@ namespace editor
 		~OverlayRenderer();
 
 		void SetCamera(const Camera& camera);
-
+		void SetTargetTextures(Texture2D* colorBuffer, Texture2D* depthStencilBuffer);
+		
 		void RenderLine3D(const glm::vec3& a, const glm::vec3& b, const glm::vec3& color);
 		void RenderCircle3D(const glm::vec3& position, float radius, const glm::vec3& color);
 
@@ -44,12 +45,16 @@ namespace editor
 		void CreateLineVertexInput();
 		void DestroyLineVertexInput();
 
+		void CreateFramebuffer();
+		void DestroyFramebuffer();
+
 		GraphicsContext* mGraphics = nullptr;
 		Camera mCamera;
 		std::array<ShaderSource, ShaderIndexCount> mShaderSources = GetShaderSources();
 		std::array<Shader*, ShaderIndexCount> mShaders{};
 		GraphicsBuffer* mLinesBuffer = nullptr;
 		VertexInput* mLineVertexInput = nullptr;
+		Framebuffer* mFramebuffer = nullptr;
 	};
 }
 

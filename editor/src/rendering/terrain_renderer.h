@@ -19,14 +19,13 @@ namespace editor
 
 		~TerrainRenderer();
 
-		// TODO: add clear method
-
 		TerrainRenderMesh* CreateTerrainRenderMesh(const uavpf::TerrainMesh& mesh);
 		void DestroyTerrainRenderMesh(TerrainRenderMesh* mesh);
 
 		void SetTargetTextures(Texture2D* colorBuffer, Texture2D* depthStencilBuffer);
 		void SetCamera(const Camera& camera);
 
+		void Clear();
 		void Render(TerrainRenderMesh* mesh, const glm::mat4& modelMatrix);
 
 	private:

@@ -1,5 +1,7 @@
 #include "app/asset_storage.h"
 
+#include "app/app_service.h"
+
 namespace editor
 {
 	//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -93,6 +95,11 @@ namespace editor
 	//
 	//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
+	AssetStorage::AssetStorage(AppService* service)
+		: mService(service)
+	{
+	}
+
 	AssetID AssetStorage::LoadAsset(const std::filesystem::path& assetPath, AssetKind kind)
 	{
 		if (mAssetIDByPath.count(assetPath))
@@ -126,13 +133,16 @@ namespace editor
 		return id;
 	}
 
-	std::future<AssetID> AssetStorage::LoadAssetAsync(const std::filesystem::path& assetPath, AssetKind kind)
+	void AssetStorage::LoadAssetAsync(
+		const std::filesystem::path& assetPath,
+		AssetKind kind,
+		std::function<void(AssetID)> onComplete)
 	{
-		return std::async(
-			std::launch::async,
-			[this, assetPath, kind]() -> AssetID
+		mService->AddTask(
+			[this, assetPath, kind, onComplete]()
 			{
-				return LoadAsset(assetPath, kind);
+				AssetID id = LoadAsset(assetPath, kind);
+				onComplete(id);
 			}
 		);
 	}
@@ -180,6 +190,17 @@ namespace editor
 
 		mAssetIDByPath.erase(assetPath);
 		mAssetPathByID.at(id).clear();
+	}
+
+	bool AssetStorage::Exists(AssetID id) const
+	{
+		return mAssetIDs.IsActive(id);
+	}
+
+	bool AssetStorage::IsOfKind(AssetID id, AssetKind kind) const
+	{
+		return Exists(id)
+			&& mAssetByID.at(id)->GetKind() == kind;
 	}
 
 	Asset* AssetStorage::GetAssetFromPath(const std::filesystem::path& assetPath) const
