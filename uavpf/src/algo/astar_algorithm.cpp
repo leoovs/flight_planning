@@ -25,7 +25,7 @@ namespace uavpf
 
 		NavNode* startNode = mGrid->GetNode(start.x, start.y);
 		startNode->TotalCost = 0.0f;
-		startNode->HeuristicCost = mCost->CalculateHeuristic(startNode);
+		startNode->HeuristicCost = CalculateHeuristic(startNode);
 		mToExplore.push_back(startNode);
 	}
 
@@ -76,7 +76,7 @@ namespace uavpf
 		{
 			neighbour->Parent = mCurrentNode;
 			neighbour->TotalCost = totalScoreFromStart;
-			neighbour->HeuristicCost = mCost->CalculateHeuristic(neighbour);
+			neighbour->HeuristicCost = CalculateHeuristic(neighbour);
 
 			auto it = std::find(mToExplore.begin(), mToExplore.end(), neighbour);
 			if (it == mToExplore.end())
@@ -99,5 +99,13 @@ namespace uavpf
 		std::reverse(path.begin(), path.end());
 
 		return path;
+	}
+
+	float AStarAlgorithm::CalculateHeuristic(NavNode* currentNode) const
+	{
+		glm::ivec2 targetCoord = mGrid->GetCoordinates(mTargetNode);
+		glm::ivec2 currentCoord = mGrid->GetCoordinates(currentNode);
+
+		return glm::length(glm::vec2(targetCoord - currentCoord));
 	}
 }

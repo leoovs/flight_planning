@@ -32,6 +32,8 @@ namespace uavpf
 		std::vector<NavNode*> ConstructPath() const;
 
 	private:
+		float CalculateHeuristic(NavNode* node) const;
+
 		AStarCost* mCost = nullptr;
 		NavGrid* mGrid = nullptr;
 		std::deque<NavNode*> mToExplore;

@@ -17,7 +17,6 @@ namespace uavpf
 
 		virtual std::string_view GetName() const = 0;
 
-		virtual float CalculateHeuristic(const NavNode* node) const = 0;
 		virtual float CalculateCost(const NavNode* current, const NavNode* neighbour) const = 0;
 	};
 
@@ -31,7 +30,6 @@ namespace uavpf
 
 		std::string_view GetName() const override;
 
-		float CalculateHeuristic(const NavNode* node) const override;
 		float CalculateCost(const NavNode* current, const NavNode* neighbour) const override;
 
 	private:
@@ -50,7 +48,6 @@ namespace uavpf
 
 		std::string_view GetName() const override;
 
-		float CalculateHeuristic(const NavNode* node) const override;
 		float CalculateCost(const NavNode* current, const NavNode* neighbour) const override;
 
 	private:

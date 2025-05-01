@@ -27,14 +27,6 @@ namespace uavpf
 		return "Countor matching";
 	}
 
-	float ContourMatchingCost::CalculateHeuristic(const NavNode* node) const
-	{
-		glm::ivec2 targetCoord = mGrid->GetCoordinates(mTarget);
-		glm::ivec2 currentCoord = mGrid->GetCoordinates(node);
-
-		return glm::length(glm::vec2(targetCoord - currentCoord));
-	}
-
 	float ContourMatchingCost::CalculateCost(const NavNode* current, const NavNode* neighbour) const
 	{
 		glm::ivec2 distance = mGrid->GetCoordinates(current) - mGrid->GetCoordinates(neighbour);
@@ -62,11 +54,6 @@ namespace uavpf
 	std::string_view ElevationConservingCost::GetName() const
 	{
 		return "Elevation conservation";
-	}
-
-	float ElevationConservingCost::CalculateHeuristic(const NavNode* node) const
-	{
-		return mDistanceHeuristic.CalculateHeuristic(node);
 	}
 
 	float ElevationConservingCost::CalculateCost(const NavNode* current, const NavNode* neighbour) const

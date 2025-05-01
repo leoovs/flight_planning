@@ -3,6 +3,7 @@
 #include <cinttypes>
 
 #include <vector>
+#include <limits>
 
 #include <glm/glm.hpp>
 
@@ -16,7 +17,7 @@ namespace uavpf
 
 	struct NavNode
 	{
-		static constexpr float cInfiniteScore = 1e5f;
+		static constexpr float cInfiniteScore = std::numeric_limits<float>::infinity();
 
 		float TotalCost = cInfiniteScore;
 		float HeuristicCost = 0.0f;
