@@ -19,6 +19,8 @@ namespace editor
 		void RenderLine3D(const glm::vec3& a, const glm::vec3& b, const glm::vec3& color);
 		void RenderCircle3D(const glm::vec3& position, float radius, const glm::vec3& color);
 
+		void IgnoreDepth(bool ignore);
+
 	private:
 		enum ShaderIndex
 		{
@@ -55,6 +57,7 @@ namespace editor
 		GraphicsBuffer* mLinesBuffer = nullptr;
 		VertexInput* mLineVertexInput = nullptr;
 		Framebuffer* mFramebuffer = nullptr;
+		DepthStencilState mDepthStencilState;
 	};
 }
 

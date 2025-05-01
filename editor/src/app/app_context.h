@@ -3,6 +3,7 @@
 #include "app/asset_storage.h"
 #include "app/app_service.h"
 #include "app/path_mission.h"
+#include "app/terrain_scaler.h"
 
 namespace editor
 {
@@ -17,6 +18,7 @@ namespace editor
 		uavpf::TiffImage* GetMapImage();
 
 		PathMission& GetPathMission();
+		TerrainScaler& GetTerrainScaler();
 
 	private:
 		AppService* mService = nullptr;
@@ -24,6 +26,7 @@ namespace editor
 
 		AssetID mMapImage = uavpf::cBadID;
 		PathMission mPathMission;
+		TerrainScaler mTerrainScaler;
 	};
 }
 

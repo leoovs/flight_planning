@@ -2,6 +2,21 @@
 
 namespace editor
 {
+	void Path::AddCoordinate(const glm::vec2& coordinate, float elevation)
+	{
+		mCoordinates.emplace_back(coordinate.x, elevation, coordinate.y);
+	}
+
+	void Path::Clear()
+	{
+		mCoordinates.clear();
+	}
+
+	const std::vector<glm::vec3>& Path::GetCoordinates() const
+	{
+		return mCoordinates;
+	}
+
 	void PathMission::SetHeightMap(uavpf::HeightMap heightMap)
 	{
 		mHeightMap = std::move(heightMap);
@@ -19,25 +34,86 @@ namespace editor
 		return mGrid;
 	}
 
-	void PathMission::SetStart(glm::vec2 start)
+	void PathMission::SetRelativeStart(glm::vec2 relativeStart)
 	{
-		mStart = start;
+		mRelativeStart = relativeStart;
 	}
 
-	glm::vec2 PathMission::GetStart() const
+	glm::vec2 PathMission::GetRelativeStart() const
 	{
-		return mStart;
+		return mRelativeStart;
 	}
 
 
-	void PathMission::SetEnd(glm::vec2 end)
+	void PathMission::SetRelativeEnd(glm::vec2 relativeEnd)
 	{
-		mEnd = end;
+		mRelativeEnd = relativeEnd;
 	}
 
-	glm::vec2 PathMission::GetEnd() const
+	glm::vec2 PathMission::GetRelativeEnd() const
 	{
-		return mEnd;
+		return mRelativeEnd;
+	}
+
+	void PathMission::SetStart(glm::ivec2 start)
+	{
+		const uavpf::NavGridSpecification& gridSpec = mGrid.GetSpecification();
+		mRelativeStart = {
+			start.x / float(gridSpec.Width),
+			start.y / float(gridSpec.Depth),
+		};
+	}
+
+	glm::ivec2 PathMission::GetStart() const
+	{
+		const uavpf::NavGridSpecification& gridSpec = mGrid.GetSpecification();
+		return {
+			gridSpec.Width * mRelativeStart.x,
+			gridSpec.Depth * mRelativeStart.y,
+		};
+	}
+
+	void PathMission::SetEnd(glm::ivec2 end)
+	{
+		const uavpf::NavGridSpecification& gridSpec = mGrid.GetSpecification();
+		mRelativeEnd = {
+			end.x / float(gridSpec.Width),
+			end.y / float(gridSpec.Depth),
+		};
+	}
+
+	glm::ivec2 PathMission::GetEnd() const
+	{
+		const uavpf::NavGridSpecification& gridSpec = mGrid.GetSpecification();
+		return {
+			gridSpec.Width * mRelativeEnd.x,
+			gridSpec.Depth * mRelativeEnd.y,
+		};
+	}
+
+	void PathMission::SetMinElevation(float elevation)
+	{
+		mMinElevation = std::max(elevation, 0.0f);
+	}
+
+	float PathMission::GetMinElevation() const
+	{
+		return mMinElevation;
+	}
+
+	void PathMission::SetStatus(PathStatus status)
+	{
+		mStatus = status;
+	}
+
+	PathMission::PathStatus PathMission::GetStatus() const
+	{
+		return mStatus;
+	}
+
+	Path& PathMission::GetPath()
+	{
+		return mPath;
 	}
 }
 

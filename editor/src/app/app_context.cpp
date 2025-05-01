@@ -1,4 +1,5 @@
 #include "app/app_context.h"
+#include "app/terrain_scaler.h"
 
 namespace editor
 {
@@ -36,6 +37,11 @@ namespace editor
 	PathMission& AppContext::GetPathMission()
 	{
 		return mPathMission;
+	}
+
+	TerrainScaler& AppContext::GetTerrainScaler()
+	{
+		return mTerrainScaler;
 	}
 }
 

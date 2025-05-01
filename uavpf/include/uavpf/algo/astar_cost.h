@@ -42,7 +42,7 @@ namespace uavpf
 	class ElevationConservingCost : public AStarCost
 	{
 	public:
-		ElevationConservingCost(float elevation);
+		ElevationConservingCost();
 		~ElevationConservingCost() override = default;
 		
 		void SetGrid(const NavGrid* grid) override;
@@ -55,7 +55,6 @@ namespace uavpf
 
 	private:
 		ContourMatchingCost mDistanceHeuristic;	
-		float mTargetElevation = 0.0f;
 		const NavGrid* mGrid = nullptr;
 		const NavNode* mTarget = nullptr;
 	};

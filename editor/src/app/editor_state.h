@@ -58,6 +58,7 @@ namespace editor
 		{
 			Idle,
 			Preparing,
+			PathFinding,
 		};
 
 		~Editor_PathBuilder() override = default;
@@ -73,18 +74,25 @@ namespace editor
 		void ShowUI() override;
 
 	private:
+		void Render_PathMissionTargets();
+		void Render_Path();
+
 		void Show_CloseMenu();
 		void Show_PathMissionPanel();
 		void Show_ScenePanel();
+		void Show_MapPanel();
 
 		void UpdateProgressMessage();
 		void InitializePathMission();
 		void InitializeTerrainMesh();
+		void FindPath();
 
 		void LoadTerrainMesh();
 		void SetupRenderBuffers(int32_t width, int32_t height);
 		void SetupRenderers();
 		void HandleCameraInput();
+		void ResetTerrainScaling();
+		glm::vec4 NavCoordToWorldCoord(const glm::vec3& navCoord) const;
 
 		bool OnMouseMove(const MouseMovementEvent& event);
 
@@ -92,7 +100,9 @@ namespace editor
 		EditorApp* mApp = nullptr;
 		EventSubscriber mSubscriber;
 
-		std::string mProgressMessage = "Preparing PathBuilder...";
+		std::string mProgressMessage = "";
+		std::string mProgressTitle = "Preparing PathBuilder";
+		std::string mProgressChar = "\n*";
 		float mProgressSeconds = 0.0f;
 
 		uavpf::TerrainMesh mTerrainMesh;

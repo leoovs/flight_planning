@@ -47,10 +47,7 @@ namespace uavpf
 	//
 	//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
-	ElevationConservingCost::ElevationConservingCost(float elevation)
-		: mTargetElevation(elevation)
-	{
-	}
+	ElevationConservingCost::ElevationConservingCost() = default;
 
 	void ElevationConservingCost::SetGrid(const NavGrid* grid)
 	{
@@ -74,19 +71,14 @@ namespace uavpf
 
 	float ElevationConservingCost::CalculateCost(const NavNode* current, const NavNode* neighbour) const
 	{
-		float distance = mDistanceHeuristic.CalculateCost(current, neighbour);
+		float distanceCost = mDistanceHeuristic.CalculateCost(current, neighbour);
 		float currentElevation = mGrid->GetElevation(mGrid->GetCoordinates(current));
 		float nextElevation = mGrid->GetElevation(mGrid->GetCoordinates(neighbour));
 
 		float slopeCost = nextElevation - currentElevation;
-		if (slopeCost > 0.0f)
-		{
-			slopeCost *= 500.0f;
-		}
-
 		float elevationCost = nextElevation;
 
-		return distance + elevationCost + slopeCost;
+		return distanceCost + elevationCost + 1000.0f * slopeCost;
 	}
 }
 

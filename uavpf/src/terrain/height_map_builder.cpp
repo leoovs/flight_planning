@@ -66,7 +66,7 @@ namespace uavpf
 		{
 			for (int32_t j = 0; j < rows; j++)
 			{
-				mHeightMap.At(i, j) = mGrayscale.Get(i, j);
+				mHeightMap.At(cols - i - 1, j) = mGrayscale.Get(i, j);
 			}
 		}
 	}

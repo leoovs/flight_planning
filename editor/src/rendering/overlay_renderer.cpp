@@ -52,6 +52,7 @@ namespace editor
 			glm::vec4(b, 1.0f),
 		};
 		mLinesBuffer->SetData(lines, sizeof(lines));
+		mGraphics->SetDepthStencilState(mDepthStencilState);
 		mGraphics->SetVertexInput(mLineVertexInput);
 		mGraphics->SetPrimitiveMode(PrimitiveMode::LineList);
 		mGraphics->SetShader(ShaderKind::Vertex, mShaders.at(LineVS2));
@@ -111,6 +112,7 @@ namespace editor
 		mShaders.at(CircleVS)->SetUniform("uProj", proj);
 		mShaders.at(CirclePS)->SetUniform("uColor", color);
 
+		mGraphics->SetDepthStencilState(mDepthStencilState);
 		mGraphics->SetVertexInput(mLineVertexInput);
 		mGraphics->SetPrimitiveMode(PrimitiveMode::TriangleList);
 		mGraphics->SetShader(ShaderKind::Vertex, mShaders.at(CircleVS));
@@ -118,6 +120,11 @@ namespace editor
 		mGraphics->SetFramebuffer(mFramebuffer);
 
 		mGraphics->Draw(0, 6);
+	}
+
+	void OverlayRenderer::IgnoreDepth(bool ignore)
+	{
+		mDepthStencilState.DepthTestEnabled = !ignore;
 	}
 
 	auto OverlayRenderer::GetShaderSources() -> std::array<ShaderSource, ShaderIndexCount>
