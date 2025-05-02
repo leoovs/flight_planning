@@ -375,11 +375,11 @@ namespace editor
 	{
 		glPolygonMode(
 			GL_FRONT_AND_BACK,
-			OglFacts::ConvertFillModeToNative(state.FillMode));
+			OglFacts::ConvertFillModeToNative(state.Fill));
 
 		glEnable(GL_CULL_FACE);
 		glFrontFace(GL_CW);
-		glCullFace(OglFacts::ConvertCullModeToNative(state.CullMode));
+		glCullFace(OglFacts::ConvertCullModeToNative(state.Cull));
 	}
 }
 

@@ -17,8 +17,8 @@ namespace editor
 
 	struct RasterizerState
 	{
-		FillMode FillMode = FillMode::Solid;
-		CullMode CullMode = CullMode::Back;
+		FillMode Fill = FillMode::Solid;
+		CullMode Cull = CullMode::Back;
 	};
 }
 
