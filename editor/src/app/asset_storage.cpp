@@ -102,9 +102,9 @@ namespace editor
 
 	AssetID AssetStorage::LoadAsset(const std::filesystem::path& assetPath, AssetKind kind)
 	{
-		if (mAssetIDByPath.count(assetPath))
+		if (mAssetIDByPath.count(assetPath.string()))
 		{
-			return mAssetIDByPath.at(assetPath);
+			return mAssetIDByPath.at(assetPath.string());
 		}
 
 		AssetID id = uavpf::cBadID;
@@ -123,7 +123,7 @@ namespace editor
 			return id;
 		}
 
-		mAssetIDByPath.insert(std::make_pair(assetPath, id));
+		mAssetIDByPath.insert(std::make_pair(assetPath.string(), id));
 		if (mAssetPathByID.size() <= id)
 		{
 			mAssetPathByID.resize(id + 1);
@@ -188,7 +188,7 @@ namespace editor
 
 		const std::filesystem::path& assetPath = mAssetPathByID.at(id);
 
-		mAssetIDByPath.erase(assetPath);
+		mAssetIDByPath.erase(assetPath.string());
 		mAssetPathByID.at(id).clear();
 	}
 
@@ -205,9 +205,9 @@ namespace editor
 
 	Asset* AssetStorage::GetAssetFromPath(const std::filesystem::path& assetPath) const
 	{
-		if (mAssetIDByPath.count(assetPath))
+		if (mAssetIDByPath.count(assetPath.string()))
 		{
-			AssetID id = mAssetIDByPath.at(assetPath);
+			AssetID id = mAssetIDByPath.at(assetPath.string());
 			return GetAssetFromID(id);
 		}
 

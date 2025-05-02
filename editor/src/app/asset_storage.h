@@ -123,7 +123,7 @@ namespace editor
 		AppService* mService = nullptr;
 
 		uavpf::IDAllocator mAssetIDs;
-		std::unordered_map<std::filesystem::path, AssetID> mAssetIDByPath;
+		std::unordered_map<std::string, AssetID> mAssetIDByPath;
 		std::vector<std::unique_ptr<Asset>> mAssetByID;
 		std::vector<std::filesystem::path> mAssetPathByID;
 	};
