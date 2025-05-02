@@ -7,7 +7,6 @@ add_executable(editor)
 target_sources(
 	editor
 	PRIVATE
-	"src/application.cpp"
 	"src/main.cpp"
 
 	"src/app/app_context.cpp"
