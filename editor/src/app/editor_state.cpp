@@ -4,6 +4,7 @@
 #include "app/path_mission.h"
 #include "imgui_internal.h"
 #include "uavpf/algo/astar_cost.h"
+#include "uavpf/algo/navgrid.h"
 
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/projection.hpp>
@@ -118,8 +119,13 @@ namespace editor
 		SetupRenderBuffers(720, 480);
 		SetupRenderers();
 
-		mFreeCamera.SetPosition(glm::vec3(0.0f));
-		mFreeCamera.LookAt(glm::vec3(0.0f, 0.0f, 1.0f));
+		mFreeCamera.SetPosition(glm::vec3(1.0f));
+		mFreeCamera.LookAt(glm::vec3(0.0f));
+
+		uavpf::CostCollection& costs = mApp->GetContext()->GetPathMission().GetCosts();
+		costs.Clear();
+		costs.Add<uavpf::DistanceCost>(1.0f)
+			.Add<uavpf::SlopeCost>(1.0f);
 
 		mProgressTitle = "Initializing PathBuilder";
 		mProgressChar = "\n*";
@@ -179,6 +185,7 @@ namespace editor
 		mTerrainRenderer->Render(mTerrainRenderMesh.get(), mApp->GetContext()->GetTerrainScaler().GetModelMatrix());
 
 		Render_PathMissionTargets();
+		Render_Notams();
 		Render_Path();
 
 		mOverlayRenderer->SetTargetTextures(mColorBuffer.get(), mDepthBuffer.get());
@@ -196,7 +203,7 @@ namespace editor
 		switch (mState)
 		{
 			case State::Preparing:
-				ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.4f, 1.0f), "%s", mProgressMessage.data());
+				ImGui::TextColored(ImVec4(0.47f, 0.76f, 1.0f, 1.0f), "%s", mProgressMessage.data());
 				break;
 			case State::Idle:
 			case State::PathFinding:
@@ -287,6 +294,67 @@ namespace editor
 		}
 	}
 
+	void Editor_PathBuilder::Render_Notams()
+	{
+		PathMission& mission = mApp->GetContext()->GetPathMission();
+		uavpf::CostCollection& costs = mission.GetCosts();
+		const uavpf::NavGrid& grid = mission.GetNavGrid();
+		auto [width, depth] = grid.GetSpecification();
+		float elevation = mission.GetMinElevation();
+
+		if (width == 0 || depth == 0)
+		{
+			return;
+		}
+
+		mOverlayRenderer->IgnoreDepth(false);
+		for (ptrdiff_t iCost = 0; iCost < costs.GetSize(); iCost++)
+		{
+			uavpf::AStarCost* cost = costs.GetCost(iCost);
+			if (cost->GetKind() != uavpf::AStarCostKind::Notam)
+			{
+				continue;
+			}
+
+			auto* notam = dynamic_cast<uavpf::NotamCost*>(cost);
+
+			glm::ivec2 center = notam->GetNavSpaceCenter();
+			glm::ivec2 offset = { notam->GetRadiusA(), 0 };
+
+			float height = elevation + grid.GetElevation(center);
+
+			glm::vec3 centerWithHeight{ center.x, height, center.y };
+			glm::vec4 worldCenter = NavCoordToWorldCoord(centerWithHeight);
+
+			glm::vec3 offsetWithHeight{ offset.x, 0.0f, offset.y };
+			glm::vec4 worldOffset = NavCoordToWorldCoord(offsetWithHeight);
+			float worldRadius = glm::length(glm::vec3(worldOffset));
+
+			mOverlayRenderer->RenderCircle3D(
+				worldCenter,
+				0.0f == worldRadius ? 0.03f : 0.01f,
+				glm::vec3(1.0f, 1.0f, 0.3f));
+
+			int32_t segments = std::max(std::min(width, depth) / 2, 25);
+			float deltaAngle = glm::two_pi<float>() / segments;
+			int32_t segment = 0;
+			for (; segment < segments; segment++)
+			{
+				int32_t nextSegment = (segment + 1) % segments;
+
+				glm::vec4 offset1(glm::vec3(0.0f), 1.0f);
+				offset1.x = worldRadius * glm::cos(segment * deltaAngle);
+				offset1.z = worldRadius * glm::sin(segment * deltaAngle);
+
+				glm::vec4 offset2(glm::vec3(0.0f), 1.0f);
+				offset2.x = worldRadius * glm::cos(nextSegment * deltaAngle);
+				offset2.z = worldRadius * glm::sin(nextSegment * deltaAngle);
+
+				mOverlayRenderer->RenderLine3D(worldCenter + offset1, worldCenter + offset2, glm::vec3(1.0f, 1.0f, 0.7f));
+			}
+		}
+	}
+
 	void Editor_PathBuilder::Show_CloseMenu()
 	{
 		if (ImGui::BeginMenuBar())
@@ -325,27 +393,38 @@ namespace editor
 
 		ImGui::Begin("PathMission");
 		bool updateNavGrid = ImGui::DragInt2("NavGrid resolution", glm::value_ptr(resolution), 1.0f, 0, 1000, "%d", sliderFlags);
-		bool updateTargets = ImGui::DragFloat2("Start", glm::value_ptr(relativeStart), 0.01f, 0, 0.9f, "%.2f", sliderFlags);
-		updateTargets = ImGui::DragFloat2("End", glm::value_ptr(relativeEnd), 0.01f, 0, 0.9f, "%.2f", sliderFlags) | updateTargets;
+		bool updateTargets = ImGui::DragFloat2("Start", glm::value_ptr(relativeStart), 0.01f, 0, 0.94f, "%.2f", sliderFlags);
+		updateTargets = ImGui::DragFloat2("End", glm::value_ptr(relativeEnd), 0.01f, 0, 0.94f, "%.2f", sliderFlags) | updateTargets;
 
-		if (ImGui::Button("Build") && mState != State::PathFinding)
+		if (mState != State::PathFinding)
 		{
-			mProgressSeconds = 0.0f;
-			mProgressTitle = "Path finding";
-			mProgressChar = ".";
-			mProgressMessage = mProgressTitle;
+			if (ImGui::Button("Build"))
+			{
+				mStopPathFinding = false;
+				mProgressSeconds = 0.0f;
+				mProgressTitle = "Path finding";
+				mProgressChar = ".";
+				mProgressMessage = mProgressTitle;
 
-			mission.GetPath().Clear();
-			mission.SetStatus(PathMission::PathStatus::None);
+				mission.GetPath().Clear();
+				mission.SetStatus(PathMission::PathStatus::None);
 
-			mApp->GetService()->AddTask(
-				[this]()
-				{
-					mState = State::PathFinding;
-					FindPath();
-					mState = State::Idle;
-				}
-			);
+				mApp->GetService()->AddTask(
+					[this]()
+					{
+						mState = State::PathFinding;
+						FindPath();
+						mState = State::Idle;
+					}
+				);
+			}
+		}
+		else
+		{
+			if (ImGui::Button("Stop"))
+			{
+				mStopPathFinding = true;
+			}
 		}
 
 		float maxHeightKilometers = 2.0f * scaler.GetMaxHeight().GetKilometers();
@@ -355,8 +434,9 @@ namespace editor
 		
 		if (State::PathFinding == mState)
 		{
-			ImGui::TextColored(ImVec4(0.0f, 0.3f, 0.7f, 1.0f), "%s", mProgressMessage.data());
+			ImGui::TextColored(ImVec4(0.47f, 0.76f, 1.0f, 1.0f), "%s", mProgressMessage.data());
 		}
+		Show_CostCollection();
 		ImGui::End();
 
 		if (State::PathFinding == mState)
@@ -375,10 +455,118 @@ namespace editor
 			gridSpec.Width = resolution.x;
 			gridSpec.Depth = resolution.y;
 			mission.SpecifyGrid(gridSpec);
+			mission.GetCosts().SetGrid(&mission.GetNavGrid());
 		}
 
 		mission.SetRelativeStart(relativeStart);
 		mission.SetRelativeEnd(relativeEnd);
+	}
+
+	void Editor_PathBuilder::Show_CostCollection()
+	{
+		bool isOpen = ImGui::TreeNode("Costs");
+
+		PathMission& mission = mApp->GetContext()->GetPathMission();
+		uavpf::CostCollection& costs = mission.GetCosts();
+
+		if (ImGui::BeginPopupContextItem("CostsContext"))
+		{
+			if (ImGui::BeginMenu("Add"))
+			{
+				if (ImGui::MenuItem("Distance"))
+				{
+					costs.Add<uavpf::DistanceCost>(1.0f);
+				}
+				if (ImGui::MenuItem("Slope"))
+				{
+					costs.Add<uavpf::SlopeCost>(1.0f);
+				}
+				if (ImGui::MenuItem("Notam"))
+				{
+					costs.Add<uavpf::NotamCost>(1.0f);
+				}
+				ImGui::EndMenu();
+			}
+			if (ImGui::MenuItem("Clear"))
+			{
+				costs.Clear();
+			}
+			ImGui::EndPopup();
+		}
+
+		if (!isOpen)
+		{
+			return;
+		}
+
+		for (ptrdiff_t iCost = 0; iCost < costs.GetSize(); iCost++)
+		{
+			ImGui::PushID(iCost);
+			Show_CostMenu(iCost);
+			ImGui::PopID();
+		}
+
+		ImGui::TreePop();
+	}
+
+	void Editor_PathBuilder::Show_CostMenu(ptrdiff_t iCost)
+	{
+		PathMission& mission = mApp->GetContext()->GetPathMission();
+		uavpf::CostCollection& costs = mission.GetCosts();
+
+		uavpf::AStarCost* cost = costs.GetCost(iCost);
+		uavpf::AStarCostKind kind = cost->GetKind();
+		float& weight = costs.GetWeight(iCost);
+
+		bool isOpen = ImGui::TreeNode(uavpf::GetAStarCostKindString(kind).data());
+
+		if (ImGui::BeginPopupContextItem("CostContext", ImGuiPopupFlags_MouseButtonRight))
+		{
+			if (ImGui::MenuItem("Delete"))
+			{
+				cost = nullptr;
+				costs.Erase(iCost);
+			}
+			ImGui::EndPopup();
+		}
+
+		if (!isOpen)
+		{
+			return;
+		}
+		if (nullptr == cost)
+		{
+			ImGui::TreePop();
+			return;
+
+		}
+
+		ImGui::DragFloat("Weight", &weight, 0.5f, 0.5f, 100.0f, "%.1f", ImGuiSliderFlags_AlwaysClamp);
+
+		switch (cost->GetKind())
+		{
+			case uavpf::AStarCostKind::Notam:
+				Show_NotamMenu(dynamic_cast<uavpf::NotamCost*>(cost));
+				break;
+			case uavpf::AStarCostKind::Unknown:
+			case uavpf::AStarCostKind::Collection:
+			case uavpf::AStarCostKind::Distance:
+			case uavpf::AStarCostKind::Slope:
+				break;
+		}
+
+		ImGui::TreePop();
+	}
+
+	void Editor_PathBuilder::Show_NotamMenu(uavpf::NotamCost* cost)
+	{
+		PathMission& mission = mApp->GetContext()->GetPathMission();
+		auto& [width, depth] = mission.GetNavGrid().GetSpecification();
+		float& relativeRadius = cost->GetRadius();
+		glm::vec2& relativeCenter = cost->GetCenter();
+
+		ImGui::DragFloat("Radius", &relativeRadius, 0.01f, 0.0f, 0.94f, "%.2f", ImGuiSliderFlags_AlwaysClamp);
+		ImGui::DragFloat2("Position", glm::value_ptr(relativeCenter), 0.01f, 0.0f, 0.94f, "%.2f", ImGuiSliderFlags_AlwaysClamp);
 	}
 
 	void Editor_PathBuilder::Show_ScenePanel()
@@ -502,11 +690,9 @@ namespace editor
 		PathMission& mission = mApp->GetContext()->GetPathMission();
 		uavpf::NavGrid navGrid(mission.GetNavGrid());
 
-		uavpf::ElevationConservingCost cost;
-		// uavpf::ContourMatchingCost cost;
-		uavpf::AStarAlgorithm pathFinder(&cost, &navGrid, mission.GetStart(), mission.GetEnd());
+		uavpf::AStarAlgorithm pathFinder(&mission.GetCosts(), &navGrid, mission.GetStart(), mission.GetEnd());
 
-		while (pathFinder.IsExplorable())
+		while (pathFinder.IsExplorable() && !mStopPathFinding)
 		{
 			pathFinder.ExploreNext();
 			if (pathFinder.IsGoal())

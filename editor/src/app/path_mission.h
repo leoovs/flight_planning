@@ -32,6 +32,8 @@ namespace editor
 		void SpecifyGrid(uavpf::NavGridSpecification spec);
 		const uavpf::NavGrid& GetNavGrid() const;
 
+		uavpf::CostCollection& GetCosts();
+
 		void SetRelativeStart(glm::vec2 relativeStart);
 		glm::vec2 GetRelativeStart() const;
 
@@ -55,6 +57,7 @@ namespace editor
 	private:
 		uavpf::HeightMap mHeightMap;
 		uavpf::NavGrid mGrid;
+		uavpf::CostCollection mCosts;
 
 		glm::vec2 mRelativeStart{};
 		glm::vec2 mRelativeEnd{};

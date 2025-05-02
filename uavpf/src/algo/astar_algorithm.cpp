@@ -21,7 +21,6 @@ namespace uavpf
 		mTargetNode = mGrid->GetNode(end.x, end.y);
 
 		mCost->SetGrid(mGrid);
-		mCost->SetTarget(mTargetNode);
 
 		NavNode* startNode = mGrid->GetNode(start.x, start.y);
 		startNode->TotalCost = 0.0f;

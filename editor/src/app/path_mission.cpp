@@ -34,6 +34,11 @@ namespace editor
 		return mGrid;
 	}
 
+	uavpf::CostCollection& PathMission::GetCosts()
+	{
+		return mCosts;
+	}
+
 	void PathMission::SetRelativeStart(glm::vec2 relativeStart)
 	{
 		mRelativeStart = relativeStart;
@@ -43,7 +48,6 @@ namespace editor
 	{
 		return mRelativeStart;
 	}
-
 
 	void PathMission::SetRelativeEnd(glm::vec2 relativeEnd)
 	{

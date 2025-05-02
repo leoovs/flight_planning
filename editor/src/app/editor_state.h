@@ -76,9 +76,13 @@ namespace editor
 	private:
 		void Render_PathMissionTargets();
 		void Render_Path();
+		void Render_Notams();
 
 		void Show_CloseMenu();
 		void Show_PathMissionPanel();
+		void Show_CostCollection();
+		void Show_CostMenu(ptrdiff_t iCost);
+		void Show_NotamMenu(uavpf::NotamCost* cost);
 		void Show_ScenePanel();
 		void Show_MapPanel();
 
@@ -116,6 +120,7 @@ namespace editor
 		bool mIsSceneFocused = false;
 		bool mCanOperateCamera = false;
 		std::atomic_bool mCanLoadMesh = false;
+		std::atomic_bool mStopPathFinding = false;
 		Camera mFreeCamera;
 		Camera mTopDownCamera;
 	};

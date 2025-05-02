@@ -235,7 +235,7 @@ namespace editor
 		mGrid = uavpf::NavGrid(spec);
 		mGrid.SetHeightMap(&mHeightMap);
 
-		uavpf::ElevationConservingCost cost;
+		uavpf::DistanceCost cost;
 		// uavpf::ContourMatchingCost cost;
 		uavpf::AStarAlgorithm pathFinder(&cost, &mGrid, { 0, 0 }, { 0.7 * 50, 0.5 * 50 });
 

@@ -17,9 +17,9 @@ namespace uavpf
 
 	struct NavNode
 	{
-		static constexpr float cInfiniteScore = std::numeric_limits<float>::infinity();
+		static constexpr float cInfiniteCost = std::numeric_limits<float>::infinity();
 
-		float TotalCost = cInfiniteScore;
+		float TotalCost = cInfiniteCost;
 		float HeuristicCost = 0.0f;
 		NavNode* Parent = nullptr;
 
