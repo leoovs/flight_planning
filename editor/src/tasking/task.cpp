@@ -1,6 +1,7 @@
 #include "tasking/task.h"
 
 #include <cassert>
+#include <future>
 
 namespace editor
 {
@@ -124,6 +125,37 @@ namespace editor
 	bool EmptyTask::IsDone() const
 	{
 		return mIdled >= mIdling;
+	}
+
+	//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	//
+	// CpuBoundTask
+	//
+	//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+	CpuBoundTask::CpuBoundTask(std::function<void()> taskFunc)
+		: mTaskFunc(std::move(taskFunc))
+	{}
+
+	CpuBoundTask::~CpuBoundTask() = default;
+
+	void CpuBoundTask::Start()
+	{
+		mTaskFuture = std::async(std::launch::async, mTaskFunc);
+	}
+
+	void CpuBoundTask::Abort()
+	{
+		mTaskFuture.wait();
+	}
+
+	void CpuBoundTask::Update()
+	{}
+
+	bool CpuBoundTask::IsDone() const
+	{
+		return mTaskFuture.wait_for(std::chrono::seconds(0))
+			== std::future_status::ready;
 	}
 
 	//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+

@@ -22,6 +22,7 @@ namespace editor
 			if (mOnComplete.front())
 			{
 				mOnComplete.front()(current);
+				mOnComplete.pop();
 			}
 			mTasks.pop();
 			return;

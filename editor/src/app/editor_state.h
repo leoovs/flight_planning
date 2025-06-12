@@ -44,11 +44,14 @@ namespace editor
 
 	private:
 		bool OnTiffMapRequested(const TiffMapRequestedEvent& event);
+		bool OnTiffMapLoaded(const TiffMapLoadedEvent& event);
+
+		void LoadTiffMap(const std::filesystem::path& path);
 
 		EditorApp* mApp = nullptr;
 		EventSubscriber mSubscriber;
 		EventPublisher mPublisher;
-		AssetID mMapImage = uavpf::cBadID;
+		std::atomic<AssetID> mMapImage = uavpf::cBadID;
 	};
 
 	class Editor_PathBuilder final : public EditorState
@@ -89,7 +92,6 @@ namespace editor
 		void UpdateProgressMessage();
 		void InitializePathMission();
 		void InitializeTerrainMesh();
-		void FindPath();
 
 		void LoadTerrainMesh();
 		void SetupRenderBuffers(int32_t width, int32_t height);
@@ -98,6 +100,7 @@ namespace editor
 		void ResetTerrainScaling();
 		glm::vec4 NavCoordToWorldCoord(const glm::vec3& navCoord) const;
 
+		bool OnStartPathFinding(const StartPathFindingEvent& event);
 		bool OnMouseMove(const MouseMovementEvent& event);
 
 		State mState = State::Preparing;

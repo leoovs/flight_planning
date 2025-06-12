@@ -1,7 +1,10 @@
 #pragma once
 
+#include <atomic>
 #include <cinttypes>
 
+#include <functional>
+#include <future>
 #include <vector>
 #include <memory>
 #include <stack>
@@ -75,6 +78,23 @@ namespace editor
 	private:
 		const int32_t mIdling = 1;
 		int32_t mIdled = 0;
+	};
+
+	class CpuBoundTask final : public Task
+	{
+	public:
+		CpuBoundTask(std::function<void()> taskFunc);
+		~CpuBoundTask();
+
+		void Start() override;
+		void Abort() override;
+		void Update() override;
+
+		bool IsDone() const override;
+
+	private:
+		std::function<void()> mTaskFunc;
+		std::future<void> mTaskFuture;
 	};
 
 	class TaskBuilder

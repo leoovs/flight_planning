@@ -32,5 +32,14 @@ namespace editor
 			: MapImage(mapImage)
 		{}
 	};
+
+	class StartPathFindingEvent final : public Event
+	{};
+
+	class CancelPathFindingEvent final : public Event
+	{};	
+
+	class PathFoundEvent final : public Event
+	{};
 }
 

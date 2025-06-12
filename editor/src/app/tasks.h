@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "app/events.h"
+#include "app/app_events.h"
 #include "app/path_mission.h"
 #include "event/event_publisher.h"
 #include "tasking/task.h"
@@ -45,15 +45,32 @@ namespace editor
 
 	private:
 		void ConstructPath();
+		void ResetNavGrid();
 
 		bool OnCancelPathFinding(const CancelPathFindingEvent& event);
 
-		bool mCancel = false;
+		bool mDone = false;
 		PathMission* mMission = nullptr;
 		uavpf::NavGrid mNavGrid;
 		std::unique_ptr<uavpf::AStarAlgorithm> mAlgorithm;
 		EventSubscriber mSubscriber;
 		EventPublisher mPublisher;
+	};
+
+	class LoadTerrainTask final : public Task
+	{
+	public:
+		LoadTerrainTask();
+		~LoadTerrainTask() override = default;
+
+		void Start() override;
+		void Abort() override;
+		void Update() override;
+
+		bool IsDone() const override;
+
+	private:
+		
 	};
 }
 

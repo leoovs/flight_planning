@@ -80,27 +80,28 @@ namespace editor
 
 	void FindPathTask::Abort()
 	{
-		mCancel = true;
-		mMission->SetStatus(PathMission::PathStatus::NotFound);
+		mDone = true;
+		mMission->SetStatus(PathMission::PathStatus::None);
+		ResetNavGrid();
 	}
 
 	void FindPathTask::Update()
 	{
 		if (!mAlgorithm->IsExplorable())
 		{
+			mDone = true;
+			mMission->SetStatus(PathMission::PathStatus::NotFound);
+			ResetNavGrid();
 			return;
 		}
 
 		mAlgorithm->ExploreNext();
 		if (mAlgorithm->IsGoal())
 		{
+			mDone = true;
 			mMission->SetStatus(PathMission::PathStatus::Found);
 			ConstructPath();
-
-			// EVIL HACK: set global costs grid to the global grid pointer,
-			// otherwise it will try to access dangling pointer when the
-			// current task dies.
-			mMission->GetCosts().SetGrid(&mMission->GetNavGrid());
+			ResetNavGrid();
 			return;
 		}
 
@@ -125,19 +126,28 @@ namespace editor
 
 	bool FindPathTask::IsDone() const
 	{
-		return !mAlgorithm->IsExplorable()
-			|| mAlgorithm->IsGoal()
-			|| mCancel;
+		return mDone;
 	}
 
 	void FindPathTask::ConstructPath()
 	{
+		Path& path = mMission->GetPath();
+		path.Clear();
 		for (uavpf::NavNode* node : mAlgorithm->ConstructPath())
 		{
 			glm::ivec2 navCoords = mNavGrid.GetCoordinates(node);
-			mMission->GetPath().AddCoordinate(navCoords, mNavGrid.GetElevation(navCoords) + mMission->GetMinElevation());
+			path.AddCoordinate(navCoords, mNavGrid.GetElevation(navCoords) + mMission->GetMinElevation());
 		}
 		mPublisher.Publish<PathFoundEvent>(EventPublishMode::Queued);
+	}
+
+	void FindPathTask::ResetNavGrid()
+	{
+		// EVIL HACK: set global costs grid to the global grid pointer,
+		// otherwise it will try to access dangling pointer when the
+		// current task dies. Algorithm sets nav grid in ctor, which is very
+		// bad and craves for refactoring.
+		mMission->GetCosts().SetGrid(&mMission->GetNavGrid());
 	}
 
 	bool FindPathTask::OnCancelPathFinding(const CancelPathFindingEvent& event)

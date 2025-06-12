@@ -4,10 +4,5 @@
 
 namespace editor
 {
-	class CancelPathFindingEvent final : public Event
-	{};	
-
-	class PathFoundEvent final : public Event
-	{};
 }
 

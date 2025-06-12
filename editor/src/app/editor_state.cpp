@@ -3,14 +3,16 @@
 #include "app/editor_app.h"
 #include "app/path_mission.h"
 #include "app/tasks.h"
-#include "imgui_internal.h"
+#include "event/event_bus.h"
 #include "uavpf/algo/astar_cost.h"
 #include "uavpf/algo/navgrid.h"
+#include "uavpf/id/base_id.h"
 
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtx/projection.hpp>
 #include <glm/gtx/string_cast.hpp>
 #include <imgui.h>
+#include <imgui_internal.h>
 #include <tinyfiledialogs.h>
 
 namespace editor
@@ -37,6 +39,7 @@ namespace editor
 		mSubscriber
 			.BeginClass(*this)
 				.SubscribeMethod(&Editor_Idle::OnTiffMapRequested)
+				.SubscribeMethod(&Editor_Idle::OnTiffMapLoaded)
 			.EndClass();
 	}
 
@@ -78,22 +81,39 @@ namespace editor
 
 	bool Editor_Idle::OnTiffMapRequested(const TiffMapRequestedEvent& event)
 	{
-		mApp->GetContext()->GetAssets().LoadAssetAsync(
-			event.TiffMapPath,
-			AssetKind::Image,
-			[this](AssetID id)
-			{
-				if (uavpf::cBadID == id)
-				{
-					return;
-				}
+		return LoadTiffMap(event.TiffMapPath), true;
+	}
 
-				mApp->GetContext()->SetMapImage(id);
-				mApp->Push(EditorStateKind::PathBuilder);
-			}
-		);
+	bool Editor_Idle::OnTiffMapLoaded(const TiffMapLoadedEvent& event)
+	{
+		mApp->GetContext()->SetMapImage(event.MapImage);
+		mApp->Push(EditorStateKind::PathBuilder);
 
 		return true;
+	}
+
+	void Editor_Idle::LoadTiffMap(const std::filesystem::path& path)
+	{
+		auto loader = [this, path]()
+			{
+				mMapImage = mApp->GetContext()->GetAssets().LoadAsset(path, AssetKind::Image);
+			};
+
+		auto task = TaskBuilder()
+			.BeginGroup()
+				.Add<CpuBoundTask>(loader)	
+			.End()
+			.Build();
+
+		auto onComplete = [this](Task& task)
+			{
+				if (uavpf::cBadID != mMapImage)
+				{
+					mPublisher.Publish<TiffMapLoadedEvent>(EventPublishMode::Queued, mMapImage);
+				}
+			};
+
+		mApp->GetService()->Schedule(std::move(task), onComplete);
 	}
 
 	//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -115,6 +135,7 @@ namespace editor
 		mSubscriber
 			.BeginClass(*this)
 				.SubscribeMethod(&Editor_PathBuilder::OnMouseMove)
+				.SubscribeMethod(&Editor_PathBuilder::OnStartPathFinding)
 			.EndClass();
 
 		mPublisher = EventPublisher(mApp->GetEvents());
@@ -399,41 +420,16 @@ namespace editor
 		bool updateTargets = ImGui::DragFloat2("Start", glm::value_ptr(relativeStart), 0.01f, 0, 0.94f, "%.2f", sliderFlags);
 		updateTargets = ImGui::DragFloat2("End", glm::value_ptr(relativeEnd), 0.01f, 0, 0.94f, "%.2f", sliderFlags) | updateTargets;
 
+		if (ImGui::Button("Swap"))
+		{
+			std::swap(relativeStart, relativeEnd);
+		}
+
 		if (mState != State::PathFinding)
 		{
 			if (ImGui::Button("Build"))
 			{
-				mStopPathFinding = false;
-				mProgressSeconds = 0.0f;
-				mProgressTitle = "Path finding";
-				mProgressChar = ".";
-				mProgressMessage = mProgressTitle;
-
-				mission.GetPath().Clear();
-				mission.SetStatus(PathMission::PathStatus::None);
-
-				auto task = TaskBuilder()
-					.BeginGroup()
-						.Add<FindPathTask>(mApp->GetContext()->GetPathMission(), mApp->GetEvents())
-					.End()
-					.Build();
-
-				mState = State::PathFinding;
-				mApp->GetService()->Schedule(
-					std::move(task),
-					[this](auto& task)
-					{
-						mState = State::Idle;
-					}
-				);
-
-			//	mApp->GetService()->AddTask(
-			//		[this]()
-			//		{
-			//			FindPath();
-			//			mState = State::Idle;
-			//		}
-			//	);
+				mPublisher.Publish<StartPathFindingEvent>(EventPublishMode::Queued);
 			}
 		}
 		else
@@ -481,6 +477,12 @@ namespace editor
 
 	void Editor_PathBuilder::Show_CostCollection()
 	{
+		if (mState == State::PathFinding)
+		{
+			// TODO: simply grey out widgets, but for now just hide them.
+			return;
+		}
+
 		bool isOpen = ImGui::TreeNode("Costs");
 
 		PathMission& mission = mApp->GetContext()->GetPathMission();
@@ -555,7 +557,6 @@ namespace editor
 		{
 			ImGui::TreePop();
 			return;
-
 		}
 
 		ImGui::DragFloat("Weight", &weight, 0.5f, 0.5f, 100.0f, "%.1f", ImGuiSliderFlags_AlwaysClamp);
@@ -702,58 +703,6 @@ namespace editor
 		mCanLoadMesh = true;
 	}
 
-	void Editor_PathBuilder::FindPath()
-	{
-		PathMission& mission = mApp->GetContext()->GetPathMission();
-		uavpf::NavGrid navGrid(mission.GetNavGrid());
-
-		uavpf::AStarAlgorithm pathFinder(
-			&mission.GetCosts(),
-			&navGrid,
-			mission.GetStart(),
-			mission.GetEnd());
-
-		while (pathFinder.IsExplorable() && !mStopPathFinding)
-		{
-			pathFinder.ExploreNext();
-			if (pathFinder.IsGoal())
-			{
-				mission.SetStatus(PathMission::PathStatus::Found);
-				break;
-			}
-
-			glm::ivec2 directions[]
-			{
-				{  0,  1 },
-				{  0, -1 },
-				{  1,  0 },
-				{ -1,  0 },
-
-				{  1,  1 },
-				{  1, -1 },
-				{ -1,  1 },
-				{ -1,  -1 },
-			};
-
-			for (const glm::ivec2& direction : directions)
-			{
-				pathFinder.ExploreNeighbour(direction);
-			}
-		}
-
-		if (mission.GetStatus() != PathMission::PathStatus::Found)
-		{
-			mission.SetStatus(PathMission::PathStatus::NotFound);
-			return;
-		}
-
-		for (uavpf::NavNode* node : pathFinder.ConstructPath())
-		{
-			glm::ivec2 navCoords = navGrid.GetCoordinates(node);
-			mission.GetPath().AddCoordinate(navCoords, navGrid.GetElevation(navCoords) + mission.GetMinElevation());
-		}
-	}
-
 	void Editor_PathBuilder::LoadTerrainMesh()
 	{
 		if (!mCanLoadMesh || mTerrainRenderMesh != nullptr)
@@ -867,6 +816,34 @@ namespace editor
 		glm::vec4 coord = scaler.GetModelMatrix() * glm::vec4(imageSpaceCoord, 1.0f);
 
 		return coord;
+	}
+
+	bool Editor_PathBuilder::OnStartPathFinding(const StartPathFindingEvent& event)
+	{
+		mStopPathFinding = false;
+		mProgressSeconds = 0.0f;
+		mProgressTitle = "Path finding";
+		mProgressChar = ".";
+		mProgressMessage = mProgressTitle;
+
+		PathMission& mission = mApp->GetContext()->GetPathMission();
+
+		auto task = TaskBuilder()
+			.BeginGroup()
+				.Add<FindPathTask>(mApp->GetContext()->GetPathMission(), mApp->GetEvents())
+			.End()
+			.Build();
+
+		mState = State::PathFinding;
+		mApp->GetService()->Schedule(
+			std::move(task),
+			[this](Task& task)
+			{
+				mState = State::Idle;
+			}
+		);
+
+		return true;
 	}
 
 	bool Editor_PathBuilder::OnMouseMove(const MouseMovementEvent& event)
