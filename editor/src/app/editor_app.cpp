@@ -14,9 +14,9 @@ namespace editor
 		mContext = std::make_unique<AppContext>(service);
 	}
 
-	void EditorApp::Bind(EventBus& bus)
+	void EditorApp::Bind(EventBus bus)
 	{
-		mEventBus = &bus;
+		mEventBus = bus;
 
 		mEventSubscriber = EventSubscriber(bus);
 		mEventSubscriber
@@ -63,9 +63,9 @@ namespace editor
 		mStateQueue.push(kind);
 	}
 
-	EventBus& EditorApp::GetEvents() const
+	EventBus EditorApp::GetEvents() const
 	{
-		return *mEventBus;
+		return mEventBus;
 	}
 
 	AppService* EditorApp::GetService() const

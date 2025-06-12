@@ -2,6 +2,7 @@
 
 #include "app/editor_app.h"
 #include "app/path_mission.h"
+#include "app/tasks.h"
 #include "imgui_internal.h"
 #include "uavpf/algo/astar_cost.h"
 #include "uavpf/algo/navgrid.h"
@@ -28,7 +29,7 @@ namespace editor
 	void Editor_Idle::OnAttach(EditorApp* app)
 	{
 		mApp = app;
-		EventBus& events = mApp->GetEvents();
+		EventBus events = mApp->GetEvents();
 
 		mPublisher = EventPublisher(events);
 
@@ -115,6 +116,8 @@ namespace editor
 			.BeginClass(*this)
 				.SubscribeMethod(&Editor_PathBuilder::OnMouseMove)
 			.EndClass();
+
+		mPublisher = EventPublisher(mApp->GetEvents());
 
 		SetupRenderBuffers(720, 480);
 		SetupRenderers();
@@ -409,21 +412,35 @@ namespace editor
 				mission.GetPath().Clear();
 				mission.SetStatus(PathMission::PathStatus::None);
 
-				mApp->GetService()->AddTask(
-					[this]()
+				auto task = TaskBuilder()
+					.BeginGroup()
+						.Add<FindPathTask>(mApp->GetContext()->GetPathMission(), mApp->GetEvents())
+					.End()
+					.Build();
+
+				mState = State::PathFinding;
+				mApp->GetService()->Schedule(
+					std::move(task),
+					[this](auto& task)
 					{
-						mState = State::PathFinding;
-						FindPath();
 						mState = State::Idle;
 					}
 				);
+
+			//	mApp->GetService()->AddTask(
+			//		[this]()
+			//		{
+			//			FindPath();
+			//			mState = State::Idle;
+			//		}
+			//	);
 			}
 		}
 		else
 		{
 			if (ImGui::Button("Stop"))
 			{
-				mStopPathFinding = true;
+				mPublisher.Publish<CancelPathFindingEvent>(EventPublishMode::Queued);
 			}
 		}
 
@@ -690,7 +707,11 @@ namespace editor
 		PathMission& mission = mApp->GetContext()->GetPathMission();
 		uavpf::NavGrid navGrid(mission.GetNavGrid());
 
-		uavpf::AStarAlgorithm pathFinder(&mission.GetCosts(), &navGrid, mission.GetStart(), mission.GetEnd());
+		uavpf::AStarAlgorithm pathFinder(
+			&mission.GetCosts(),
+			&navGrid,
+			mission.GetStart(),
+			mission.GetEnd());
 
 		while (pathFinder.IsExplorable() && !mStopPathFinding)
 		{

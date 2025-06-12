@@ -24,7 +24,7 @@ namespace editor
 		void BeginFrame() override;
 		void EndFrame() override;
 		 
-		void BindEvents(EventBus& events) override;
+		void BindEvents(EventBus events) override;
 		void PollEvents() override;
 
 		Sdl3Window* CreateWindow(const WindowParams& params) override;

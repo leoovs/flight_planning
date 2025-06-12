@@ -9,6 +9,7 @@
 #include "event/event_subscriber.h"
 #include "platform/platform_service.h"
 #include "rendering/frame_timer.h"
+#include "tasking/task_scheduler.h"
 
 namespace editor
 {
@@ -41,6 +42,7 @@ namespace editor
 		float GetDeltaTime() const;
 
 		void AddTask(TaskExecutor::TaskFn fn, std::function<void()> onComplete = nullptr);
+		void Schedule(std::unique_ptr<Task> task, TaskCompletionHandler onComplete = nullptr);
 		
 	private:
 		void Initialize();
@@ -66,6 +68,7 @@ namespace editor
 
 		std::unique_ptr<App> mRuntimeApp;
 		TaskExecutor mTasks;
+		TaskScheduler mScheduler;
 	};
 }
 

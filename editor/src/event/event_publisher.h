@@ -8,20 +8,18 @@ namespace editor
 	{
 	public:
 		EventPublisher();
-		EventPublisher(EventBus& bus);
+		EventPublisher(EventBus bus);
 
 		template<typename EventT, typename... ArgsT>
 		bool Publish(EventPublishMode mode, ArgsT&&... args)
 		{
-			return mBus
-				? mBus->Publish<EventT>(mode, std::forward<ArgsT>(args)...)
-				: false;
+			return mBus.Publish<EventT>(mode, std::forward<ArgsT>(args)...);
 		}
 
 		bool Publish(EventPublishMode mode, std::unique_ptr<Event> event);
 
 	private:
-		EventBus* mBus = nullptr;
+		EventBus mBus;
 	};
 }
 

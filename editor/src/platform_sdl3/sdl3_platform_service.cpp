@@ -45,7 +45,7 @@ namespace editor
 		mPlatformEventPublisher.Publish<EndFrameEvent>(EventPublishMode::Immediate);
 	}
 
-	void Sdl3PlatformService::BindEvents(EventBus& events)
+	void Sdl3PlatformService::BindEvents(EventBus events)
 	{
 		mPlatformEventPublisher = EventPublisher(events);
 	}

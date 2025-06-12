@@ -103,6 +103,7 @@ namespace editor
 		State mState = State::Preparing;
 		EditorApp* mApp = nullptr;
 		EventSubscriber mSubscriber;
+		EventPublisher mPublisher;
 
 		std::string mProgressMessage = "";
 		std::string mProgressTitle = "Preparing PathBuilder";

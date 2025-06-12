@@ -29,6 +29,7 @@ namespace editor
 			mDeltaTime = mFrameTimer.GetDeltaTimeSeconds();
 
 			mPlatform->PollEvents();
+			mScheduler.Update();
 			mEvents.Dispatch();
 
 			mRuntimeApp->Update();
@@ -91,6 +92,11 @@ namespace editor
 	void AppService::AddTask(TaskExecutor::TaskFn fn, std::function<void()> onComplete)
 	{
 		mTasks.Execute(fn, onComplete);
+	}
+
+	void AppService::Schedule(std::unique_ptr<Task> task, TaskCompletionHandler onComplete)
+	{
+		mScheduler.Push(std::move(task), onComplete);
 	}
 
 	void AppService::Initialize()
