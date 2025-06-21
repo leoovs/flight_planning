@@ -172,7 +172,7 @@ namespace editor
 
 		auto task = TaskBuilder()
 			.BeginSequence()
-				.Do(prepare)
+				.DoThreaded(prepare)
 				.Do(uploadRenderMesh)
 			.End()
 			.Build();
