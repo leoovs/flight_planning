@@ -12,15 +12,15 @@ namespace editor
 	class TaskScheduler
 	{
 	public:
-		void Push(std::unique_ptr<Task> task, TaskCompletionHandler onComplete);
+		void Push(std::unique_ptr<Task> task);
 		void Update();
 		void Abort();
 
 	private:
-		Task& GetCurrentTask() const;
+		void PeekNextTask();
 
+		std::unique_ptr<Task> mCurrentTask;
 		std::queue<std::unique_ptr<Task>> mTasks;
-		std::queue<TaskCompletionHandler> mOnComplete;
 	};
 }
 

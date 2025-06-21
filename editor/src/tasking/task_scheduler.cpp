@@ -2,45 +2,43 @@
 
 namespace editor
 {
-	void TaskScheduler::Push(std::unique_ptr<Task> task, TaskCompletionHandler onComplete)
+	void TaskScheduler::Push(std::unique_ptr<Task> task)
 	{
 		mTasks.push(std::move(task));
-		GetCurrentTask().Start();
-		mOnComplete.push(std::move(onComplete));
 	}
 
 	void TaskScheduler::Update()
 	{
-		if (mTasks.empty())
+		if (nullptr == mCurrentTask)
 		{
-			return;
-		}
-
-		Task& current = GetCurrentTask();
-		if (current.IsDone())
-		{
-			if (mOnComplete.front())
+			if (mTasks.empty())
 			{
-				mOnComplete.front()(current);
-				mOnComplete.pop();
+				return;
 			}
-			mTasks.pop();
+			PeekNextTask();
+		}
+		if (mCurrentTask->IsDone())
+		{
+			mCurrentTask = nullptr;
 			return;
 		}
-		current.Update();
+		mCurrentTask->Update();
 	}
 
 	void TaskScheduler::Abort()
 	{
-		if (!mTasks.empty())
+		if (nullptr != mCurrentTask)
 		{
-			GetCurrentTask().Abort();
+			mCurrentTask->Abort();
+			mCurrentTask = nullptr;
 		}
 	}
 
-	Task& TaskScheduler::GetCurrentTask() const
+	void TaskScheduler::PeekNextTask()
 	{
-		return *mTasks.front();
+		mCurrentTask = std::move(mTasks.front());
+		mTasks.pop();
+		mCurrentTask->Start();
 	}
 }
 

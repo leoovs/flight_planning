@@ -123,7 +123,6 @@ namespace editor
 
 		bool mIsSceneFocused = false;
 		bool mCanOperateCamera = false;
-		std::atomic_bool mCanLoadMesh = false;
 		std::atomic_bool mStopPathFinding = false;
 		Camera mFreeCamera;
 		Camera mTopDownCamera;

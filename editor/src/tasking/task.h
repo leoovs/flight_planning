@@ -5,9 +5,10 @@
 
 #include <functional>
 #include <future>
-#include <vector>
 #include <memory>
+#include <queue>
 #include <stack>
+#include <vector>
 
 namespace editor
 {
@@ -60,7 +61,10 @@ namespace editor
 		void Add(std::unique_ptr<Task> task) override;
 
 	private:
-		std::vector<std::unique_ptr<Task>> mSequence;
+		void PopNextTask();
+
+		std::unique_ptr<Task> mCurrent;
+		std::queue<std::unique_ptr<Task>> mSequence;
 	};
 
 	class EmptyTask final : public Task
@@ -84,7 +88,7 @@ namespace editor
 	{
 	public:
 		CpuBoundTask(std::function<void()> taskFunc);
-		~CpuBoundTask();
+		~CpuBoundTask() override;
 
 		void Start() override;
 		void Abort() override;
@@ -97,12 +101,31 @@ namespace editor
 		std::future<void> mTaskFuture;
 	};
 
+	class SingleStepTask final : public Task
+	{
+	public:
+		SingleStepTask(std::function<void()> step);
+		~SingleStepTask() override = default;
+
+		void Start() override;
+		void Abort() override;
+		void Update() override;
+
+		bool IsDone() const override;
+
+	private:
+		std::function<void()> mStep;
+	};
+
 	class TaskBuilder
 	{
 	public:
 		TaskBuilder& BeginGroup();
 		TaskBuilder& BeginSequence();
 		TaskBuilder& End();
+
+		TaskBuilder& Do(std::function<void()> step);
+		TaskBuilder& DoThreaded(std::function<void()> job);
 
 		std::unique_ptr<TaskCollection> Build();
 

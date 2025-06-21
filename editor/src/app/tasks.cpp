@@ -87,6 +87,12 @@ namespace editor
 
 	void FindPathTask::Update()
 	{
+		if (mDone)
+		{
+			ResetNavGrid();
+			return;
+		}
+
 		if (!mAlgorithm->IsExplorable())
 		{
 			mDone = true;

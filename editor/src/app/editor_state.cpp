@@ -94,26 +94,30 @@ namespace editor
 
 	void Editor_Idle::LoadTiffMap(const std::filesystem::path& path)
 	{
-		auto loader = [this, path]()
+		auto loadMapAsset = [this, assetPath = path]()
 			{
-				mMapImage = mApp->GetContext()->GetAssets().LoadAsset(path, AssetKind::Image);
+				mMapImage = mApp->GetContext()
+					->GetAssets()
+					.LoadAsset(assetPath, AssetKind::Image);
 			};
 
-		auto task = TaskBuilder()
-			.BeginGroup()
-				.Add<CpuBoundTask>(loader)	
-			.End()
-			.Build();
-
-		auto onComplete = [this](Task& task)
+		auto notifyMapLoaded = [this]()
 			{
 				if (uavpf::cBadID != mMapImage)
 				{
-					mPublisher.Publish<TiffMapLoadedEvent>(EventPublishMode::Queued, mMapImage);
+					mPublisher.Publish<TiffMapLoadedEvent>(
+						EventPublishMode::Queued, mMapImage);
 				}
 			};
 
-		mApp->GetService()->Schedule(std::move(task), onComplete);
+		auto task = TaskBuilder()
+			.BeginSequence()
+				.DoThreaded(loadMapAsset)	
+				.Do(notifyMapLoaded)
+			.End()
+			.Build();
+
+		mApp->GetService()->Schedule(std::move(task));
 	}
 
 	//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -149,19 +153,32 @@ namespace editor
 		uavpf::CostCollection& costs = mApp->GetContext()->GetPathMission().GetCosts();
 		costs.Clear();
 		costs.Add<uavpf::DistanceCost>(1.0f)
-			.Add<uavpf::SlopeCost>(1.0f);
+			.Add<uavpf::SlopeCost>(35.0f);
 
 		mProgressTitle = "Initializing PathBuilder";
 		mProgressChar = "\n*";
-		mApp->GetService()->AddTask(
-			[this]()
+
+		auto prepare = [this]()
 			{
-				mState = State::Preparing;
 				InitializePathMission();
 				InitializeTerrainMesh();
+			};
+
+		auto uploadRenderMesh = [this]()
+			{
+				LoadTerrainMesh();
 				mState = State::Idle;
-			}
-		);
+			};
+
+		auto task = TaskBuilder()
+			.BeginSequence()
+				.Do(prepare)
+				.Do(uploadRenderMesh)
+			.End()
+			.Build();
+
+		mState = State::Preparing;
+		mApp->GetService()->Schedule(std::move(task));
 	}
 
 	void Editor_PathBuilder::OnDetach()
@@ -180,7 +197,6 @@ namespace editor
 			case State::PathFinding:
 				UpdateProgressMessage();
 				HandleCameraInput();
-				LoadTerrainMesh();
 				break;
 		}
 	}
@@ -208,16 +224,16 @@ namespace editor
 		mTerrainRenderer->SetTargetTextures(mColorBuffer.get(), mDepthBuffer.get());
 		mTerrainRenderer->Render(mTerrainRenderMesh.get(), mApp->GetContext()->GetTerrainScaler().GetModelMatrix());
 
-		Render_PathMissionTargets();
-		Render_Notams();
-		Render_Path();
-
 		mOverlayRenderer->SetTargetTextures(mColorBuffer.get(), mDepthBuffer.get());
 		mOverlayRenderer->SetCamera(mFreeCamera);
 		mOverlayRenderer->IgnoreDepth(true);
 		mOverlayRenderer->RenderLine3D(glm::vec3(0.0f), glm::vec3(1.0f, 0.0f, 0.0f), glm::vec3(1.0f, 0.0f, 0.0f));
 		mOverlayRenderer->RenderLine3D(glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 		mOverlayRenderer->RenderLine3D(glm::vec3(0.0f), glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+
+		Render_PathMissionTargets();
+		Render_Notams();
+		Render_Path();
 
 		mApp->GetService()->GetGraphics()->SetFramebuffer(nullptr);
 	}
@@ -387,7 +403,6 @@ namespace editor
 			{
 				if (ImGui::MenuItem("Close"))
 				{
-					mCanLoadMesh = false;
 					mTerrainRenderMesh.reset();
 					mApp->Push(EditorStateKind::Idle);
 				}
@@ -699,17 +714,10 @@ namespace editor
 
 		ctx->GetTerrainScaler().SetWidth(DistanceMetric::FromKilometers(heightMap->GetWidth()));
 		ctx->GetTerrainScaler().SetDepth(DistanceMetric::FromKilometers(heightMap->GetDepth()));
-
-		mCanLoadMesh = true;
 	}
 
 	void Editor_PathBuilder::LoadTerrainMesh()
 	{
-		if (!mCanLoadMesh || mTerrainRenderMesh != nullptr)
-		{
-			return;
-		}
-
 		mTerrainRenderMesh = std::make_unique<TerrainRenderMesh>(
 			mApp->GetService()->GetGraphics(),
 			mTerrainMesh);
@@ -828,20 +836,17 @@ namespace editor
 
 		PathMission& mission = mApp->GetContext()->GetPathMission();
 
+		auto switchStateToIdle = [this](){ mState = State::Idle; };
+
 		auto task = TaskBuilder()
-			.BeginGroup()
+			.BeginSequence()
 				.Add<FindPathTask>(mApp->GetContext()->GetPathMission(), mApp->GetEvents())
+				.Do(switchStateToIdle)
 			.End()
 			.Build();
 
+		mApp->GetService()->Schedule(std::move(task));
 		mState = State::PathFinding;
-		mApp->GetService()->Schedule(
-			std::move(task),
-			[this](Task& task)
-			{
-				mState = State::Idle;
-			}
-		);
 
 		return true;
 	}

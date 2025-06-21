@@ -56,21 +56,5 @@ namespace editor
 		EventSubscriber mSubscriber;
 		EventPublisher mPublisher;
 	};
-
-	class LoadTerrainTask final : public Task
-	{
-	public:
-		LoadTerrainTask();
-		~LoadTerrainTask() override = default;
-
-		void Start() override;
-		void Abort() override;
-		void Update() override;
-
-		bool IsDone() const override;
-
-	private:
-		
-	};
 }
 

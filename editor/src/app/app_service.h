@@ -42,7 +42,7 @@ namespace editor
 		float GetDeltaTime() const;
 
 		void AddTask(TaskExecutor::TaskFn fn, std::function<void()> onComplete = nullptr);
-		void Schedule(std::unique_ptr<Task> task, TaskCompletionHandler onComplete = nullptr);
+		void Schedule(std::unique_ptr<Task> task);
 		
 	private:
 		void Initialize();

@@ -60,41 +60,54 @@ namespace editor
 
 	void TaskSequence::Start()
 	{
-		mSequence.front()->Start();
+		PopNextTask();
 	}
 
 	void TaskSequence::Abort()
 	{
-		for (const std::unique_ptr<Task>& task : mSequence)
+		if (nullptr != mCurrent)
 		{
-			if (!task->IsDone())
-			{
-				task->Abort();
-				continue;
-			}
+			mCurrent->Abort();
+			mCurrent.reset();
 		}
+		mSequence = {};
 	}
 
 	void TaskSequence::Update()
 	{
-		for (const std::unique_ptr<Task>& task : mSequence)
+		if (nullptr == mCurrent)
 		{
-			if (!task->IsDone())
-			{
-				task->Update();
-				return;
-			}
+			return;
+		}
+
+		mCurrent->Update();
+		if (mCurrent->IsDone())
+		{
+			mCurrent = nullptr;
+			PopNextTask();
 		}
 	}
 
 	bool TaskSequence::IsDone() const
 	{
-		return mSequence.back()->IsDone();
+		return nullptr == mCurrent;
+	}
+
+	void TaskSequence::PopNextTask()
+	{
+		if (mSequence.empty())
+		{
+			return;
+		}
+
+		mCurrent = std::move(mSequence.front());
+		mSequence.pop();
+		mCurrent->Start();
 	}
 
 	void TaskSequence::Add(std::unique_ptr<Task> task)
 	{
-		mSequence.push_back(std::move(task));
+		mSequence.push(std::move(task));
 	}
 
 	//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -160,6 +173,40 @@ namespace editor
 
 	//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 	//
+	// SingleStepTask
+	//
+	//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+	SingleStepTask::SingleStepTask(std::function<void()> step)
+		: mStep(std::move(step))
+	{}
+
+	void SingleStepTask::Start()
+	{
+		assert(nullptr != mStep);
+	}
+
+	void SingleStepTask::Abort()
+	{
+		mStep = nullptr;
+	}
+
+	void SingleStepTask::Update()
+	{
+		if (mStep)
+		{
+			mStep();
+			mStep = nullptr;
+		}
+	}
+
+	bool SingleStepTask::IsDone() const
+	{
+		return nullptr == mStep;
+	}
+
+	//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	//
 	//	TaskBuilder
 	//
 	//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
@@ -192,6 +239,16 @@ namespace editor
 		mCurrentCollection = std::move(current);
 
 		return *this;
+	}
+
+	TaskBuilder& TaskBuilder::Do(std::function<void()> step)
+	{
+		return Add<SingleStepTask>(std::move(step));
+	}
+
+	TaskBuilder& TaskBuilder::DoThreaded(std::function<void()> job)
+	{
+		return Add<CpuBoundTask>(std::move(job));
 	}
 
 	std::unique_ptr<TaskCollection> TaskBuilder::Build()

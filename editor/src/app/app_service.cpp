@@ -94,9 +94,9 @@ namespace editor
 		mTasks.Execute(fn, onComplete);
 	}
 
-	void AppService::Schedule(std::unique_ptr<Task> task, TaskCompletionHandler onComplete)
+	void AppService::Schedule(std::unique_ptr<Task> task)
 	{
-		mScheduler.Push(std::move(task), onComplete);
+		mScheduler.Push(std::move(task));
 	}
 
 	void AppService::Initialize()
