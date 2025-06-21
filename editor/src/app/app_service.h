@@ -3,7 +3,6 @@
 #include <memory>
 #include <type_traits>
 
-#include "app/task_executor.h"
 #include "event/event_bus.h"
 #include "event/event_queue.h"
 #include "event/event_subscriber.h"
@@ -41,7 +40,6 @@ namespace editor
 
 		float GetDeltaTime() const;
 
-		void AddTask(TaskExecutor::TaskFn fn, std::function<void()> onComplete = nullptr);
 		void Schedule(std::unique_ptr<Task> task);
 		
 	private:
@@ -67,7 +65,6 @@ namespace editor
 		std::shared_ptr<ImGuiGraphicsBackend> mImGuiGraphics;
 
 		std::unique_ptr<App> mRuntimeApp;
-		TaskExecutor mTasks;
 		TaskScheduler mScheduler;
 	};
 }

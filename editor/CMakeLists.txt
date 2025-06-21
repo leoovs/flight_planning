@@ -15,7 +15,6 @@ target_sources(
 	"src/app/editor_app.cpp"
 	"src/app/editor_state.cpp"
 	"src/app/path_mission.cpp"
-	"src/app/task_executor.cpp"
 	"src/app/tasks.cpp"
 	"src/app/terrain_scaler.cpp"
 

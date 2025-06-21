@@ -16,7 +16,6 @@ namespace editor
 
 	void AppService::Run()
 	{
-		mTasks.Start();
 		mRunning = true;
 
 		mRuntimeApp->Bind(mEvents);
@@ -44,7 +43,6 @@ namespace editor
 		}
 
 		mRuntimeApp->OnQuit();
-		mTasks.Finish();
 	}
 
 	void AppService::Render()
@@ -87,11 +85,6 @@ namespace editor
 	float AppService::GetDeltaTime() const
 	{
 		return mDeltaTime;
-	}
-
-	void AppService::AddTask(TaskExecutor::TaskFn fn, std::function<void()> onComplete)
-	{
-		mTasks.Execute(fn, onComplete);
 	}
 
 	void AppService::Schedule(std::unique_ptr<Task> task)
