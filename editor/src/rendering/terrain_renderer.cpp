@@ -92,18 +92,18 @@ namespace editor
 				vec3 dPosdY = dFdy(eyeRelativePosition);
 				
 				vec3 faceNormal = normalize(cross(dPosdX, dPosdY));
-				return faceNormal;	
+				return faceNormal;
 			}
 
 			void main()
 			{
 				vec3 normal = getNormal();
-				vec3 lightDirection =  normalize(uEyePosition - vec3(worldSpacePosition));
+				vec3 lightDir =  normalize(uEyePosition - vec3(worldSpacePosition));
 
 				float height = modelSpacePosition.y;
-				float light = dot(lightDirection, normal);
+				float light = max(0.4, dot(normalize(lightDir), normalize(normal)));
 
-				vec3 color = vec3(height / 2, height, 1 - height) * light;
+				vec3 color = vec3(0.3f, height, 1 - height) * light;
 
 				oColor = vec4(color, 1.0);
 			}
