@@ -26,6 +26,15 @@
 #include "uavpf/image/tiff_loader.h"
 #include "uavpf/image/image_grayscale.h"
 
+#include "uavpf/nav/exploration_direction.h"
+#include "uavpf/nav/nav_cell.h"
+#include "uavpf/nav/nav_grid.h"
+#include "uavpf/nav/nav_resolution.h"
+#include "uavpf/nav/nav_space.h"
+#include "uavpf/nav/path_finder.h"
+#include "uavpf/nav/path_node.h"
+#include "uavpf/nav/step_cost.h"
+
 #include "uavpf/terrain/height_map.h"
 #include "uavpf/terrain/height_map_builder.h"
 #include "uavpf/terrain/terrain_mesh.h"

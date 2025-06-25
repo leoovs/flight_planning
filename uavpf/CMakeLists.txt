@@ -35,6 +35,11 @@ target_sources(
 	"src/image/tiff_loader.cpp"
 	"src/image/tiff_tag_accessor_impl.cpp"
 
+	"src/nav/nav_grid.cpp"
+	"src/nav/nav_space.cpp"
+	"src/nav/path_finder.cpp"
+	"src/nav/step_cost.cpp"
+
 	"src/terrain/height_map.cpp"
 	"src/terrain/height_map_builder.cpp"
 	"src/terrain/terrain_mesh.cpp"

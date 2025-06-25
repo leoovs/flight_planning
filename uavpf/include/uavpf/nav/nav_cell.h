@@ -1,0 +1,16 @@
+#pragma once
+
+#include <cstdint>
+
+#include <glm/glm.hpp>
+
+namespace uavpf::experimental
+{
+	struct NavCell
+	{
+		size_t Index = 0;
+		glm::ivec2 NavCoords;
+		float RelativeHeight = 0.0f;
+	};
+}
+
