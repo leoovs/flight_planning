@@ -15,7 +15,7 @@ target_sources(
 	"src/app/editor_app.cpp"
 	"src/app/editor_state.cpp"
 	"src/app/path_mission.cpp"
-	"src/app/task_executor.cpp"
+	"src/app/tasks.cpp"
 	"src/app/terrain_scaler.cpp"
 
 	"src/event/event_bus.cpp"
@@ -54,6 +54,9 @@ target_sources(
 	"src/rendering/overlay_renderer.cpp"
 	"src/rendering/terrain_render_mesh.cpp"
 	"src/rendering/terrain_renderer.cpp"
+
+	"src/tasking/task.cpp"
+	"src/tasking/task_scheduler.cpp"
 )
 
 target_include_directories(

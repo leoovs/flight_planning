@@ -93,7 +93,6 @@ namespace editor
 		AssetStorage(AppService* service);
 
 		AssetID LoadAsset(const std::filesystem::path& assetPath, AssetKind kind);
-		void LoadAssetAsync(const std::filesystem::path& assetPath, AssetKind kind, std::function<void(AssetID)> onComplete);
 
 		AssetID CreateAsset(AssetKind kind);
 		void UnloadAsset(AssetID id);

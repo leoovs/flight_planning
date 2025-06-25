@@ -42,9 +42,11 @@ namespace editor
 		template<typename EventT>
 		EventSubscription Subscribe(EventCallback<EventT> callback)
 		{
-			assert(HasDispatcher() && "Trying to subscribe with no dispatcher"
-				" assigned to an event bus");
-			return mDispatcher->Subscribe(std::move(callback));
+			if (mDispatcher)
+			{
+				return mDispatcher->Subscribe(std::move(callback));
+			}
+			return EventSubscription();
 		}
 
 		void Unsubscribe(const EventSubscription& subscription);

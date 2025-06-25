@@ -20,8 +20,10 @@ namespace editor
 
 	struct EventSubscription
 	{
-		std::type_index EventTypeID;
+		std::type_index EventTypeID = typeid(void);
 		EventSubscriberID SubscriberID = uavpf::cBadID;
+
+		EventSubscription() = default;
 
 		EventSubscription(
 			std::type_index eventTypeID,

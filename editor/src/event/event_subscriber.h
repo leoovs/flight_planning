@@ -35,24 +35,20 @@ namespace editor
 
 		EventSubscriber() = default;
 		EventSubscriber(EventSubscriber&& other) noexcept;
-		EventSubscriber(EventBus& bus);
+		EventSubscriber(EventBus bus);
 
 		EventSubscriber& operator=(EventSubscriber&& other) noexcept;
 
 		~EventSubscriber();
 
-		bool HasBus() const;
-		EventBus& GetBus() const;
+		EventBus GetBus() const;
 
 		void AddSubscription(EventSubscription subscription);
 
 		template<typename EventT>
 		void SubscribeFunction(bool(*fnCallback)(const EventT& event))
 		{
-			if (HasBus())
-			{
-				AddSubscription(mBus->Subscribe(fnCallback));
-			}
+			AddSubscription(mBus.Subscribe(fnCallback));
 		}
 
 		template<typename ClassT>
@@ -65,7 +61,7 @@ namespace editor
 		void UnsubscribeAll();
 
 		std::vector<EventSubscription> mSubscriptions;
-		EventBus* mBus = nullptr;
+		EventBus mBus;
 	};
 
 	template<typename ClassT>
@@ -74,11 +70,6 @@ namespace editor
 	EventSubscriber::MethodSubscriptionChain<ClassT>::SubscribeMethod(
 		bool(ClassT::*method)(const EventT& event))
 	{
-		if (!mParent.get().HasBus())
-		{
-			return *this;
-		}
-
 		EventSubscription subscription = mParent.get().GetBus().Subscribe(EventCallback<EventT>(
 			[classInstancePtr = &mClassInstance.get(), method](const EventT& event) -> bool
 			{

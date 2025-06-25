@@ -3,12 +3,12 @@
 #include <memory>
 #include <type_traits>
 
-#include "app/task_executor.h"
 #include "event/event_bus.h"
 #include "event/event_queue.h"
 #include "event/event_subscriber.h"
 #include "platform/platform_service.h"
 #include "rendering/frame_timer.h"
+#include "tasking/task_scheduler.h"
 
 namespace editor
 {
@@ -40,7 +40,7 @@ namespace editor
 
 		float GetDeltaTime() const;
 
-		void AddTask(TaskExecutor::TaskFn fn, std::function<void()> onComplete = nullptr);
+		void Schedule(std::unique_ptr<Task> task);
 		
 	private:
 		void Initialize();
@@ -65,7 +65,7 @@ namespace editor
 		std::shared_ptr<ImGuiGraphicsBackend> mImGuiGraphics;
 
 		std::unique_ptr<App> mRuntimeApp;
-		TaskExecutor mTasks;
+		TaskScheduler mScheduler;
 	};
 }
 

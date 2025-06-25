@@ -15,7 +15,7 @@ namespace editor
 	{
 	public:
 		void RegisterService(AppService* service) override;
-		void Bind(EventBus& bus) override;
+		void Bind(EventBus bus) override;
 
 		void OnRun() override;
 		void OnUI() override;
@@ -23,7 +23,7 @@ namespace editor
 		void Render() override;
 
 		void Push(EditorStateKind kind);
-		EventBus& GetEvents() const;
+		EventBus GetEvents() const;
 		AppService* GetService() const;
 		AppContext* GetContext() const;
 
@@ -40,7 +40,7 @@ namespace editor
 		AppService* mService = nullptr;
 		std::unique_ptr<AppContext> mContext;
 
-		EventBus* mEventBus = nullptr;
+		EventBus mEventBus;
 		EventSubscriber mEventSubscriber;
 		EventPublisher mEventPublisher;
 

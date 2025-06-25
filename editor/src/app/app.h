@@ -1,8 +1,9 @@
 #pragma once
 
+#include "event/event_bus.h"
+
 namespace editor
 {
-	class EventBus;
 	class AppService;
 
 	class App
@@ -11,7 +12,7 @@ namespace editor
 		virtual ~App() = default;
 
 		virtual void RegisterService(AppService* service) {}
-		virtual void Bind(EventBus& events) {}
+		virtual void Bind(EventBus events) {}
 
 		virtual void OnRun() {}
 		virtual void OnQuit() {}

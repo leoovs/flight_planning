@@ -3,14 +3,13 @@
 namespace editor
 {
 	EventSubscriber::EventSubscriber(EventSubscriber&& other) noexcept
-		: mBus(std::exchange(other.mBus, nullptr))
+		: mBus(std::move(other.mBus))
 		, mSubscriptions(std::move(other.mSubscriptions))
 	{}
 
-	EventSubscriber::EventSubscriber(EventBus& bus)
-		: mBus(&bus)
-	{
-	}
+	EventSubscriber::EventSubscriber(EventBus bus)
+		: mBus(bus)
+	{}
 
 	EventSubscriber& EventSubscriber::operator=(EventSubscriber&& other) noexcept
 	{
@@ -20,7 +19,7 @@ namespace editor
 		}
 
 		UnsubscribeAll();
-		mBus = std::exchange(other.mBus, nullptr);
+		mBus = std::move(other.mBus);
 		mSubscriptions = std::move(other.mSubscriptions);
 
 		return *this;
@@ -31,14 +30,9 @@ namespace editor
 		UnsubscribeAll();
 	}
 
-	bool EventSubscriber::HasBus() const
+	EventBus EventSubscriber::GetBus() const
 	{
-		return nullptr != mBus;
-	}
-
-	EventBus& EventSubscriber::GetBus() const
-	{
-		return *mBus;
+		return mBus;
 	}
 
 	void EventSubscriber::AddSubscription(EventSubscription subscription)
@@ -48,14 +42,9 @@ namespace editor
 
 	void EventSubscriber::UnsubscribeAll()
 	{
-		if (!HasBus())
-		{
-			return;
-		}
-
 		for (const EventSubscription& subscription : mSubscriptions)
 		{
-			GetBus().Unsubscribe(subscription);
+			mBus.Unsubscribe(subscription);
 		}
 	}
 }

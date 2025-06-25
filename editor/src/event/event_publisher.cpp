@@ -4,8 +4,8 @@ namespace editor
 {
 	EventPublisher::EventPublisher() = default;
 
-	EventPublisher::EventPublisher(EventBus& bus)
-		: mBus(&bus)
+	EventPublisher::EventPublisher(EventBus bus)
+		: mBus(bus)
 	{
 	}
 
@@ -13,9 +13,7 @@ namespace editor
 		EventPublishMode mode,
 		std::unique_ptr<Event> event)
 	{
-		return mBus
-			? mBus->Publish(mode, std::move(event))
-			: false;
+		return mBus.Publish(mode, std::move(event));
 	}
 }
 

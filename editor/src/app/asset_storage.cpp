@@ -133,20 +133,6 @@ namespace editor
 		return id;
 	}
 
-	void AssetStorage::LoadAssetAsync(
-		const std::filesystem::path& assetPath,
-		AssetKind kind,
-		std::function<void(AssetID)> onComplete)
-	{
-		mService->AddTask(
-			[this, assetPath, kind, onComplete]()
-			{
-				AssetID id = LoadAsset(assetPath, kind);
-				onComplete(id);
-			}
-		);
-	}
-
 	AssetID AssetStorage::CreateAsset(AssetKind kind)
 	{
 		if (AssetKind::Unknown == kind)

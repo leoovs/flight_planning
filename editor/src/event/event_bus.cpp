@@ -83,12 +83,11 @@ namespace editor
 
 	bool EventBus::Fire(const std::unique_ptr<Event>& event)
 	{
-		if (!HasDispatcher())
+		if (HasDispatcher())
 		{
-			return false;
+			return mDispatcher->Notify(event);
 		}
-
-		return mDispatcher->Notify(event);
+		return false;
 	}
 }
 
