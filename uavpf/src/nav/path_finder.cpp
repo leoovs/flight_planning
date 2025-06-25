@@ -123,6 +123,9 @@ namespace uavpf::experimental
 				return {  1, -1 };
 			case ExplorationDirection::SouthWest:
 				return { -1, -1 };
+			default:
+				assert(false);
+				return {};
 		}
 	}
 
