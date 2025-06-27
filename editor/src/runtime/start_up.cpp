@@ -30,6 +30,7 @@ namespace editor
 		GraphicsContext* graphics = platform->CreateGraphicsContext(std::move(graphicsParams));
 
 		ImGui::CreateContext();
+		ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 		ImGuiPlatformBackend* imguiPlatform = platform->CreateImGuiBackend();
 		ImGuiGraphicsBackend* imguiGraphics = imguiPlatform->CreateGraphicsBackend(graphics);
 

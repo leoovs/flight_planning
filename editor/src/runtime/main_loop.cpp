@@ -96,6 +96,7 @@ namespace editor
 
 	void MainLoop::Render()
 	{
+		mGraphics->ClearColor(nullptr, 0.5f, 0.5f, 0.5f, 1.0f);
 		mAppInstance->Render();
 		mImGuiGraphics->RenderDrawData(ImGui::GetDrawData());
 		mGraphics->Present();

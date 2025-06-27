@@ -19,6 +19,8 @@ target_sources(
 	# "src/app/terrain_scaler.cpp"
 
 	"src/editor/editor_app.cpp"
+	"src/editor/editor_debug_panel.cpp"
+	"src/editor/editor_dockspace_panel.cpp"
 
 	"src/event/event_bus.cpp"
 	"src/event/event_dispatcher.cpp"
