@@ -46,14 +46,16 @@ namespace editor
 			TaskScheduler taskScheduler;
 			RtModuleLocator::Register<TaskScheduler>(&taskScheduler);
 
-			MainLoop mainLoop(
-				platform,
-				&taskScheduler,
-				graphics,
-				imguiPlatform,
-				imguiGraphics,
-				std::move(boundApp));
-			mainLoop.Run();
+			{
+				MainLoop mainLoop(
+					platform,
+					&taskScheduler,
+					graphics,
+					imguiPlatform,
+					imguiGraphics,
+					std::move(boundApp));
+				mainLoop.Run();
+			}
 
 			RtModuleLocator::Unregister<TaskScheduler>();
 		}
