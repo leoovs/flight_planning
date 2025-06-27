@@ -1,7 +1,7 @@
 #include <uavpf/uavpf.h>
 
-#include "app/app_service.h"
-#include "app/editor_app.h"
+#include "runtime/start_up.h"
+#include "editor/editor_app.h"
 
 int main()
 {
@@ -13,8 +13,6 @@ int main()
 		std::move(formatter),
 		std::move(emitter));
 
-	editor::AppService()
-		.Bind<editor::EditorApp>()
-		.Run();
+	editor::StartUp(editor::App::Bind<editor::EditorApp>());
 }
 

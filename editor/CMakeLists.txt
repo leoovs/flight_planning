@@ -9,14 +9,16 @@ target_sources(
 	PRIVATE
 	"src/main.cpp"
 
-	"src/app/app_context.cpp"
-	"src/app/app_service.cpp"
-	"src/app/asset_storage.cpp"
-	"src/app/editor_app.cpp"
-	"src/app/editor_state.cpp"
-	"src/app/path_mission.cpp"
-	"src/app/tasks.cpp"
-	"src/app/terrain_scaler.cpp"
+	# "src/app/app_context.cpp"
+	# "src/app/app_service.cpp"
+	# "src/app/asset_storage.cpp"
+	# "src/app/editor_app.cpp"
+	# "src/app/editor_state.cpp"
+	# "src/app/path_mission.cpp"
+	# "src/app/tasks.cpp"
+	# "src/app/terrain_scaler.cpp"
+
+	"src/editor/editor_app.cpp"
 
 	"src/event/event_bus.cpp"
 	"src/event/event_dispatcher.cpp"
@@ -54,6 +56,10 @@ target_sources(
 	"src/rendering/overlay_renderer.cpp"
 	"src/rendering/terrain_render_mesh.cpp"
 	"src/rendering/terrain_renderer.cpp"
+
+	"src/runtime/main_loop.cpp"
+	"src/runtime/rt_module_locator.cpp"
+	"src/runtime/start_up.cpp"
 
 	"src/tasking/task.cpp"
 	"src/tasking/task_scheduler.cpp"
