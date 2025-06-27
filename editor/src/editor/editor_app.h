@@ -17,18 +17,18 @@ namespace editor
 	class EditorApp final : public App	
 	{
 	public:
-          ~EditorApp() override = default;
+		~EditorApp() override = default;
 
-          void Setup() override;
-          void Connect(EventBus events) override;
+		void Setup() override;
+		void Connect(EventBus events) override;
 
-          void Update(float dt) override;
-          void OnImGui() override;
-          void Render() override;
+		void Update(float dt) override;
+		void OnImGui() override;
+		void Render() override;
 
-          void Enable(EditorPanelKind kind);
-          void Disable(EditorPanelKind kind);
-          bool IsEnabled(EditorPanelKind kind) const;
+		void Enable(EditorPanelKind kind);
+		void Disable(EditorPanelKind kind);
+		bool IsEnabled(EditorPanelKind kind) const;
 
 	private:
 		bool OnWindowClosed(const WindowCloseEvent& event);
