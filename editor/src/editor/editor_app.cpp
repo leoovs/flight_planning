@@ -2,6 +2,7 @@
 
 #include "editor/editor_debug_panel.h"
 #include "editor/editor_dockspace_panel.h"
+#include "editor/editor_terrain_panel.h"
 #include "event/event_publisher.h"
 #include "event/event_subscriber.h"
 #include "runtime/main_loop.h"
@@ -12,8 +13,10 @@ namespace editor
 	{
 		RegisterPanel<EditorDockspacePanel>();
 		RegisterPanel<EditorDebugPanel>();
+		RegisterPanel<EditorTerrainPanel>();
 
 		Enable(EditorPanelKind::Dockspace);
+		Enable(EditorPanelKind::Terrain);
 	}
 
 	void EditorApp::Connect(EventBus events)

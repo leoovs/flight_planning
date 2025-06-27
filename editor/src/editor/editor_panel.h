@@ -11,6 +11,7 @@ namespace editor
 		Dockspace,
 		Debug,
 		MenuBar,
+		Terrain,
 		Count_,
 	};
 
