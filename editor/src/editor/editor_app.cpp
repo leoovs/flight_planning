@@ -2,6 +2,7 @@
 
 #include "editor/editor_debug_panel.h"
 #include "editor/editor_dockspace_panel.h"
+#include "editor/editor_menu_bar.h"
 #include "editor/editor_terrain_panel.h"
 #include "event/event_publisher.h"
 #include "event/event_subscriber.h"
@@ -11,12 +12,15 @@ namespace editor
 {
 	void EditorApp::Setup()
 	{
-		RegisterPanel<EditorDockspacePanel>();
+		mTasks = RtModuleLocator::Locate<TaskScheduler>();
+
 		RegisterPanel<EditorDebugPanel>();
-		RegisterPanel<EditorTerrainPanel>();
+		RegisterPanel<EditorDockspacePanel>();
+		RegisterPanel<EditorMenuBar>();
+		RegisterPanel<EditorTerrainPanel>(mTerrainEditor);
 
 		Enable(EditorPanelKind::Dockspace);
-		Enable(EditorPanelKind::Terrain);
+		Enable(EditorPanelKind::MenuBar);
 	}
 
 	void EditorApp::Connect(EventBus events)
@@ -36,6 +40,7 @@ namespace editor
 		mSubscriber
 			.BeginClass(*this)
 				.SubscribeMethod(&EditorApp::OnWindowClosed)
+				.SubscribeMethod(&EditorApp::OnHeightMapRequested)
 			.EndClass();
 	}
 
@@ -109,6 +114,33 @@ namespace editor
 	bool EditorApp::OnWindowClosed(const WindowCloseEvent& event)
 	{
 		mPublisher.Publish<MainLoopQuitEvent>(EventPublishMode::Queued);
+		return true;
+	}
+
+	bool EditorApp::OnHeightMapRequested(const HeightMapRequestedEvent& event)
+	{
+		auto loadHeightMap = [this, path = event.HeightMapPath]()
+		{
+			mTerrainEditor.LoadHeightMap(path);
+		};
+
+		auto postLoadedEvent = [this]()
+		{
+			mPublisher.Publish<HeightMapLoadedEvent>(EventPublishMode::Queued);
+		};
+
+		auto enableTerrain = [this]() { Enable(EditorPanelKind::Terrain); };
+
+		auto task = TaskBuilder()
+			.BeginSequence()
+				.DoThreaded(loadHeightMap)
+				.Do(enableTerrain)
+				.Do(postLoadedEvent)
+			.End()
+			.Build();
+
+		mTasks->Push(std::move(task));
+
 		return true;
 	}
 

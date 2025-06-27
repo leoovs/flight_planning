@@ -2,6 +2,8 @@
 
 #include <imgui/imgui.h>
 
+#include "asset/asset_storage.h"
+#include "asset/height_map_asset.h"
 #include "graphics/imgui_graphics_backend.h"
 #include "platform/imgui_platform_backend.h"
 #include "platform/platform_service.h"
@@ -44,7 +46,11 @@ namespace editor
 
 		{
 			TaskScheduler taskScheduler;
+			AssetStorage assets;
+			assets.RegisterImporter<HeightMapImporter>();
+
 			RtModuleLocator::Register<TaskScheduler>(&taskScheduler);
+			RtModuleLocator::Register<AssetStorage>(&assets);
 
 			{
 				MainLoop mainLoop(
@@ -57,6 +63,7 @@ namespace editor
 				mainLoop.Run();
 			}
 
+			RtModuleLocator::Unregister<AssetStorage>();
 			RtModuleLocator::Unregister<TaskScheduler>();
 		}
 

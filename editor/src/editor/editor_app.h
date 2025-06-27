@@ -2,37 +2,43 @@
 
 #include <array>
 
+#include "editor/editor_events.h"
 #include "editor/editor_panel.h"
+#include "editor/terrain_editor.h"
 #include "event/event_publisher.h"
 #include "event/event_subscriber.h"
 #include "platform/platform_events.h"
 #include "runtime/app.h"
+#include "runtime/rt_module_locator.h"
+#include "tasking/task_scheduler.h"
 
 namespace editor
 {
 	class EditorApp final : public App	
 	{
 	public:
-		~EditorApp() override = default;
+          ~EditorApp() override = default;
 
-		void Setup() override;
-		void Connect(EventBus events) override;
-		
-		void Update(float dt) override;
-		void OnImGui() override;
-		void Render() override;
+          void Setup() override;
+          void Connect(EventBus events) override;
 
-		void Enable(EditorPanelKind kind);
-		void Disable(EditorPanelKind kind);
-		bool IsEnabled(EditorPanelKind kind) const;
+          void Update(float dt) override;
+          void OnImGui() override;
+          void Render() override;
+
+          void Enable(EditorPanelKind kind);
+          void Disable(EditorPanelKind kind);
+          bool IsEnabled(EditorPanelKind kind) const;
 
 	private:
 		bool OnWindowClosed(const WindowCloseEvent& event);
 
-		template<typename PanelT>
-		void RegisterPanel()
+		bool OnHeightMapRequested(const HeightMapRequestedEvent& event);
+
+		template<typename PanelT, typename... ArgsT>
+		void RegisterPanel(ArgsT&&... args)
 		{
-			auto panel = std::make_unique<PanelT>();
+			auto panel = std::make_unique<PanelT>(std::forward<ArgsT>(args)...);
 			mPanels.at(+panel->GetKind()) = std::move(panel);
 		}
 
@@ -45,6 +51,10 @@ namespace editor
 		std::array<std::unique_ptr<EditorPanel>, +EditorPanelKind::Count_>
 		mPanels;
 		std::array<bool, +EditorPanelKind::Count_> mIsEnabled;
+
+		TaskScheduler* mTasks = nullptr;
+
+		TerrainEditor mTerrainEditor;
 	};
 }
 

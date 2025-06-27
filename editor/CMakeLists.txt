@@ -18,10 +18,15 @@ target_sources(
 	# "src/app/tasks.cpp"
 	# "src/app/terrain_scaler.cpp"
 
+	"src/asset/asset_storage.cpp"
+	"src/asset/height_map_asset.cpp"
+
 	"src/editor/editor_app.cpp"
 	"src/editor/editor_debug_panel.cpp"
 	"src/editor/editor_dockspace_panel.cpp"
+	"src/editor/editor_menu_bar.cpp"
 	"src/editor/editor_terrain_panel.cpp"
+	"src/editor/terrain_editor.cpp"
 
 	"src/event/event_bus.cpp"
 	"src/event/event_dispatcher.cpp"

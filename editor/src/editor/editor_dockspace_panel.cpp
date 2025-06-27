@@ -15,8 +15,7 @@ namespace editor
 	{
 		ImGuiWindowFlags dockspaceWindowFlags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoTitleBar
 			| ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove
-			| ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus
-			| ImGuiWindowFlags_MenuBar;
+			| ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
 
 		const ImGuiViewport* vp = ImGui::GetMainViewport();
 		ImGui::SetNextWindowPos(vp->WorkPos);
