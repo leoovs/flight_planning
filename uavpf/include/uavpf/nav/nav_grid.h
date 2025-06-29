@@ -15,6 +15,7 @@ namespace uavpf::experimental
 	class NavGrid
 	{
 	public:
+		NavGrid();
 		NavGrid(NavResolution resolution, std::vector<NavCell> cells);
 
 		const NavCell& GetCell(glm::ivec2 navCoords) const;

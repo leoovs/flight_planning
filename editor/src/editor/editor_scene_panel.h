@@ -23,7 +23,8 @@ namespace editor
 		EditorScenePanel(
 			GraphicsContext* graphics,
 			ImGuiGraphicsBackend* imguiGraphics,
-			TerrainEditor& terrainEditor);
+			TerrainEditor& terrainEditor,
+			PathPlanner& pathPlanner);
 		~EditorScenePanel() override = default;
 
 		EditorPanelKind GetKind() const override;
@@ -41,6 +42,7 @@ namespace editor
 
 		void RenderTerrain();
 		void RenderCoordinateAxes();
+		void RenderCheckpoints();
 
 		bool OnHeightMapRequested(const HeightMapRequestedEvent& event);
 		bool OnHeightMapLoaded(const HeightMapLoadedEvent& event);
@@ -51,6 +53,7 @@ namespace editor
 		GraphicsContext* mGraphics = nullptr;
 		ImGuiGraphicsBackend* mImGuiGraphics = nullptr;
 		TerrainEditor* mTerrainEditor = nullptr;
+		PathPlanner* mPathPlanner = nullptr;
 		TerrainRenderer mTerrainRenderer;
 		OverlayRenderer mOverlayRenderer;
 		Camera mFreeCamera;

@@ -25,8 +25,10 @@ target_sources(
 	"src/editor/editor_debug_panel.cpp"
 	"src/editor/editor_dockspace_panel.cpp"
 	"src/editor/editor_menu_bar.cpp"
+	"src/editor/editor_nav_panel.cpp"
 	"src/editor/editor_scene_panel.cpp"
 	"src/editor/editor_terrain_panel.cpp"
+	"src/editor/path_planner.cpp"
 	"src/editor/terrain_editor.cpp"
 
 	"src/event/event_bus.cpp"

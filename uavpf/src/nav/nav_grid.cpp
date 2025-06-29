@@ -13,6 +13,10 @@ namespace uavpf::experimental
 	//
 	//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 
+	NavGrid::NavGrid()
+		: NavGrid({ 1, 1 }, { NavCell{} })
+	{}
+
 	NavGrid::NavGrid(NavResolution resolution, std::vector<NavCell> cells)
 		: mResolution(std::move(resolution))
 		, mCells(std::move(cells))
@@ -61,6 +65,7 @@ namespace uavpf::experimental
 
 		for (ptrdiff_t iCell = 0; iCell < mCells.size(); iCell++)
 		{
+			// TODO: is that ok?
 			int32_t navX = iCell % mResolution.Width;
 			int32_t navZ = iCell / mResolution.Depth;
 
@@ -88,10 +93,8 @@ namespace uavpf::experimental
 			int32_t navX = iCell % mResolution.Width;
 			int32_t navZ = iCell / mResolution.Depth;
 
-			cell.Index = iCell;
+			cell.Index = iCell++;
 			cell.NavCoords = { navX, navZ };
-
-			iCell++;
 		}
 	}
 }

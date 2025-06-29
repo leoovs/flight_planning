@@ -44,6 +44,10 @@ namespace editor
 					}
 					ImGui::EndMenu();
 				}
+				if (ImGui::MenuItem("Close"))
+				{
+					mPublisher.Publish<CloseHeightMapRequestEvent>(EventPublishMode::Queued);
+				}
 				ImGui::EndMenu();
 			}
 			ImGui::EndMenuBar();

@@ -13,6 +13,7 @@ namespace editor
 		MenuBar,
 		Terrain,
 		Scene,
+		Nav,
 		Count_,
 	};
 

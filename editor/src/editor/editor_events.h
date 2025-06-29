@@ -4,7 +4,9 @@
 
 #include <glm/glm.hpp>
 
+#include "editor/path_planner.h"
 #include "event/event.h"
+#include "uavpf/nav/nav_resolution.h"
 
 namespace editor
 {
@@ -22,6 +24,10 @@ namespace editor
 	{
 	};
 
+	class CloseHeightMapRequestEvent final : public Event
+	{
+	};
+
 	class UpdateTerrainScaleEvent final : public Event
 	{
 	public:
@@ -29,6 +35,28 @@ namespace editor
 
 		UpdateTerrainScaleEvent(glm::vec3 terrainScale)
 			: TerrainScale(terrainScale)
+		{}
+	};
+
+	class UpdateNavGridResolutionEvent final : public Event
+	{
+	public:
+		uavpf::experimental::NavResolution Resolution;
+
+		UpdateNavGridResolutionEvent(uavpf::experimental::NavResolution res)
+			: Resolution(res)
+		{}
+	};
+
+	class UpdateCheckpointNavCoord final : public Event
+	{
+	public:
+		glm::ivec2 NavCoord;
+		CheckpointKind Checkpoint;
+
+		UpdateCheckpointNavCoord(glm::ivec2 navCoord, CheckpointKind checkpoint)
+			: NavCoord(navCoord)
+			, Checkpoint(checkpoint)
 		{}
 	};
 }

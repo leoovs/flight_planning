@@ -2,6 +2,7 @@
 
 #include <imgui/imgui.h>
 
+#include "editor/path_planner.h"
 #include "editor/terrain_editor.h"
 #include "imgui_internal.h"
 #include "platform/keyboard.h"
@@ -14,10 +15,12 @@ namespace editor
 	EditorScenePanel::EditorScenePanel(
 		GraphicsContext* graphics,
 		ImGuiGraphicsBackend* imguiGraphics,
-		TerrainEditor& terrainEditor)
+		TerrainEditor& terrainEditor,
+		PathPlanner& pathPlanner)
 		: mGraphics(graphics)
 		, mImGuiGraphics(imguiGraphics)
 		, mTerrainEditor(&terrainEditor)
+		, mPathPlanner(&pathPlanner)
 		, mTerrainRenderer(graphics)
 		, mOverlayRenderer(graphics)
 	{
@@ -87,6 +90,7 @@ namespace editor
 
 		RenderTerrain();
 		RenderCoordinateAxes();
+		RenderCheckpoints();
 
 		mGraphics->SetFramebuffer(nullptr);
 	}
@@ -188,9 +192,26 @@ namespace editor
 		glm::vec3 right(1.0f, 0.0f, 0.0f);
 		glm::vec3 up(0.0f, 1.0f, 0.0f);
 
+		mOverlayRenderer.IgnoreDepth(true);
 		mOverlayRenderer.RenderLine3D(glm::vec3(0.0f), front, front);
 		mOverlayRenderer.RenderLine3D(glm::vec3(0.0f), right, right);
 		mOverlayRenderer.RenderLine3D(glm::vec3(0.0f), up, up);
+	}
+
+	void EditorScenePanel::RenderCheckpoints()
+	{
+		mOverlayRenderer.IgnoreDepth(false);
+		for (ptrdiff_t iCheckpoint = 0; iCheckpoint < +CheckpointKind::Count_; iCheckpoint++)
+		{
+			auto kind = CheckpointKind(iCheckpoint);
+			glm::ivec2 navCoord = mPathPlanner->GetNavCoord(kind);
+			glm::ivec2 hmCoord = mPathPlanner->NavCoordToHeightMapCoord(navCoord);
+			glm::vec3 worldCoord = mTerrainEditor->HeightMapToWorldCoord(hmCoord);
+
+			worldCoord.y += 0.01f;
+
+			mOverlayRenderer.RenderCircle3D(worldCoord, 0.01f, glm::vec4(1.0f));
+		}
 	}
 
 	bool EditorScenePanel::OnHeightMapRequested(const HeightMapRequestedEvent& event)

@@ -34,6 +34,11 @@ namespace editor
 		return mHeightMapResolution;
 	}
 
+	bool TerrainEditor::IsHeightMapLoaded() const
+	{
+		return uavpf::cBadID != mHeightMap;
+	}
+
 	glm::vec3 TerrainEditor::GetTerrainScale() const
 	{
 		return mTerrainScale;
@@ -58,9 +63,10 @@ namespace editor
 		return glm::scale(glm::mat4(1.0f), mTerrainScale);
 	}
 
-	bool TerrainEditor::IsHeightMapLoaded() const
+	glm::vec3 TerrainEditor::HeightMapToWorldCoord(glm::ivec2 hmCoord) const
 	{
-		return uavpf::cBadID != mHeightMap;
+		glm::vec4 originalSpace{ hmCoord.x, GetHeightMap().GetElevation(hmCoord.x, hmCoord.y), hmCoord.y, 1.0f }; 
+		return GetTerrainScaleAsMatrix() * originalSpace;
 	}
 }
 

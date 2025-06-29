@@ -4,6 +4,7 @@
 
 #include "editor/editor_events.h"
 #include "editor/editor_panel.h"
+#include "editor/path_planner.h"
 #include "editor/terrain_editor.h"
 #include "event/event_publisher.h"
 #include "event/event_subscriber.h"
@@ -33,6 +34,7 @@ namespace editor
 	private:
 		bool OnWindowClosed(const WindowCloseEvent& event);
 		bool OnHeightMapRequested(const HeightMapRequestedEvent& event);
+		bool OnCloseHeightMapRequested(const CloseHeightMapRequestEvent& event);
 
 		template<typename PanelT, typename... ArgsT>
 		void RegisterPanel(ArgsT&&... args)
@@ -54,6 +56,7 @@ namespace editor
 		TaskScheduler* mTasks = nullptr;
 
 		TerrainEditor mTerrainEditor;
+		PathPlanner mPathPlanner{ mTerrainEditor };
 	};
 }
 

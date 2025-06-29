@@ -3,6 +3,8 @@
 #include "editor/editor_debug_panel.h"
 #include "editor/editor_dockspace_panel.h"
 #include "editor/editor_menu_bar.h"
+#include "editor/editor_nav_panel.h"
+#include "editor/editor_panel.h"
 #include "editor/editor_scene_panel.h"
 #include "editor/editor_terrain_panel.h"
 #include "event/event_publisher.h"
@@ -20,7 +22,8 @@ namespace editor
 		RegisterPanel<EditorDebugPanel>();
 		RegisterPanel<EditorDockspacePanel>();
 		RegisterPanel<EditorMenuBar>();
-		RegisterPanel<EditorScenePanel>(graphics, imguiGraphics, mTerrainEditor);
+		RegisterPanel<EditorNavPanel>(mPathPlanner);
+		RegisterPanel<EditorScenePanel>(graphics, imguiGraphics, mTerrainEditor, mPathPlanner);
 		RegisterPanel<EditorTerrainPanel>(mTerrainEditor);
 
 		Enable(EditorPanelKind::Dockspace);
@@ -45,6 +48,7 @@ namespace editor
 			.BeginClass(*this)
 				.SubscribeMethod(&EditorApp::OnWindowClosed)
 				.SubscribeMethod(&EditorApp::OnHeightMapRequested)
+				.SubscribeMethod(&EditorApp::OnCloseHeightMapRequested)
 			.EndClass();
 	}
 
@@ -137,6 +141,7 @@ namespace editor
 		{
 			Enable(EditorPanelKind::Terrain);
 			Enable(EditorPanelKind::Scene);
+			Enable(EditorPanelKind::Nav);
 		};
 
 		auto task = TaskBuilder()
@@ -148,6 +153,15 @@ namespace editor
 			.Build();
 
 		mTasks->Push(std::move(task));
+
+		return true;
+	}
+
+	bool EditorApp::OnCloseHeightMapRequested(const CloseHeightMapRequestEvent& event)
+	{
+		Disable(EditorPanelKind::Terrain);
+		Disable(EditorPanelKind::Scene);
+		Disable(EditorPanelKind::Nav);
 
 		return true;
 	}
