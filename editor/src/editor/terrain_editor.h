@@ -17,12 +17,22 @@ namespace editor
 
 		const uavpf::HeightMap& GetHeightMap() const;
 		const uavpf::TiffImage& GetHeightMapImage() const;
+		glm::ivec2 GetHeightMapResolution() const;
+
+		glm::vec3 GetTerrainScale() const;
+		void SetTerrainScale(const glm::vec3& scale);
+		void ScaleToFitUnitSquare();
+		glm::mat4 GetTerrainScaleAsMatrix() const;
+
+		// TODO: implement coords convertation.
 
 		bool IsHeightMapLoaded() const;
 
 	private:
 		AssetStorage* mAssets = RtModuleLocator::Locate<AssetStorage>();
 		AssetID mHeightMap = uavpf::cBadID;	
+		glm::ivec2 mHeightMapResolution;
+		glm::vec3 mTerrainScale{ 1.0f };
 	};
 }
 

@@ -48,12 +48,12 @@ namespace uavpf
 		mIndices.clear();
 
 		int32_t width = mHeightMap->GetWidth();
-		int32_t height = mHeightMap->GetDepth();
+		int32_t depth = mHeightMap->GetDepth();
 
-		mPositions.reserve(width * height);
-		mIndices.reserve(width * height * 3);
+		mPositions.reserve(width * depth);
+		mIndices.reserve(width * depth * 3);
 
-		for (int32_t i = 0; i < height; i++)
+		for (int32_t i = 0; i < depth; i++)
 		{
 			for (int32_t j = 0; j < width; j++)
 			{
@@ -63,7 +63,7 @@ namespace uavpf
 
 				mPositions.push_back(modelSpacePosition);
 
-				if (i < height - 1)
+				if (i < depth - 1)
 				{
 					mIndices.push_back(j + width * (i + 0));
 					mIndices.push_back(j + width * (i + 1));

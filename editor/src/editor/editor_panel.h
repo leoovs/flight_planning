@@ -12,6 +12,7 @@ namespace editor
 		Debug,
 		MenuBar,
 		Terrain,
+		Scene,
 		Count_,
 	};
 

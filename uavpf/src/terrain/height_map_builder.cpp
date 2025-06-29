@@ -1,7 +1,5 @@
 #include "uavpf/terrain/height_map_builder.h"
 
-#include <algorithm>
-
 namespace uavpf
 {
 	HeightMapBuilder& HeightMapBuilder::SetGrayscale(ImageGrayscale grayscale)
@@ -57,16 +55,16 @@ namespace uavpf
 
 	void HeightMapBuilder::GenerateHeightFromPoints()
 	{
-		int32_t rows = mGrayscale.GetImage()->GetHeight();
-		int32_t cols = mGrayscale.GetImage()->GetWidth();
+		int32_t width = mGrayscale.GetImage()->GetWidth();
+		int32_t depth = mGrayscale.GetImage()->GetHeight();
 
-		mHeightMap = HeightMap(cols, rows);
+		mHeightMap = HeightMap(width, depth);
 
-		for (int32_t i = 0; i < cols; i++)
+		for (int32_t i = 0; i < width; i++)
 		{
-			for (int32_t j = 0; j < rows; j++)
+			for (int32_t j = 0; j < depth; j++)
 			{
-				mHeightMap.At(cols - i - 1, j) = mGrayscale.Get(i, j);
+				mHeightMap.At(i, depth - j - 1) = mGrayscale.Get(i, j);
 			}
 		}
 	}

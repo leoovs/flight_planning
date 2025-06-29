@@ -103,7 +103,7 @@ namespace editor
 				float height = modelSpacePosition.y;
 				float light = max(0.4, dot(normalize(lightDir), normalize(normal)));
 
-				vec3 color = vec3(0.3f, height, 1 - height) * light;
+				vec3 color = vec3(0.3f, height, 1 - height) * light * (height+0.3f) * 1.5f;
 
 				oColor = vec4(color, 1.0);
 			}

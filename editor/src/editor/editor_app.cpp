@@ -3,6 +3,7 @@
 #include "editor/editor_debug_panel.h"
 #include "editor/editor_dockspace_panel.h"
 #include "editor/editor_menu_bar.h"
+#include "editor/editor_scene_panel.h"
 #include "editor/editor_terrain_panel.h"
 #include "event/event_publisher.h"
 #include "event/event_subscriber.h"
@@ -13,10 +14,13 @@ namespace editor
 	void EditorApp::Setup()
 	{
 		mTasks = RtModuleLocator::Locate<TaskScheduler>();
+		auto* graphics = RtModuleLocator::Locate<GraphicsContext>();
+		auto* imguiGraphics = RtModuleLocator::Locate<ImGuiGraphicsBackend>();
 
 		RegisterPanel<EditorDebugPanel>();
 		RegisterPanel<EditorDockspacePanel>();
 		RegisterPanel<EditorMenuBar>();
+		RegisterPanel<EditorScenePanel>(graphics, imguiGraphics, mTerrainEditor);
 		RegisterPanel<EditorTerrainPanel>(mTerrainEditor);
 
 		Enable(EditorPanelKind::Dockspace);
@@ -129,12 +133,16 @@ namespace editor
 			mPublisher.Publish<HeightMapLoadedEvent>(EventPublishMode::Queued);
 		};
 
-		auto enableTerrain = [this]() { Enable(EditorPanelKind::Terrain); };
+		auto enablePanels = [this]()
+		{
+			Enable(EditorPanelKind::Terrain);
+			Enable(EditorPanelKind::Scene);
+		};
 
 		auto task = TaskBuilder()
 			.BeginSequence()
 				.DoThreaded(loadHeightMap)
-				.Do(enableTerrain)
+				.Do(enablePanels)
 				.Do(postLoadedEvent)
 			.End()
 			.Build();

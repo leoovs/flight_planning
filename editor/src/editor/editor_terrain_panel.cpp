@@ -1,8 +1,10 @@
 #include "editor/editor_terrain_panel.h"
 
+#include <glm/gtc/type_ptr.hpp>
 #include <imgui/imgui.h>
 
 #include "editor/editor_panel.h"
+#include "event/event_publisher.h"
 #include "graphics/graphics_context.h"
 #include "graphics/imgui_graphics_backend.h"
 #include "graphics/subresource.h"
@@ -22,6 +24,7 @@ namespace editor
 
 	void EditorTerrainPanel::Connect(EventBus events)
 	{
+		mPublisher = EventPublisher(events);
 		mSubscriber = EventSubscriber(events);
 
 		mSubscriber
@@ -39,13 +42,33 @@ namespace editor
 			return;
 		}
 
-		if (ImGui::Begin("Terrain"))
-		{
-			mPanelSize = ImGui::GetWindowSize();
+		ImGui::Begin("Terrain");
 
-			ImTextureID heightMapID = (ImTextureID)imguiGraphics->GetTextureID(mHeightMapTexture.get());
-			ImGui::Image(heightMapID, FitHeightMapTextureSize(), { 0, 1 }, { 1, 0 });
+		mPanelSize = ImGui::GetWindowSize();
+
+		ImTextureID heightMapID = (ImTextureID)imguiGraphics->GetTextureID(mHeightMapTexture.get());
+		ImGui::Image(heightMapID, FitHeightMapTextureSize(), { 0, 1 }, { 1, 0 });
+
+		ImGui::NewLine();
+
+		glm::vec2 heightMapResolution = mTerrainEditor->GetHeightMapResolution();
+		glm::vec3 terrainScale = mTerrainEditor->GetTerrainScale();
+		float dragSpeed = 1.0f / std::max(heightMapResolution.x, heightMapResolution.y);
+
+		ImGui::Text("Terrain Scale");
+		if (ImGui::DragFloat3("##TERRAIN-SCALE", glm::value_ptr(terrainScale), dragSpeed, 0.0f, 0.0f, "%.4f"))
+		{
+			mTerrainEditor->SetTerrainScale(terrainScale);
+			mPublisher.Publish<UpdateTerrainScaleEvent>(EventPublishMode::Queued, terrainScale);
 		}
+
+		ImGui::SameLine();
+		if (ImGui::Button("Unit"))
+		{
+			mTerrainEditor->ScaleToFitUnitSquare();
+			mPublisher.Publish<UpdateTerrainScaleEvent>(EventPublishMode::Queued, mTerrainEditor->GetTerrainScale());
+		}
+
 		ImGui::End();
 	}
 
@@ -102,7 +125,7 @@ namespace editor
 		};
 
 		float minWidth = 100.0f;
-		float maxWidth = 300.0f;
+		float maxWidth = 500.0f;
 
 		ImVec2 clapmedSize
 		{

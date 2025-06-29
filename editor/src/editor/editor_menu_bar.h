@@ -20,11 +20,10 @@ namespace editor
 		void Update(float dt) override;
 
 	private:
-		void RequestLoadHeightMap();
+		void RequestLoadHeightMap(const char* heightMap);
 
 		EventBus mEvents;
 		EventPublisher mPublisher;
-		const char* mHeightMapFilePath = nullptr;
 	};
 }
 

@@ -32,7 +32,6 @@ namespace editor
 
 	private:
 		bool OnWindowClosed(const WindowCloseEvent& event);
-
 		bool OnHeightMapRequested(const HeightMapRequestedEvent& event);
 
 		template<typename PanelT, typename... ArgsT>

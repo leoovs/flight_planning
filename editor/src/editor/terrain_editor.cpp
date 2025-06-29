@@ -1,6 +1,9 @@
 #include "editor/terrain_editor.h"
 
+#include <glm/ext/matrix_transform.hpp>
+
 #include "asset/height_map_asset.h"
+
 #include "runtime/rt_module_locator.h"
 
 namespace editor
@@ -8,6 +11,12 @@ namespace editor
 	void TerrainEditor::LoadHeightMap(const std::filesystem::path& path)
 	{
 		mHeightMap = mAssets->Load(path, AssetKind::HeightMap);
+
+		auto hm = mAssets->Get<HeightMapAsset>(mHeightMap)->GetHeightMap();
+		mHeightMapResolution = {
+			hm.GetWidth(),
+			hm.GetDepth(),
+		};
 	}
 
 	const uavpf::HeightMap& TerrainEditor::GetHeightMap() const
@@ -18,6 +27,35 @@ namespace editor
 	const uavpf::TiffImage& TerrainEditor::GetHeightMapImage() const
 	{
 		return mAssets->Get<HeightMapAsset>(mHeightMap)->GetImage();
+	}
+
+	glm::ivec2 TerrainEditor::GetHeightMapResolution() const
+	{
+		return mHeightMapResolution;
+	}
+
+	glm::vec3 TerrainEditor::GetTerrainScale() const
+	{
+		return mTerrainScale;
+	}
+
+	void TerrainEditor::SetTerrainScale(const glm::vec3& scale)
+	{
+		mTerrainScale = scale;
+	}
+
+	void TerrainEditor::ScaleToFitUnitSquare()
+	{
+		SetTerrainScale({
+			1.0f / mHeightMapResolution.x,
+			1.0f,
+			1.0f / mHeightMapResolution.y
+		});
+	}
+
+	glm::mat4 TerrainEditor::GetTerrainScaleAsMatrix() const
+	{
+		return glm::scale(glm::mat4(1.0f), mTerrainScale);
 	}
 
 	bool TerrainEditor::IsHeightMapLoaded() const

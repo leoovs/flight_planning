@@ -84,18 +84,16 @@ namespace editor
 	private:
 		bool Dispatch(const EventT& event)
 		{
+			bool allHandled = true;
 			for (const SubscriberCallback& callback : mCallbacksBySubscriberID)
 			{
-				if (callback && callback(event))
+				if (callback)
 				{
-					// Beware that `callback` may become `nullptr` at this 
-					// point (unsubscribed itself while processing current
-					// event).
-					return true;
+					allHandled = allHandled && callback(event);
 				}
 			}
 
-			return false;
+			return allHandled;
 		}
 
 		uavpf::IDAllocator mSubscriberIDRegistry;

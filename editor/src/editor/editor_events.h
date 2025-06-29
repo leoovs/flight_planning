@@ -2,6 +2,8 @@
 
 #include <filesystem>
 
+#include <glm/glm.hpp>
+
 #include "event/event.h"
 
 namespace editor
@@ -18,6 +20,16 @@ namespace editor
 
 	class HeightMapLoadedEvent final : public Event
 	{
+	};
+
+	class UpdateTerrainScaleEvent final : public Event
+	{
+	public:
+		glm::vec3 TerrainScale;
+
+		UpdateTerrainScaleEvent(glm::vec3 terrainScale)
+			: TerrainScale(terrainScale)
+		{}
 	};
 }
 

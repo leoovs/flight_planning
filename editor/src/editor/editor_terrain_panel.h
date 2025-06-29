@@ -3,6 +3,7 @@
 #include <imgui/imgui.h>
 
 #include "event/event_bus.h"
+#include "event/event_publisher.h"
 #include "event/event_subscriber.h"
 #include "editor/editor_panel.h"
 #include "editor/editor_events.h"
@@ -24,12 +25,15 @@ namespace editor
 		void OnImGui() override;
 
 	private:
+		void ShowTerrainScaleControl();
+
 		bool OnHeightMapLoaded(const HeightMapLoadedEvent& event);
 
 		void UpdateHeightMapTexture();
 		ImVec2 FitHeightMapTextureSize();
 
 		EventSubscriber mSubscriber;
+		EventPublisher mPublisher;
 		TerrainEditor* mTerrainEditor = nullptr;
 		std::shared_ptr<Texture2D> mHeightMapTexture;
 		ImVec2 mPanelSize{};

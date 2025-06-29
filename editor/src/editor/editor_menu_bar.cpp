@@ -30,13 +30,17 @@ namespace editor
 					if (ImGui::MenuItem("TIFF Height Map"))
 					{
 						const char* tiffFilters[]{ "*.tif", "*.tiff" };
-						mHeightMapFilePath = tinyfd_openFileDialog(
+						const char* filePath = tinyfd_openFileDialog(
 								"TIFF map",
 								nullptr,
 								std::size(tiffFilters),
 								tiffFilters,
 								nullptr,
 								0);
+						if (nullptr != filePath)
+						{
+							RequestLoadHeightMap(filePath);
+						}
 					}
 					ImGui::EndMenu();
 				}
@@ -49,17 +53,11 @@ namespace editor
 
 	void EditorMenuBar::Update(float dt)
 	{
-		if (mHeightMapFilePath)
-		{
-			RequestLoadHeightMap();
-		}
 	}
 
-	void EditorMenuBar::RequestLoadHeightMap()
+	void EditorMenuBar::RequestLoadHeightMap(const char* filePath)
 	{
-		std::filesystem::path assetPath(mHeightMapFilePath);	
-		mHeightMapFilePath = nullptr;
-
+		std::filesystem::path assetPath(filePath);	
 		mPublisher.Publish<HeightMapRequestedEvent>(EventPublishMode::Queued, std::move(assetPath));
 	}
 }
