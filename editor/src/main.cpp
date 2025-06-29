@@ -13,6 +13,6 @@ int main()
 		std::move(formatter),
 		std::move(emitter));
 
-	editor::StartUp(editor::App::Bind<editor::EditorApp>());
+	editor::StartUp<editor::EditorApp>();
 }
 
