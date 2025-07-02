@@ -144,7 +144,7 @@ namespace editor
 			glm::ivec2 navCoords = mNavGrid.GetCoordinates(node);
 			path.AddCoordinate(navCoords, mNavGrid.GetElevation(navCoords) + mMission->GetMinElevation());
 		}
-		mPublisher.Publish<PathFoundEvent>(EventPublishMode::Queued);
+		mPublisher.Publish<PathBuiltEvent>(EventPublishMode::Queued);
 	}
 
 	void FindPathTask::ResetNavGrid()

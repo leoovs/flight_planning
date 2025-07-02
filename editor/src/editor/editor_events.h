@@ -48,16 +48,25 @@ namespace editor
 		{}
 	};
 
-	class UpdateCheckpointNavCoord final : public Event
+	class UpdateCheckpointNavCoordEvent final : public Event
 	{
 	public:
 		glm::ivec2 NavCoord;
 		CheckpointKind Checkpoint;
 
-		UpdateCheckpointNavCoord(glm::ivec2 navCoord, CheckpointKind checkpoint)
+		UpdateCheckpointNavCoordEvent(glm::ivec2 navCoord, CheckpointKind checkpoint)
 			: NavCoord(navCoord)
 			, Checkpoint(checkpoint)
 		{}
 	};
+
+	class BuildPathEvent final : public Event
+	{};
+
+	class CancelBuildPathEvent final : public Event
+	{};
+
+	class PathBuiltEvent final : public Event
+	{};
 }
 

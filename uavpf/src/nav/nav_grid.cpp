@@ -24,12 +24,21 @@ namespace uavpf::experimental
 		assert(resolution.Width * resolution.Depth == mCells.size());
 	}
 
+	size_t NavGrid::ToCellIndex(glm::ivec2 navCoords) const
+	{
+		return navCoords.y * mResolution.Width + navCoords.x;
+	}
+
+	bool NavGrid::IsInBounds(glm::ivec2 navCoords) const
+	{
+		return ToCellIndex(navCoords) < mCells.size()
+			&& navCoords.x >= 0
+			&& navCoords.y >= 0;
+	}
+
 	const NavCell& NavGrid::GetCell(glm::ivec2 navCoords) const
 	{
-		float widthX = navCoords.x;
-		float depthZ = navCoords.y;
-
-		return mCells.at(depthZ * mResolution.Width + widthX);
+		return mCells.at(ToCellIndex(navCoords));
 	}
 
 	float NavGrid::GetHeight(glm::ivec2 navCoords) const

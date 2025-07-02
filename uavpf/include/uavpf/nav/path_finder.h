@@ -1,6 +1,7 @@
 #pragma once
 
 #include <deque>
+#include <unordered_map>
 
 #include "uavpf/nav/exploration_direction.h"
 #include "uavpf/nav/nav_grid.h"
@@ -14,8 +15,8 @@ namespace uavpf::experimental
 	public:
 		PathFinder(
 			const NavGrid& grid,
-			NavCell start,
-			NavCell end,
+			const NavCell& start,
+			const NavCell& end,
 			const StepCost& cost);
 
 		bool IsExplorable() const;
@@ -30,14 +31,14 @@ namespace uavpf::experimental
 		bool IsEnd(PathNode* node) const;
 
 		glm::ivec2 ConvertDirectionToCoordOffset(ExplorationDirection direction) const;
-		PathNode& GetAssociatedNode(const NavCell& cell);
+		PathNode& GetAssociatedNode(NavCell cell);
 		std::deque<PathNode*>::const_iterator FindNodeWithLeastCost() const;
 		float CalculateHeuristic(const NavCell& cell) const;
 
 		const NavGrid* mGrid = nullptr;
 		const StepCost* mCost = nullptr;
 		std::deque<PathNode*> mToExplore;
-		std::vector<PathNode> mNodePool;
+		std::unordered_map<size_t, PathNode> mNodePool;
 		PathNode* mCurrent = nullptr;
 		PathNode* mEnd = nullptr;
 	};

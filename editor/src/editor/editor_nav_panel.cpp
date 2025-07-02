@@ -2,11 +2,13 @@
 #include "editor/editor_events.h"
 #include "editor/editor_panel.h"
 #include "editor/path_planner.h"
+#include "event/event_bus.h"
 #include "event/event_publisher.h"
 #include "uavpf/nav/nav_resolution.h"
 
 #include <glm/gtc/type_ptr.hpp>
 #include <imgui/imgui.h>
+#include <imgui/imgui_internal.h>
 
 namespace editor
 {
@@ -26,19 +28,28 @@ namespace editor
 
 	void EditorNavPanel::OnImGui()
 	{
-		ImGui::Begin("Planner");
+		ImGui::Begin("Solver");
+
+		bool disabled = mPathPlanner->IsBuildingPath();
+		if (disabled)
+		{
+			ImGui::PushItemFlag(ImGuiItemFlags_Disabled, true);
+			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.5f);
+		}
 
 		uavpf::experimental::NavResolution res = mPathPlanner->GetResolution();
 
-		ImGui::Text("NavGrid Resolution");
+		ImGui::Text("Nav Grid resolution");
 		if (ImGui::DragInt2("##NAV-RES", &res.Width, 1.0f, 1, 1000, "%d", ImGuiSliderFlags_AlwaysClamp))
 		{
-			mPathPlanner->SetResolution(res);
+			mPublisher.Publish<UpdateNavGridResolutionEvent>(
+				EventPublishMode::Immediate,
+				res);
 		}
 
 		ImGui::NewLine();
 
-		ImGui::Text("Nav Coordinates");
+		ImGui::Text("Nav coordinates");
 		for (ptrdiff_t iCheckpoint = 0; iCheckpoint < +CheckpointKind::Count_; iCheckpoint++)
 		{
 			auto kind = CheckpointKind(iCheckpoint);
@@ -64,10 +75,31 @@ namespace editor
 
 			if (navCoordUpdated)
 			{
-				mPathPlanner->SetNavCoord(kind, navCoord);
+				mPublisher.Publish<UpdateCheckpointNavCoordEvent>(
+					EventPublishMode::Immediate,
+					navCoord,
+					kind);
 			}
 
 			ImGui::PopID();
+		}
+
+		ImGui::NewLine();
+		
+		if (ImGui::Button("Build"))
+		{
+			mPublisher.Publish<BuildPathEvent>(EventPublishMode::Queued);
+		}
+
+		if (disabled)
+		{
+			ImGui::PopStyleVar();
+			ImGui::PopItemFlag();
+		}
+
+		if (ImGui::Button("Cancel"))
+		{
+			mPublisher.Publish<CancelBuildPathEvent>(EventPublishMode::Queued);
 		}
 
 		ImGui::End();

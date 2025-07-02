@@ -41,6 +41,7 @@ namespace editor
 				.SubscribeMethod(&EditorScenePanel::OnHeightMapRequested)
 				.SubscribeMethod(&EditorScenePanel::OnHeightMapLoaded)
 				.SubscribeMethod(&EditorScenePanel::OnMouseMovement)
+				.SubscribeMethod(&EditorScenePanel::OnPathBuilt)
 			.EndClass();
 	}
 
@@ -91,6 +92,7 @@ namespace editor
 		RenderTerrain();
 		RenderCoordinateAxes();
 		RenderCheckpoints();
+		RenderPath();
 
 		mGraphics->SetFramebuffer(nullptr);
 	}
@@ -207,14 +209,46 @@ namespace editor
 		mOverlayRenderer.IgnoreDepth(false);
 		for (ptrdiff_t iCheckpoint = 0; iCheckpoint < +CheckpointKind::Count_; iCheckpoint++)
 		{
+			glm::vec4 color = iCheckpoint
+				? glm::vec4(0.8f, 0.2f, 0.2f, 1.0f)
+				: glm::vec4(0.5f, 1.0f, 0.5f, 1.0f);
+
 			auto kind = CheckpointKind(iCheckpoint);
 			glm::ivec2 navCoord = mPathPlanner->GetNavCoord(kind);
 			glm::ivec2 hmCoord = mPathPlanner->NavCoordToHeightMapCoord(navCoord);
 			glm::vec3 worldCoord = mTerrainEditor->HeightMapToWorldCoord(hmCoord);
 
-			worldCoord.y += 0.01f;
+			float radius = 0.01f;
+			worldCoord.y += radius + mPathPlanner->GetWorldSpaceElevation();
 
-			mOverlayRenderer.RenderCircle3D(worldCoord, 0.01f, glm::vec4(1.0f));
+			mOverlayRenderer.RenderCircle3D(worldCoord, radius, color);
+		}
+	}
+
+	void EditorScenePanel::RenderPath()
+	{
+		mOverlayRenderer.IgnoreDepth(false);
+
+		ptrdiff_t iCell = 1;
+		for (; iCell < mCachedPath.size(); iCell++)
+		{
+			ptrdiff_t iPrevCell = iCell - 1;
+
+			glm::ivec2 navCoord = mCachedPath.at(iCell).NavCoords;
+			glm::ivec2 prevNavCoord = mCachedPath.at(iPrevCell).NavCoords;
+
+			glm::ivec2 hmCoord = mPathPlanner->NavCoordToHeightMapCoord(navCoord);
+			glm::ivec2 prevHmCoord = mPathPlanner->NavCoordToHeightMapCoord(prevNavCoord);
+
+			glm::vec3 worldCoord = mTerrainEditor->HeightMapToWorldCoord(hmCoord);
+			glm::vec3 prevWorldCoord = mTerrainEditor->HeightMapToWorldCoord(prevHmCoord);
+
+			float radius = 0.003f;
+			worldCoord.y += 0.01f + mPathPlanner->GetWorldSpaceElevation();
+			prevWorldCoord.y += 0.01f + mPathPlanner->GetWorldSpaceElevation();
+
+			mOverlayRenderer.RenderLine3D(worldCoord, prevWorldCoord, glm::vec3(1.0f));
+			mOverlayRenderer.RenderCircle3D(worldCoord, radius, glm::vec3(1.0f));
 		}
 	}
 
@@ -250,6 +284,12 @@ namespace editor
 
 		mFreeCamera.LookAround(polar, azimuth);
 
+		return true;
+	}
+
+	bool EditorScenePanel::OnPathBuilt(const PathBuiltEvent& event)
+	{
+		mCachedPath = mPathPlanner->GetPath();
 		return true;
 	}
 }

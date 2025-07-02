@@ -43,10 +43,12 @@ namespace editor
 		void RenderTerrain();
 		void RenderCoordinateAxes();
 		void RenderCheckpoints();
+		void RenderPath();
 
 		bool OnHeightMapRequested(const HeightMapRequestedEvent& event);
 		bool OnHeightMapLoaded(const HeightMapLoadedEvent& event);
 		bool OnMouseMovement(const MouseMovementEvent& event);
+		bool OnPathBuilt(const PathBuiltEvent& event);
 
 		EventSubscriber mSubscriber;
 
@@ -64,6 +66,7 @@ namespace editor
 		std::unique_ptr<TerrainRenderMesh> mTerrainRenderMesh;
 		std::shared_ptr<Texture2D> mColorBuffer;
 		std::shared_ptr<Texture2D> mDepthBuffer;
+		std::vector<uavpf::experimental::NavCell> mCachedPath;
 	};
 }
 

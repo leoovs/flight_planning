@@ -5,6 +5,7 @@
 #include <cstddef>
 
 #include <array>
+#include <atomic>
 
 #include <glm/glm.hpp>
 #include <uavpf/nav/nav_grid.h>
@@ -48,12 +49,26 @@ namespace editor
 
 		glm::ivec2 NavCoordToHeightMapCoord(glm::ivec2 navCoord) const;
 
+		void BeginBuildPath();
+		bool IsBuildingPath();
+		void BuildPath();
+		void EndBuildPath();
+		const std::vector<uavpf::experimental::NavCell>& GetPath() const;
+
+		float GetWorldSpaceElevation() const;
+		void SetWorldSpaceElevation(float elevation);
+
+		// TODO: should we add height map space elevation instead?
+
 	private:
 		void ClampCheckpointNavCoords();
 
 		TerrainEditor* mTerrainEditor = nullptr;
 		CheckpointNavCoords mCheckpointNavCoords{};
 		uavpf::experimental::NavGrid mNavGrid;
+		std::vector<uavpf::experimental::NavCell> mNavPath;
+		std::atomic_bool mBuildingPath;
+		float mWorldSpaceElevation = 0.02f;
 	};
 }
 

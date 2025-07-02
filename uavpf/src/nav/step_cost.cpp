@@ -8,7 +8,7 @@ namespace uavpf::experimental
 {
 	float DistanceCost::Evaluate(const NavCell& src, const NavCell& dst) const
 	{
-		return glm::distance(glm::vec2(src.NavCoords), glm::vec2(dst.NavCoords));
+		return glm::length(glm::vec2(src.NavCoords - dst.NavCoords));
 	}
 
 	float ClimbCost::Evaluate(const NavCell& src, const NavCell& dst) const
@@ -24,6 +24,13 @@ namespace uavpf::experimental
 			totalCost += weight * cost->Evaluate(src, dst);
 		}
 		return totalCost;
+	}
+
+	void ComplexCost::Add(std::unique_ptr<StepCost> cost, float weight)
+	{
+		mCosts.push_back(std::make_pair(
+			std::move(cost),
+			weight));
 	}
 
 	size_t ComplexCost::GetCostCount() const

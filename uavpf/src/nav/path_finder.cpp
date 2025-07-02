@@ -7,19 +7,18 @@ namespace uavpf::experimental
 {
 	PathFinder::PathFinder(
 		const NavGrid& grid,
-		NavCell start,
-		NavCell end,
+		const NavCell& start,
+		const NavCell& end,
 		const StepCost& cost)
 		: mGrid(&grid)
 		, mEnd(nullptr)
 		, mCost(&cost)
 	{
+		mEnd = &GetAssociatedNode(end);	
+
 		PathNode& startNode = GetAssociatedNode(start);
 		startNode.TotalCost = 0.0f;
 		startNode.HeuristicCost = CalculateHeuristic(start);
-
-		mEnd = &GetAssociatedNode(end);	
-
 		mToExplore.push_back(&startNode);
 	}
 
@@ -48,10 +47,14 @@ namespace uavpf::experimental
 
 	void PathFinder::ExploreNeighbour(ExplorationDirection direction)
 	{
-		mCurrent->NextDirection = direction;
 		glm::ivec2 neighbourCoords = mCurrent->Cell->NavCoords
 			+ ConvertDirectionToCoordOffset(direction);
+		if (!mGrid->IsInBounds(neighbourCoords))
+		{
+			return;
+		}
 
+		mCurrent->NextDirection = direction;
 		PathNode& neighbour = GetAssociatedNode(mGrid->GetCell(neighbourCoords));
 
 		float tentativeScore = mCurrent->TotalCost + mCost->Evaluate(
@@ -62,9 +65,10 @@ namespace uavpf::experimental
 		{
 			neighbour.Parent = mCurrent;
 			neighbour.TotalCost = tentativeScore;
-			neighbour.HeuristicCost = tentativeScore + CalculateHeuristic(*neighbour.Cell);
+			neighbour.HeuristicCost = CalculateHeuristic(*neighbour.Cell);
+
 			auto it = std::find(mToExplore.begin(), mToExplore.end(), &neighbour);	
-			if (mToExplore.end() != it)
+			if (mToExplore.end() == it)
 			{
 				mToExplore.push_back(&neighbour);
 			}
@@ -73,25 +77,88 @@ namespace uavpf::experimental
 
 	std::vector<NavCell> PathFinder::ReconstructPath() const
 	{
+		// TODO: fix ignore of the flat surfaces...
+
 		std::vector<NavCell> path;
+
+		if (mCurrent == nullptr)
+			return path;
+
+		// Collect all nodes in reverse order (child → parent)
+		std::vector<PathNode*> nodes;
 		PathNode* current = mCurrent;
-		ExplorationDirection dir = current->NextDirection;
-		
 		while (current != nullptr)
 		{
-			path.push_back(*current->Cell);
-
+			nodes.push_back(current);
 			current = current->Parent;
-			dir = current->NextDirection;
-
-			while (nullptr != current && current->NextDirection == dir)
-			{
-				current = current->Parent;
-				dir = current->NextDirection;
-			}
 		}
 
-		std::reverse(path.begin(), path.end());
+		if (nodes.empty())
+			return path;
+
+		// The first node is always included
+		path.push_back(*nodes.back()->Cell);
+		if (nodes.size() == 1)
+			return path;  // Only one node, nothing to merge
+
+		ExplorationDirection lastDir = nodes.back()->NextDirection;
+		float lastHeight = nodes.back()->Cell->RelativeHeight;
+		bool isIncreasing = false;
+		bool isDecreasing = false;
+		bool trendInitialized = false;
+
+		// Iterate from second-to-last node to the start (parent → child)
+		for (int i = nodes.size() - 2; i >= 0; --i)
+		{
+			PathNode* node = nodes[i];
+			float currentHeight = node->Cell->RelativeHeight;
+			bool heightIncreased = (currentHeight > lastHeight);
+			bool heightDecreased = (currentHeight < lastHeight);
+
+			// Check if direction changed → always split
+			if (node->NextDirection != lastDir)
+			{
+				path.push_back(*node->Cell);
+				lastDir = node->NextDirection;
+				lastHeight = currentHeight;
+				trendInitialized = false;  // Reset trend for new direction
+				continue;
+			}
+
+			// If direction is the same, check height trend
+			if (!trendInitialized)
+			{
+				// First step: determine trend
+				if (heightIncreased)
+				{
+					isIncreasing = true;
+					isDecreasing = false;
+					trendInitialized = true;
+				}
+				else if (heightDecreased)
+				{
+					isIncreasing = false;
+					isDecreasing = true;
+					trendInitialized = true;
+				}
+				// Else: neutral (same height), no trend yet
+			}
+			else
+			{
+				// Check if trend is violated
+				if ((isIncreasing && !heightIncreased) || (isDecreasing && !heightDecreased))
+				{
+					// Trend broken → add to path and reset
+					path.push_back(*node->Cell);
+					trendInitialized = false;
+					lastHeight = currentHeight;
+					continue;
+				}
+			}
+
+			// If we reach here, the trend is maintained → update lastHeight
+			lastHeight = currentHeight;
+		}
 
 		return path;
 	}
@@ -129,13 +196,17 @@ namespace uavpf::experimental
 		}
 	}
 
-	PathNode& PathFinder::GetAssociatedNode(const NavCell& cell)
+	PathNode& PathFinder::GetAssociatedNode(NavCell cell)
 	{
-		if (mNodePool.size() <= cell.Index)
+		if (mNodePool.count(cell.Index))
 		{
-			mNodePool.resize(cell.Index + 1);
+			return mNodePool.at(cell.Index);
 		}
-		return mNodePool.at(cell.Index);
+
+		PathNode node;
+		node.Cell = &mGrid->GetCell(cell.NavCoords);
+
+		return mNodePool[cell.Index] = node;
 	}
 
 	std::deque<PathNode*>::const_iterator PathFinder::FindNodeWithLeastCost() const
@@ -151,6 +222,6 @@ namespace uavpf::experimental
 
 	float PathFinder::CalculateHeuristic(const NavCell& cell) const
 	{
-		return glm::distance(glm::vec2(cell.NavCoords), glm::vec2(mEnd->Cell->NavCoords));
+		return DistanceCost().Evaluate(cell, *mEnd->Cell);
 	}
 }

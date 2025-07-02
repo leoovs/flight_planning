@@ -15,7 +15,7 @@ namespace uavpf::experimental
 
 		virtual ~StepCost() = default;
 
-		virtual float Evaluate(const NavCell& src, const NavCell& dst) const;
+		virtual float Evaluate(const NavCell& src, const NavCell& dst) const = 0;
 	};
 
 	class DistanceCost final : public StepCost
@@ -42,6 +42,8 @@ namespace uavpf::experimental
 		~ComplexCost() override = default;
 
 		float Evaluate(const NavCell& src, const NavCell& dst) const override;
+
+		void Add(std::unique_ptr<StepCost> cost, float weight = 1.0f);
 
 		size_t GetCostCount() const;
 

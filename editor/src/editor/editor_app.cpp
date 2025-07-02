@@ -6,6 +6,7 @@
 #include "editor/editor_nav_panel.h"
 #include "editor/editor_panel.h"
 #include "editor/editor_scene_panel.h"
+#include "editor/editor_tasks.h"
 #include "editor/editor_terrain_panel.h"
 #include "event/event_publisher.h"
 #include "event/event_subscriber.h"
@@ -49,6 +50,10 @@ namespace editor
 				.SubscribeMethod(&EditorApp::OnWindowClosed)
 				.SubscribeMethod(&EditorApp::OnHeightMapRequested)
 				.SubscribeMethod(&EditorApp::OnCloseHeightMapRequested)
+				.SubscribeMethod(&EditorApp::OnUpdateNavGridResolutionEvent)
+				.SubscribeMethod(&EditorApp::OnUpdateCheckpointNavCoord)
+				.SubscribeMethod(&EditorApp::OnBuildPath)
+				.SubscribeMethod(&EditorApp::OnCancelBuildPath)
 			.EndClass();
 	}
 
@@ -137,6 +142,11 @@ namespace editor
 			mPublisher.Publish<HeightMapLoadedEvent>(EventPublishMode::Queued);
 		};
 
+		auto updatePathPlanner = [this]()
+		{
+			mPathPlanner.SetResolution(mPathPlanner.GetResolution());
+		};
+
 		auto enablePanels = [this]()
 		{
 			Enable(EditorPanelKind::Terrain);
@@ -148,6 +158,7 @@ namespace editor
 			.BeginSequence()
 				.DoThreaded(loadHeightMap)
 				.Do(enablePanels)
+				.Do(updatePathPlanner)
 				.Do(postLoadedEvent)
 			.End()
 			.Build();
@@ -163,6 +174,62 @@ namespace editor
 		Disable(EditorPanelKind::Scene);
 		Disable(EditorPanelKind::Nav);
 
+		return true;
+	}
+
+	bool EditorApp::OnUpdateNavGridResolutionEvent(const UpdateNavGridResolutionEvent& event)
+	{
+		if (!mPathPlanner.IsBuildingPath())
+		{
+			mPathPlanner.SetResolution(event.Resolution);
+		}
+
+		return true;
+	}
+
+	bool EditorApp::OnUpdateCheckpointNavCoord(const UpdateCheckpointNavCoordEvent& event)
+	{
+		if (!mPathPlanner.IsBuildingPath())
+		{
+			mPathPlanner.SetNavCoord(event.Checkpoint, event.NavCoord);
+		}
+
+		return true;
+	}
+
+	bool EditorApp::OnBuildPath(const BuildPathEvent& event)
+	{
+		auto beginPathBuilding = [this]() { mPathPlanner.BeginBuildPath(); };
+
+		auto buildPath = [this]()
+			{
+				mPathPlanner.BuildPath();
+			};
+
+		auto endPathBuilding = [this]() { mPathPlanner.EndBuildPath(); };
+
+		auto notifyPathBuilt = [this]()
+			{
+				mPublisher.Publish<PathBuiltEvent>(EventPublishMode::Queued);
+			};
+
+		auto task = TaskBuilder()
+			.BeginSequence()
+				.Do(beginPathBuilding)
+				.DoThreaded(buildPath)
+				.Do(endPathBuilding)
+				.Do(notifyPathBuilt)
+			.End()
+			.Build();
+
+		mTasks->Push(std::move(task));
+
+		return true;
+	}
+
+	bool EditorApp::OnCancelBuildPath(const CancelBuildPathEvent& event)
+	{
+		mPathPlanner.EndBuildPath();
 		return true;
 	}
 

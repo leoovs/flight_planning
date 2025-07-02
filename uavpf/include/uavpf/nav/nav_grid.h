@@ -18,6 +18,8 @@ namespace uavpf::experimental
 		NavGrid();
 		NavGrid(NavResolution resolution, std::vector<NavCell> cells);
 
+		size_t ToCellIndex(glm::ivec2 navCoords) const;
+		bool IsInBounds(glm::ivec2 navCoords) const;
 		const NavCell& GetCell(glm::ivec2 navCoords) const;
 		float GetHeight(glm::ivec2 navCoords) const;
 		NavResolution GetResolution() const;
