@@ -126,6 +126,9 @@ namespace editor
 
 	void EditorScenePanel::CreateRenderTextures(int32_t width, int32_t height)
 	{
+		mTerrainRenderer.SetTargetTextures(nullptr, nullptr);
+		mTerrainRenderer.SetTargetTextures(nullptr, nullptr);
+
 		Texture2DParams params;
 		params.DebugName = "SCENE-CLR";
 		params.Format = GraphicsFormat::R8G8B8A8_UNORM;
@@ -138,7 +141,8 @@ namespace editor
 		};
 
 		mColorBuffer.reset(mGraphics->CreateTexture2D(params), deleter);
-		params.Format = GraphicsFormat::D32_FLOAT;
+		params.DebugName = "SCENE-DPTH";
+		params.Format = GraphicsFormat::D24_UNORM_S8_UINT;
 		mDepthBuffer.reset(mGraphics->CreateTexture2D(params), deleter);
 
 		mTerrainRenderer.SetTargetTextures(mColorBuffer.get(), mDepthBuffer.get());

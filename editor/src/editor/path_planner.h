@@ -26,6 +26,9 @@ namespace editor
 	class PathPlanner
 	{
 	public:
+		using CheckpointNavCoords = std::array<glm::ivec2, +CheckpointKind::Count_>;
+		using CheckpointRelativeCoords = std::array<glm::vec2, +CheckpointKind::Count_>;
+
 		PathPlanner(TerrainEditor& terrainEditor);
 
 		uavpf::experimental::NavResolution GetResolution() const;
@@ -34,13 +37,22 @@ namespace editor
 		glm::ivec2 GetNavCoord(CheckpointKind kind) const;
 		void SetNavCoord(CheckpointKind kind, glm::ivec2 navCoord);
 
+		glm::vec2 GetRelativeCoord(CheckpointKind kind) const;
+		void SetRelativeCoord(CheckpointKind kind, glm::vec2 relCoord);
+
+		CheckpointNavCoords QueryCheckpointNavCoords() const;
+		CheckpointRelativeCoords QueryCheckpointRelativeCoords() const;
+
+		void SetCheckpointNavCoords(const CheckpointNavCoords& navCoords);
+		void SetCheckpointRelativeCoords(const CheckpointRelativeCoords& relativeCoords);
+
 		glm::ivec2 NavCoordToHeightMapCoord(glm::ivec2 navCoord) const;
 
 	private:
 		void ClampCheckpointNavCoords();
 
 		TerrainEditor* mTerrainEditor = nullptr;
-		std::array<glm::ivec2, +CheckpointKind::Count_> mCheckpointNavCoords{};
+		CheckpointNavCoords mCheckpointNavCoords{};
 		uavpf::experimental::NavGrid mNavGrid;
 	};
 }

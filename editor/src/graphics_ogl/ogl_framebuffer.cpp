@@ -1,5 +1,7 @@
 #include "graphics_ogl/ogl_framebuffer.h"
 
+#include <uavpf/uavpf.h>
+
 #include "graphics_ogl/ogl_facts.h"
 #include "graphics_ogl/ogl_texture_2d.h"
 
@@ -51,10 +53,9 @@ namespace editor
 	{
 		GLenum nativeAttachment = OglFacts::ConvertFramebufferAttachmentToNative(attachment);
 
-		glNamedFramebufferTextureLayer(
+		glNamedFramebufferTexture(
 			mNativeFramebuffer,
 			nativeAttachment,
-			0,
 			0,
 			0);
 	}

@@ -167,7 +167,7 @@ namespace editor
 
 	void TerrainRenderer::Clear()
 	{
-		mGraphics->ClearColor(mFramebuffer, 0.1f, 0.1f, 0.1f, 1.0f);
+		mGraphics->ClearColor(mFramebuffer, 0.25f, 0.25f, 0.25f, 1.0f);
 		mGraphics->ClearDepthStencil(mFramebuffer, 1.0f, 0);
 	}
 

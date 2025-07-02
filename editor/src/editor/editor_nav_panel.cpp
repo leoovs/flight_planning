@@ -26,7 +26,7 @@ namespace editor
 
 	void EditorNavPanel::OnImGui()
 	{
-		ImGui::Begin("Path Planner");
+		ImGui::Begin("Planner");
 
 		uavpf::experimental::NavResolution res = mPathPlanner->GetResolution();
 
@@ -34,7 +34,6 @@ namespace editor
 		if (ImGui::DragInt2("##NAV-RES", &res.Width, 1.0f, 1, 1000, "%d", ImGuiSliderFlags_AlwaysClamp))
 		{
 			mPathPlanner->SetResolution(res);
-			mPublisher.Publish<UpdateNavGridResolutionEvent>(EventPublishMode::Queued, res);
 		}
 
 		ImGui::NewLine();
@@ -51,17 +50,14 @@ namespace editor
 
 			if (ImGui::BeginTable("NAV-COORD-DRAG", 3))
 			{
-				ImGui::TableSetupColumn("#COL0", ImGuiTableColumnFlags_WidthStretch);
-				ImGui::TableSetupColumn("#COL1", ImGuiTableColumnFlags_WidthStretch);
-				
 				ImGui::TableNextRow();
 
 				ImGui::TableSetColumnIndex(0);
 				ImGui::Text(iCheckpoint ? "End" : "Start"); // TODO: replace with ToString()
 				ImGui::TableSetColumnIndex(1);
-				navCoordUpdated = navCoordUpdated | ImGui::DragInt("##NAV-COORD-WIDTH", &navCoord.x, 1.0f, 0, res.Width - 1, "%d", ImGuiSliderFlags_AlwaysClamp);
+				navCoordUpdated = navCoordUpdated | ImGui::DragInt("##NAV-COORD-WIDTH", &navCoord.x, 1, 0, res.Width, "%d", ImGuiSliderFlags_AlwaysClamp);
 				ImGui::TableSetColumnIndex(2);
-				navCoordUpdated = navCoordUpdated | ImGui::DragInt("##NAV-COORD-DEPTH", &navCoord.y, 1.0f, 0, res.Depth - 1, "%d", ImGuiSliderFlags_AlwaysClamp);
+				navCoordUpdated = navCoordUpdated | ImGui::DragInt("##NAV-COORD-DEPTH", &navCoord.y, 1, 0, res.Depth, "%d", ImGuiSliderFlags_AlwaysClamp);
 
 				ImGui::EndTable();
 			}
@@ -69,7 +65,6 @@ namespace editor
 			if (navCoordUpdated)
 			{
 				mPathPlanner->SetNavCoord(kind, navCoord);
-				mPublisher.Publish<UpdateCheckpointNavCoord>(EventPublishMode::Queued, navCoord, kind);
 			}
 
 			ImGui::PopID();

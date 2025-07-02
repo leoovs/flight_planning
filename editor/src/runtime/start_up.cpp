@@ -1,9 +1,11 @@
 #include "runtime/start_up.h"
 
 #include <imgui/imgui.h>
+#include <uavpf/uavpf.h>
 
 #include "asset/asset_storage.h"
 #include "asset/height_map_asset.h"
+#include "graphics/graphics_debug_watch.h"
 #include "graphics/imgui_graphics_backend.h"
 #include "platform/imgui_platform_backend.h"
 #include "platform/platform_service.h"
@@ -30,6 +32,11 @@ namespace editor
 		graphicsParams.Backend = GraphicsBackend::OpenGL;
 
 		GraphicsContext* graphics = platform->CreateGraphicsContext(std::move(graphicsParams));
+		GraphicsDebugWatch* graphicsDebug = graphics->CreateDebugWatch();
+		graphicsDebug->SetWatcher([](const GraphicsDebugEntry& entry)
+			{
+				UAVPF_LOG(Application, Error, "%s", entry.Message.data());
+			});
 
 		ImGui::CreateContext();
 		ImGui::GetIO().ConfigFlags |= ImGuiConfigFlags_DockingEnable;
@@ -79,6 +86,7 @@ namespace editor
 		platform->DestroyImGuiBackend(imguiPlatform);
 		ImGui::DestroyContext();
 
+		graphics->DestroyDebugWatch(graphicsDebug);
 		platform->DestroyGraphicsContext(graphics);
 		platform->DestroyMouse(mouse);
 		platform->DestroyKeyboard(keyboard);

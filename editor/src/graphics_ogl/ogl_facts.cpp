@@ -83,6 +83,8 @@ namespace editor
 
 			case GraphicsFormat::D32_FLOAT:
 				return GL_DEPTH_COMPONENT32F;
+			case GraphicsFormat::D24_UNORM_S8_UINT:
+				return GL_DEPTH24_STENCIL8;
 
 			default:
 				assert(false && "Invalid GraphicsFormat enum value");

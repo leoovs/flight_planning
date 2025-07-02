@@ -74,6 +74,7 @@ namespace editor
 				glewGetErrorString(error));
 		}
 		UAVPF_LOG(Application, Info, "SDL3 OpenGL provider: extensions loaded");
+		UAVPF_LOG(Application, Info, "OpenGL vendor: %s", glGetString(GL_VENDOR));
 	}
 
 	void Sdl3OglProvider::ReleaseNativeContext()

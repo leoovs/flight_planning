@@ -6,6 +6,8 @@ namespace editor
 {
 	OglGraphicsDebugWatch::OglGraphicsDebugWatch()
 	{
+		glEnable(GL_DEBUG_OUTPUT);
+		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS);
 		RegisterCallback();
 	}
 
@@ -28,6 +30,11 @@ namespace editor
 		const GLchar* message,
 		const void* typeErasedWatch)
 	{
+		if (GL_DEBUG_SEVERITY_NOTIFICATION == severity)
+		{
+			return;
+		}
+
 		auto watch = static_cast<const OglGraphicsDebugWatch*>(typeErasedWatch);
 
 		if (watch->mWatcher)
