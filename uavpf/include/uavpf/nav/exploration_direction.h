@@ -19,9 +19,9 @@ namespace uavpf::experimental
 		SouthWest,
 	};
 
-	constexpr std::array<ExplorationDirection, 8> EnumerateExplorationDirections()
+	constexpr auto EnumerateExplorationDirections()
 	{
-		return
+		constexpr std::array enumeration
 		{
 			ExplorationDirection::North,
 			ExplorationDirection::South,
@@ -33,6 +33,8 @@ namespace uavpf::experimental
 			ExplorationDirection::SouthEast,
 			ExplorationDirection::SouthWest,
 		};
+
+		return enumeration;
 	}
 }
 

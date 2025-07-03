@@ -2,6 +2,7 @@
 
 #include "editor/terrain_editor.h"
 #include "uavpf/nav/nav_resolution.h"
+#include "uavpf/nav/step_cost.h"
 #include <cstddef>
 
 #include <array>
@@ -58,7 +59,19 @@ namespace editor
 		float GetWorldSpaceElevation() const;
 		void SetWorldSpaceElevation(float elevation);
 
-		// TODO: should we add height map space elevation instead?
+		void ClearCosts();
+		void RemoveCost(size_t iCost);
+
+		template<typename CostT, typename... ArgsT>
+		void AddCost(ArgsT&&... args)
+		{
+			mCosts.Add(std::make_unique<CostT>(std::forward<ArgsT>(args)...));
+		}
+
+		size_t GetCostCount() const;
+
+		const uavpf::experimental::StepCost& GetCost(size_t iCost) const;
+		uavpf::experimental::StepCost& GetCost(size_t iCost);
 
 	private:
 		void ClampCheckpointNavCoords();
@@ -69,6 +82,7 @@ namespace editor
 		std::vector<uavpf::experimental::NavCell> mNavPath;
 		std::atomic_bool mBuildingPath;
 		float mWorldSpaceElevation = 0.02f;
+		uavpf::experimental::ComplexCost mCosts;
 	};
 }
 

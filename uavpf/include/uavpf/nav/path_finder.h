@@ -26,6 +26,7 @@ namespace uavpf::experimental
 		void ExploreNeighbour(ExplorationDirection direction);
 
 		std::vector<NavCell> ReconstructPath() const;
+		std::vector<NavCell> ReconstructAndTruncatePath() const;
 
 	private:
 		bool IsEnd(PathNode* node) const;

@@ -163,6 +163,31 @@ namespace editor
 		mWorldSpaceElevation = elevation;
 	}
 
+	void PathPlanner::ClearCosts()
+	{
+		mCosts.ClearCosts();
+	}
+
+	void PathPlanner::RemoveCost(size_t iCost)
+	{
+		mCosts.RemoveCost(iCost);
+	}
+
+	size_t PathPlanner::GetCostCount() const
+	{
+		return mCosts.GetCostCount();
+	}
+
+	const uavpf::experimental::StepCost& PathPlanner::GetCost(size_t iCost) const
+	{
+		return mCosts.GetCost(iCost);
+	}
+
+	uavpf::experimental::StepCost& PathPlanner::GetCost(size_t iCost)
+	{
+		return mCosts.GetCost(iCost);
+	}
+
 	void PathPlanner::ClampCheckpointNavCoords()
 	{
 		uavpf::experimental::NavResolution res = mNavGrid.GetResolution();

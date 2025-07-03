@@ -6,7 +6,6 @@
 #include "editor/editor_nav_panel.h"
 #include "editor/editor_panel.h"
 #include "editor/editor_scene_panel.h"
-#include "editor/editor_tasks.h"
 #include "editor/editor_terrain_panel.h"
 #include "event/event_publisher.h"
 #include "event/event_subscriber.h"

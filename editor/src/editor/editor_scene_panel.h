@@ -48,6 +48,8 @@ namespace editor
 		bool OnHeightMapRequested(const HeightMapRequestedEvent& event);
 		bool OnHeightMapLoaded(const HeightMapLoadedEvent& event);
 		bool OnMouseMovement(const MouseMovementEvent& event);
+		bool OnUpdateNavGridResolution(const UpdateNavGridResolutionEvent& event);
+		bool OnUpdateCheckpointNavCoord(const UpdateCheckpointNavCoordEvent& event);
 		bool OnPathBuilt(const PathBuiltEvent& event);
 
 		EventSubscriber mSubscriber;

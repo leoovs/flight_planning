@@ -2,6 +2,7 @@
 #include "uavpf/nav/exploration_direction.h"
 
 #include <algorithm>
+#include <glm/ext/scalar_constants.hpp>
 
 namespace uavpf::experimental
 {
@@ -54,7 +55,6 @@ namespace uavpf::experimental
 			return;
 		}
 
-		mCurrent->NextDirection = direction;
 		PathNode& neighbour = GetAssociatedNode(mGrid->GetCell(neighbourCoords));
 
 		float tentativeScore = mCurrent->TotalCost + mCost->Evaluate(
@@ -66,6 +66,7 @@ namespace uavpf::experimental
 			neighbour.Parent = mCurrent;
 			neighbour.TotalCost = tentativeScore;
 			neighbour.HeuristicCost = CalculateHeuristic(*neighbour.Cell);
+			neighbour.NextDirection = direction;
 
 			auto it = std::find(mToExplore.begin(), mToExplore.end(), &neighbour);	
 			if (mToExplore.end() == it)
@@ -77,87 +78,75 @@ namespace uavpf::experimental
 
 	std::vector<NavCell> PathFinder::ReconstructPath() const
 	{
-		// TODO: fix ignore of the flat surfaces...
+		return ReconstructAndTruncatePath();
 
 		std::vector<NavCell> path;
-
-		if (mCurrent == nullptr)
-			return path;
-
-		// Collect all nodes in reverse order (child → parent)
-		std::vector<PathNode*> nodes;
 		PathNode* current = mCurrent;
-		while (current != nullptr)
+
+		while (nullptr != current)
 		{
-			nodes.push_back(current);
+			path.push_back(*current->Cell);
 			current = current->Parent;
 		}
 
-		if (nodes.empty())
-			return path;
+		return path;
+	}
 
-		// The first node is always included
-		path.push_back(*nodes.back()->Cell);
-		if (nodes.size() == 1)
-			return path;  // Only one node, nothing to merge
+	std::vector<NavCell> PathFinder::ReconstructAndTruncatePath() const
+	{
+		std::vector<NavCell> path;
 
-		ExplorationDirection lastDir = nodes.back()->NextDirection;
-		float lastHeight = nodes.back()->Cell->RelativeHeight;
-		bool isIncreasing = false;
-		bool isDecreasing = false;
-		bool trendInitialized = false;
-
-		// Iterate from second-to-last node to the start (parent → child)
-		for (int i = nodes.size() - 2; i >= 0; --i)
+		PathNode* current = mCurrent;
+		if (nullptr == current)
 		{
-			PathNode* node = nodes[i];
-			float currentHeight = node->Cell->RelativeHeight;
-			bool heightIncreased = (currentHeight > lastHeight);
-			bool heightDecreased = (currentHeight < lastHeight);
+			return path;
+		}
 
-			// Check if direction changed → always split
-			if (node->NextDirection != lastDir)
+		float currentHeight = current->Cell->RelativeHeight;
+		ExplorationDirection currentDir = current->NextDirection;
+		int32_t heightTrend = -1;
+
+		while (nullptr != current)
+		{
+			PathNode* parent = current->Parent;
+			if (nullptr == parent)
 			{
-				path.push_back(*node->Cell);
-				lastDir = node->NextDirection;
-				lastHeight = currentHeight;
-				trendInitialized = false;  // Reset trend for new direction
-				continue;
+				path.push_back(*current->Cell);
+				break;
 			}
 
-			// If direction is the same, check height trend
-			if (!trendInitialized)
+			float nextHeight = parent->Cell->RelativeHeight;
+			ExplorationDirection nextDir = parent->NextDirection;
+			int32_t nextHeightTrend = 0;
+			
+			float heightSensitivity = glm::epsilon<float>();
+			heightSensitivity = 1e-1f;
+			float heightDiff = nextHeight - currentHeight;
+
+			if (heightDiff > heightSensitivity)
 			{
-				// First step: determine trend
-				if (heightIncreased)
-				{
-					isIncreasing = true;
-					isDecreasing = false;
-					trendInitialized = true;
-				}
-				else if (heightDecreased)
-				{
-					isIncreasing = false;
-					isDecreasing = true;
-					trendInitialized = true;
-				}
-				// Else: neutral (same height), no trend yet
+				nextHeightTrend = 1;
 			}
-			else
+			else if (heightDiff < -heightSensitivity)
 			{
-				// Check if trend is violated
-				if ((isIncreasing && !heightIncreased) || (isDecreasing && !heightDecreased))
-				{
-					// Trend broken → add to path and reset
-					path.push_back(*node->Cell);
-					trendInitialized = false;
-					lastHeight = currentHeight;
-					continue;
-				}
+				nextHeightTrend = 2;
 			}
 
-			// If we reach here, the trend is maintained → update lastHeight
-			lastHeight = currentHeight;
+			bool dirDiffers = nextDir != currentDir;
+			bool heightTrendDiffers = heightTrend != nextHeightTrend;
+
+			bool anythingDiffers = dirDiffers || heightTrendDiffers;
+
+			if (anythingDiffers)
+			{
+				path.push_back(*current->Cell);	
+			}
+
+			currentDir = nextDir;
+			heightTrend = nextHeightTrend;
+			currentHeight = nextHeight;
+
+			current = parent;
 		}
 
 		return path;

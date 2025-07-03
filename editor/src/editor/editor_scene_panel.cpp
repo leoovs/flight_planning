@@ -41,6 +41,8 @@ namespace editor
 				.SubscribeMethod(&EditorScenePanel::OnHeightMapRequested)
 				.SubscribeMethod(&EditorScenePanel::OnHeightMapLoaded)
 				.SubscribeMethod(&EditorScenePanel::OnMouseMovement)
+				.SubscribeMethod(&EditorScenePanel::OnUpdateNavGridResolution)
+				.SubscribeMethod(&EditorScenePanel::OnUpdateCheckpointNavCoord)
 				.SubscribeMethod(&EditorScenePanel::OnPathBuilt)
 			.EndClass();
 	}
@@ -116,8 +118,8 @@ namespace editor
 			glm::perspective(
 				glm::radians(50.0f),
 				mPanelSize.x / mPanelSize.y,
-				0.1f,
-				100.0f));
+				0.05f,
+				50.0f));
 
 		auto image = (ImTextureID)mImGuiGraphics->GetTextureID(mColorBuffer.get());
 		ImGui::Image(image, mPanelSize, { 0, 1 }, { 1, 0 });
@@ -284,6 +286,18 @@ namespace editor
 
 		mFreeCamera.LookAround(polar, azimuth);
 
+		return true;
+	}
+
+	bool EditorScenePanel::OnUpdateNavGridResolution(const UpdateNavGridResolutionEvent& event)
+	{
+		mCachedPath.clear();
+		return true;
+	}
+
+	bool EditorScenePanel::OnUpdateCheckpointNavCoord(const UpdateCheckpointNavCoordEvent& event)
+	{
+		mCachedPath.clear();
 		return true;
 	}
 

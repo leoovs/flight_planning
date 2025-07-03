@@ -84,8 +84,6 @@ namespace editor
 			ImGui::PopID();
 		}
 
-		ImGui::NewLine();
-		
 		if (ImGui::Button("Build"))
 		{
 			mPublisher.Publish<BuildPathEvent>(EventPublishMode::Queued);
@@ -97,6 +95,7 @@ namespace editor
 			ImGui::PopItemFlag();
 		}
 
+		ImGui::SameLine();
 		if (ImGui::Button("Cancel"))
 		{
 			mPublisher.Publish<CancelBuildPathEvent>(EventPublishMode::Queued);
