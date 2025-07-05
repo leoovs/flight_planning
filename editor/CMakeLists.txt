@@ -28,6 +28,7 @@ target_sources(
 	"src/editor/editor_nav_panel.cpp"
 	"src/editor/editor_scene_panel.cpp"
 	"src/editor/editor_terrain_panel.cpp"
+	"src/editor/nav_network.cpp"
 	"src/editor/path_planner.cpp"
 	"src/editor/terrain_editor.cpp"
 

@@ -12,8 +12,9 @@
 
 namespace editor
 {
-	EditorNavPanel::EditorNavPanel(PathPlanner& pathPlanner)
+	EditorNavPanel::EditorNavPanel(const PathPlanner& pathPlanner, const NavNetwork& navNetwork)
 		: mPathPlanner(&pathPlanner)
+		, mNavNetwork(&navNetwork)
 	{}
 
 	EditorPanelKind EditorNavPanel::GetKind() const
@@ -37,7 +38,7 @@ namespace editor
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.5f);
 		}
 
-		uavpf::experimental::NavResolution res = mPathPlanner->GetResolution();
+		uavpf::experimental::NavResolution res = mNavNetwork->GetResolution();
 
 		ImGui::Text("Nav Grid resolution");
 		if (ImGui::DragInt2("##NAV-RES", &res.Width, 1.0f, 1, 1000, "%d", ImGuiSliderFlags_AlwaysClamp))

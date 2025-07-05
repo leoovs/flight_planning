@@ -4,6 +4,7 @@
 
 #include "editor/editor_events.h"
 #include "editor/editor_panel.h"
+#include "editor/nav_network.h"
 #include "editor/path_planner.h"
 #include "editor/terrain_editor.h"
 #include "event/event_publisher.h"
@@ -60,8 +61,8 @@ namespace editor
 		TaskScheduler* mTasks = nullptr;
 
 		TerrainEditor mTerrainEditor;
-		PathPlanner mPathPlanner{ mTerrainEditor };
-		std::vector<uavpf::experimental::NavCell> mPathBuffer;
+		NavNetwork mNavNetwork{ mTerrainEditor };
+		PathPlanner mPathPlanner{ mTerrainEditor, mNavNetwork };
 	};
 }
 

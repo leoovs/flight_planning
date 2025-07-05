@@ -1,40 +1,55 @@
 #include "editor/path_planner.h"
 #include "uavpf/nav/exploration_direction.h"
 #include "uavpf/nav/nav_grid.h"
+#include "uavpf/nav/nav_resolution.h"
 #include "uavpf/nav/nav_space.h"
 #include "uavpf/nav/path_finder.h"
 #include "uavpf/nav/step_cost.h"
 
 namespace editor
 {
-	PathPlanner::PathPlanner(TerrainEditor& terrainEditor)
+	//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	//
+	// NotamCost
+	//
+	//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+	NotamCost::NotamCost(glm::vec2 navCoord, glm::vec2 ellipse)
+		: mNotamNavCoord(navCoord)
+		, mNotamNavEllipse(ellipse)
+	{}
+
+	float NotamCost::Evaluate(
+		const uavpf::experimental::NavCell& src,
+		const uavpf::experimental::NavCell& dst) const
+	{
+		float x = dst.NavCoords.x;
+		float y = dst.NavCoords.y;
+
+		float h = mNotamNavCoord.x;
+		float k = mNotamNavCoord.y;
+
+		float a = mNotamNavEllipse.x;
+		float b = mNotamNavEllipse.y;
+
+		// Ellipse equation
+		float p = glm::pow(x - h, 2) / glm::pow(a, 2) + glm::pow(y - k, 2) / glm::pow(b, 2);
+
+		return p < 1.0f
+			? cInfinite
+			: 0.0f;
+	}
+
+	//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	//
+	// PathPlanner
+	//
+	//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+	PathPlanner::PathPlanner(const TerrainEditor& terrainEditor, const NavNetwork& navNetwork)
 		: mTerrainEditor(&terrainEditor)
-	{
-	}
-
-	uavpf::experimental::NavResolution PathPlanner::GetResolution() const
-	{
-		return mNavGrid.GetResolution();
-	}
-
-	void PathPlanner::SetResolution(uavpf::experimental::NavResolution resolution)
-	{
-		if (mTerrainEditor->IsHeightMapLoaded())
-		{
-			if (!uavpf::experimental::NavSpace(resolution).IsSingular())
-			{
-				mNavGrid = uavpf::experimental::NavGridBuilder()
-					.Resize(resolution.Width, resolution.Depth)
-					.PopulateHeight(mTerrainEditor->GetHeightMap())
-					.Build();
-				ClampCheckpointNavCoords();
-			}
-			else
-			{
-				mNavGrid = {};
-			}
-		}
-	}
+		, mNavNetwork(&navNetwork)
+	{}
 
 	glm::ivec2 PathPlanner::GetNavCoord(CheckpointKind kind) const
 	{
@@ -50,7 +65,7 @@ namespace editor
 	glm::vec2 PathPlanner::GetRelativeCoord(CheckpointKind kind) const
 	{
 		glm::vec2 navCoord = GetNavCoord(kind);
-		glm::ivec2 resolution(GetResolution());
+		glm::ivec2 resolution(mNavNetwork->GetResolution());
 
 		return
 		{
@@ -61,7 +76,7 @@ namespace editor
 
 	void PathPlanner::SetRelativeCoord(CheckpointKind kind, glm::vec2 relCoord)
 	{
-		glm::ivec2 resolution(GetResolution());
+		glm::ivec2 resolution(mNavNetwork->GetResolution());
 		SetNavCoord(
 			kind,
 			{
@@ -98,7 +113,7 @@ namespace editor
 
 	glm::ivec2 PathPlanner::NavCoordToHeightMapCoord(glm::ivec2 navCoord) const
 	{
-		uavpf::experimental::NavSpace navSpace(GetResolution());
+		uavpf::experimental::NavSpace navSpace(mNavNetwork->GetResolution());
 		glm::ivec2 heightMapRes = mTerrainEditor->GetHeightMapResolution();
 		return navSpace.FromNavCoord(navCoord, heightMapRes);
 	}
@@ -108,7 +123,7 @@ namespace editor
 		mBuildingPath = true;
 	}
 
-	bool PathPlanner::IsBuildingPath()
+	bool PathPlanner::IsBuildingPath() const
 	{
 		return mBuildingPath;
 	}
@@ -118,11 +133,13 @@ namespace editor
 		uavpf::experimental::ComplexCost costs;
 		costs.Add(std::make_unique<uavpf::experimental::ClimbCost>(), 100.0f);
 		costs.Add(std::make_unique<uavpf::experimental::DistanceCost>(), 1.0f);
+		PopulateNotamCosts(costs);
 
+		uavpf::experimental::NavGrid grid = mNavNetwork->GetGrid();
 		uavpf::experimental::PathFinder finder(
-			mNavGrid,
-			mNavGrid.GetCell(mCheckpointNavCoords.at(+CheckpointKind::Start)),
-			mNavGrid.GetCell(mCheckpointNavCoords.at(+CheckpointKind::End)),
+			grid,
+			grid.GetCell(mCheckpointNavCoords.at(+CheckpointKind::Start)),
+			grid.GetCell(mCheckpointNavCoords.at(+CheckpointKind::End)),
 			costs);
 
 		while (finder.IsExplorable() && mBuildingPath)
@@ -147,7 +164,6 @@ namespace editor
 		mBuildingPath = false;
 	}
 
-
 	const std::vector<uavpf::experimental::NavCell>& PathPlanner::GetPath() const
 	{
 		return mNavPath;
@@ -163,34 +179,9 @@ namespace editor
 		mWorldSpaceElevation = elevation;
 	}
 
-	void PathPlanner::ClearCosts()
-	{
-		mCosts.ClearCosts();
-	}
-
-	void PathPlanner::RemoveCost(size_t iCost)
-	{
-		mCosts.RemoveCost(iCost);
-	}
-
-	size_t PathPlanner::GetCostCount() const
-	{
-		return mCosts.GetCostCount();
-	}
-
-	const uavpf::experimental::StepCost& PathPlanner::GetCost(size_t iCost) const
-	{
-		return mCosts.GetCost(iCost);
-	}
-
-	uavpf::experimental::StepCost& PathPlanner::GetCost(size_t iCost)
-	{
-		return mCosts.GetCost(iCost);
-	}
-
 	void PathPlanner::ClampCheckpointNavCoords()
 	{
-		uavpf::experimental::NavResolution res = mNavGrid.GetResolution();
+		uavpf::experimental::NavResolution res = mNavNetwork->GetResolution();
 
 		for (glm::ivec2& navCoord : mCheckpointNavCoords) 
 		{
@@ -201,6 +192,26 @@ namespace editor
 			};
 
 			navCoord = clamped;
+		}
+	}
+
+	void PathPlanner::PopulateNotamCosts(uavpf::experimental::ComplexCost& costs)
+	{
+		uavpf::experimental::NavResolution res = mNavNetwork->GetResolution();
+		size_t notamCount = mNavNetwork->GetNotamCount();
+
+		for (size_t iNotam = 0; iNotam < notamCount; iNotam++)
+		{
+			Notam notam = mNavNetwork->GetNotam(iNotam);
+
+			glm::vec2 navCoords = notam.NavCoord;
+			glm::vec2 notamEllipse
+			{
+				notam.RelativeRadius * res.Width,
+				notam.RelativeRadius * res.Depth,
+			};
+
+			costs.Add(std::make_unique<NotamCost>(navCoords, notamEllipse));
 		}
 	}
 }

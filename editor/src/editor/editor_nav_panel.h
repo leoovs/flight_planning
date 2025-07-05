@@ -1,6 +1,7 @@
 #pragma once
 
 #include "editor/editor_panel.h"
+#include "editor/nav_network.h"
 #include "editor/path_planner.h"
 #include "event/event_publisher.h"
 
@@ -9,7 +10,7 @@ namespace editor
 	class EditorNavPanel final : public EditorPanel
 	{
 	public:
-		EditorNavPanel(PathPlanner& pathPlanner);
+		EditorNavPanel(const PathPlanner& pathPlanner, const NavNetwork& navNetwork);
 		~EditorNavPanel() override = default;
 
 		EditorPanelKind GetKind() const override;
@@ -21,7 +22,8 @@ namespace editor
 	private:
 		EventPublisher mPublisher;
 
-		PathPlanner* mPathPlanner = nullptr;
+		const PathPlanner* mPathPlanner = nullptr;
+		const NavNetwork* mNavNetwork = nullptr;
 	};
 }
 

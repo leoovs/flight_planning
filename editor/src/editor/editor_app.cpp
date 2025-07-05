@@ -22,7 +22,7 @@ namespace editor
 		RegisterPanel<EditorDebugPanel>();
 		RegisterPanel<EditorDockspacePanel>();
 		RegisterPanel<EditorMenuBar>();
-		RegisterPanel<EditorNavPanel>(mPathPlanner);
+		RegisterPanel<EditorNavPanel>(mPathPlanner, mNavNetwork);
 		RegisterPanel<EditorScenePanel>(graphics, imguiGraphics, mTerrainEditor, mPathPlanner);
 		RegisterPanel<EditorTerrainPanel>(mTerrainEditor);
 
@@ -134,16 +134,12 @@ namespace editor
 		auto loadHeightMap = [this, path = event.HeightMapPath]()
 		{
 			mTerrainEditor.LoadHeightMap(path);
+			mNavNetwork.PopulateHeight();
 		};
 
 		auto postLoadedEvent = [this]()
 		{
 			mPublisher.Publish<HeightMapLoadedEvent>(EventPublishMode::Queued);
-		};
-
-		auto updatePathPlanner = [this]()
-		{
-			mPathPlanner.SetResolution(mPathPlanner.GetResolution());
 		};
 
 		auto enablePanels = [this]()
@@ -157,7 +153,6 @@ namespace editor
 			.BeginSequence()
 				.DoThreaded(loadHeightMap)
 				.Do(enablePanels)
-				.Do(updatePathPlanner)
 				.Do(postLoadedEvent)
 			.End()
 			.Build();
@@ -178,9 +173,11 @@ namespace editor
 
 	bool EditorApp::OnUpdateNavGridResolutionEvent(const UpdateNavGridResolutionEvent& event)
 	{
-		if (!mPathPlanner.IsBuildingPath())
+		mNavNetwork.SetResolution(event.Resolution);
+
+		if (mTerrainEditor.IsHeightMapLoaded())
 		{
-			mPathPlanner.SetResolution(event.Resolution);
+			mNavNetwork.PopulateHeight();
 		}
 
 		return true;
@@ -188,11 +185,7 @@ namespace editor
 
 	bool EditorApp::OnUpdateCheckpointNavCoord(const UpdateCheckpointNavCoordEvent& event)
 	{
-		if (!mPathPlanner.IsBuildingPath())
-		{
-			mPathPlanner.SetNavCoord(event.Checkpoint, event.NavCoord);
-		}
-
+		mPathPlanner.SetNavCoord(event.Checkpoint, event.NavCoord);
 		return true;
 	}
 

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "editor/nav_network.h"
 #include "editor/terrain_editor.h"
 #include "uavpf/nav/nav_resolution.h"
 #include "uavpf/nav/step_cost.h"
@@ -25,16 +26,27 @@ namespace editor
 		return static_cast<size_t>(kind);
 	}
 
+	class NotamCost final : public uavpf::experimental::StepCost
+	{
+	public:
+		NotamCost(glm::vec2 navCoord, glm::vec2 ellipse);
+
+		float Evaluate(
+			const uavpf::experimental::NavCell& src,
+			const uavpf::experimental::NavCell& dst) const override;
+
+	private:
+		glm::vec2 mNotamNavCoord;
+		glm::vec2 mNotamNavEllipse;
+	};
+
 	class PathPlanner
 	{
 	public:
 		using CheckpointNavCoords = std::array<glm::ivec2, +CheckpointKind::Count_>;
 		using CheckpointRelativeCoords = std::array<glm::vec2, +CheckpointKind::Count_>;
 
-		PathPlanner(TerrainEditor& terrainEditor);
-
-		uavpf::experimental::NavResolution GetResolution() const;
-		void SetResolution(uavpf::experimental::NavResolution resolution);
+		PathPlanner(const TerrainEditor& terrainEditor, const NavNetwork& navNetwork);
 
 		glm::ivec2 GetNavCoord(CheckpointKind kind) const;
 		void SetNavCoord(CheckpointKind kind, glm::ivec2 navCoord);
@@ -51,7 +63,7 @@ namespace editor
 		glm::ivec2 NavCoordToHeightMapCoord(glm::ivec2 navCoord) const;
 
 		void BeginBuildPath();
-		bool IsBuildingPath();
+		bool IsBuildingPath() const;
 		void BuildPath();
 		void EndBuildPath();
 		const std::vector<uavpf::experimental::NavCell>& GetPath() const;
@@ -59,30 +71,16 @@ namespace editor
 		float GetWorldSpaceElevation() const;
 		void SetWorldSpaceElevation(float elevation);
 
-		void ClearCosts();
-		void RemoveCost(size_t iCost);
-
-		template<typename CostT, typename... ArgsT>
-		void AddCost(ArgsT&&... args)
-		{
-			mCosts.Add(std::make_unique<CostT>(std::forward<ArgsT>(args)...));
-		}
-
-		size_t GetCostCount() const;
-
-		const uavpf::experimental::StepCost& GetCost(size_t iCost) const;
-		uavpf::experimental::StepCost& GetCost(size_t iCost);
-
 	private:
 		void ClampCheckpointNavCoords();
+		void PopulateNotamCosts(uavpf::experimental::ComplexCost& costs);
 
-		TerrainEditor* mTerrainEditor = nullptr;
+		const TerrainEditor* mTerrainEditor = nullptr;
+		const NavNetwork* mNavNetwork = nullptr;
 		CheckpointNavCoords mCheckpointNavCoords{};
-		uavpf::experimental::NavGrid mNavGrid;
 		std::vector<uavpf::experimental::NavCell> mNavPath;
 		std::atomic_bool mBuildingPath;
 		float mWorldSpaceElevation = 0.02f;
-		uavpf::experimental::ComplexCost mCosts;
 	};
 }
 

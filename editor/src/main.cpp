@@ -9,7 +9,7 @@ int main()
 	auto emitter = std::make_unique<uavpf::ConsoleLogEmitter>();
 
 	uavpf::LoggerProvider::Get().HostLogger(
-		uavpf::LogSource::Unspecified,
+		uavpf::LogSource::Application,
 		std::move(formatter),
 		std::move(emitter));
 
