@@ -34,12 +34,15 @@ namespace editor
 
 	private:
 		bool OnWindowClosed(const WindowCloseEvent& event);
+		bool OnUpdateTerrainScale(const UpdateTerrainScaleEvent& event);
 		bool OnHeightMapRequested(const HeightMapRequestedEvent& event);
 		bool OnCloseHeightMapRequested(const CloseHeightMapRequestEvent& event);
 		bool OnUpdateNavGridResolutionEvent(const UpdateNavGridResolutionEvent& event);
 		bool OnUpdateCheckpointNavCoord(const UpdateCheckpointNavCoordEvent& event);
 		bool OnBuildPath(const BuildPathEvent& event);
 		bool OnCancelBuildPath(const CancelBuildPathEvent& event);
+		bool OnAddNotam(const AddNotamEvent& event);
+		bool OnUpdateNotam(const UpdateNotamEvent& event);
 
 		template<typename PanelT, typename... ArgsT>
 		void RegisterPanel(ArgsT&&... args)

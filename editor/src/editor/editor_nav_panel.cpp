@@ -67,9 +67,11 @@ namespace editor
 				ImGui::TableSetColumnIndex(0);
 				ImGui::Text(iCheckpoint ? "End" : "Start"); // TODO: replace with ToString()
 				ImGui::TableSetColumnIndex(1);
-				navCoordUpdated = navCoordUpdated | ImGui::DragInt("##NAV-COORD-WIDTH", &navCoord.x, 1, 0, res.Width, "%d", ImGuiSliderFlags_AlwaysClamp);
+				navCoordUpdated = ImGui::DragInt("##NAV-COORD-WIDTH", &navCoord.x, 1, 0, res.Width-1, "%d", ImGuiSliderFlags_AlwaysClamp)
+					|| navCoordUpdated;
 				ImGui::TableSetColumnIndex(2);
-				navCoordUpdated = navCoordUpdated | ImGui::DragInt("##NAV-COORD-DEPTH", &navCoord.y, 1, 0, res.Depth, "%d", ImGuiSliderFlags_AlwaysClamp);
+				navCoordUpdated = ImGui::DragInt("##NAV-COORD-DEPTH", &navCoord.y, 1, 0, res.Depth-1, "%d", ImGuiSliderFlags_AlwaysClamp)
+					|| navCoordUpdated;
 
 				ImGui::EndTable();
 			}
@@ -100,6 +102,50 @@ namespace editor
 		if (ImGui::Button("Cancel"))
 		{
 			mPublisher.Publish<CancelBuildPathEvent>(EventPublishMode::Queued);
+		}
+
+		ImGui::NewLine();
+
+		ImGui::Text("Notams");
+		ImGui::SameLine();
+		if (ImGui::Button("+"))
+		{
+			mPublisher.Publish<AddNotamEvent>(EventPublishMode::Queued);
+		}
+
+		size_t notamCount = mNavNetwork->GetNotamCount();
+		for (size_t iNotam = 0; iNotam < notamCount; iNotam++)
+		{
+			ImGui::PushID(iNotam);
+			if (ImGui::TreeNode(("#" + std::to_string(iNotam+1)).data()))
+			{
+				Notam notam = mNavNetwork->GetNotam(iNotam);
+				bool updated = false;
+
+				if (ImGui::BeginTable("##NOTAM-COORD_DRAG", 2))
+				{
+					ImGui::TableNextRow();
+					
+					ImGui::TableSetColumnIndex(0);
+					updated = ImGui::DragInt("##NOTAM-COORD-WIDTH", &notam.NavCoord.x, 1.0f, 0, res.Width-1)
+						|| updated;
+					ImGui::TableSetColumnIndex(1);
+					updated = ImGui::DragInt("##NOTAM-COORD-DEPTH", &notam.NavCoord.y, 1.0f, 0, res.Depth-1)
+						|| updated;
+
+					ImGui::EndTable();
+				}
+				updated = ImGui::DragFloat("Radius", &notam.RelativeRadius, 0.1f, 0.0f, 1.0f)
+					|| updated;
+
+				if (updated)
+				{
+					mPublisher.Publish<UpdateNotamEvent>(EventPublishMode::Queued, notam, iNotam);
+				}
+
+				ImGui::TreePop();
+			}
+			ImGui::PopID();
 		}
 
 		ImGui::End();

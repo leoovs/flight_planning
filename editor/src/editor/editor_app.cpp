@@ -23,7 +23,7 @@ namespace editor
 		RegisterPanel<EditorDockspacePanel>();
 		RegisterPanel<EditorMenuBar>();
 		RegisterPanel<EditorNavPanel>(mPathPlanner, mNavNetwork);
-		RegisterPanel<EditorScenePanel>(graphics, imguiGraphics, mTerrainEditor, mPathPlanner);
+		RegisterPanel<EditorScenePanel>(graphics, imguiGraphics, mTerrainEditor, mPathPlanner, mNavNetwork);
 		RegisterPanel<EditorTerrainPanel>(mTerrainEditor);
 
 		Enable(EditorPanelKind::Dockspace);
@@ -47,12 +47,15 @@ namespace editor
 		mSubscriber
 			.BeginClass(*this)
 				.SubscribeMethod(&EditorApp::OnWindowClosed)
+				.SubscribeMethod(&EditorApp::OnUpdateTerrainScale)
 				.SubscribeMethod(&EditorApp::OnHeightMapRequested)
 				.SubscribeMethod(&EditorApp::OnCloseHeightMapRequested)
 				.SubscribeMethod(&EditorApp::OnUpdateNavGridResolutionEvent)
 				.SubscribeMethod(&EditorApp::OnUpdateCheckpointNavCoord)
 				.SubscribeMethod(&EditorApp::OnBuildPath)
 				.SubscribeMethod(&EditorApp::OnCancelBuildPath)
+				.SubscribeMethod(&EditorApp::OnAddNotam)
+				.SubscribeMethod(&EditorApp::OnUpdateNotam)
 			.EndClass();
 	}
 
@@ -126,6 +129,13 @@ namespace editor
 	bool EditorApp::OnWindowClosed(const WindowCloseEvent& event)
 	{
 		mPublisher.Publish<MainLoopQuitEvent>(EventPublishMode::Queued);
+		return true;
+	}
+
+	bool EditorApp::OnUpdateTerrainScale(const UpdateTerrainScaleEvent& event)
+	{
+		mTerrainEditor.SetWorldScale(event.WorldScale);
+		mTerrainEditor.SetHeightScale(event.HeightScale);
 		return true;
 	}
 
@@ -222,6 +232,18 @@ namespace editor
 	bool EditorApp::OnCancelBuildPath(const CancelBuildPathEvent& event)
 	{
 		mPathPlanner.EndBuildPath();
+		return true;
+	}
+
+	bool EditorApp::OnAddNotam(const AddNotamEvent& event)
+	{
+		mNavNetwork.AddNotam({});
+		return true;
+	}
+
+	bool EditorApp::OnUpdateNotam(const UpdateNotamEvent& event)
+	{
+		mNavNetwork.SetNotam(event.UpdatedNotamIndex, event.UpdatedNotam);
 		return true;
 	}
 

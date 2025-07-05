@@ -17,6 +17,8 @@ namespace editor
 			hm.GetWidth(),
 			hm.GetDepth(),
 		};
+
+		ScaleToFitUnitSquare();
 	}
 
 	const uavpf::HeightMap& TerrainEditor::GetHeightMap() const
@@ -39,34 +41,44 @@ namespace editor
 		return uavpf::cBadID != mHeightMap;
 	}
 
-	glm::vec3 TerrainEditor::GetTerrainScale() const
+	glm::mat4 TerrainEditor::GetHeightMapToWorldMatrix() const
 	{
-		return mTerrainScale;
+		return glm::scale(glm::mat4(1.0f), mHeightMapToTerrainScale*mWorldScale);
 	}
 
-	void TerrainEditor::SetTerrainScale(const glm::vec3& scale)
+	void TerrainEditor::SetWorldScale(float scale)
 	{
-		mTerrainScale = scale;
+		mWorldScale = scale;
+	}
+
+	float TerrainEditor::GetWorldScale() const
+	{
+		return mWorldScale;
+	}
+
+	void TerrainEditor::SetHeightScale(float scale)
+	{
+		mHeightMapToTerrainScale.y = scale;
+	}
+
+	float TerrainEditor::GetHeightScale() const
+	{
+		return mHeightMapToTerrainScale.y;
 	}
 
 	void TerrainEditor::ScaleToFitUnitSquare()
 	{
-		SetTerrainScale({
+		mHeightMapToTerrainScale = {
 			1.0f / mHeightMapResolution.x,
 			1.0f,
 			1.0f / mHeightMapResolution.y
-		});
-	}
-
-	glm::mat4 TerrainEditor::GetTerrainScaleAsMatrix() const
-	{
-		return glm::scale(glm::mat4(1.0f), mTerrainScale);
+		};
 	}
 
 	glm::vec3 TerrainEditor::HeightMapToWorldCoord(glm::ivec2 hmCoord) const
 	{
 		glm::vec4 originalSpace{ hmCoord.x, GetHeightMap().GetElevation(hmCoord.x, hmCoord.y), hmCoord.y, 1.0f }; 
-		return GetTerrainScaleAsMatrix() * originalSpace;
+		return GetHeightMapToWorldMatrix() * originalSpace;
 	}
 }
 

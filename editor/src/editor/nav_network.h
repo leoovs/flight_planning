@@ -13,7 +13,7 @@ namespace editor
 {
 	struct Notam
 	{
-		glm::vec2 NavCoord{};
+		glm::ivec2 NavCoord{};
 		float RelativeRadius = 0.3f;
 	};
 

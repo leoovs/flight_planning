@@ -20,18 +20,24 @@ namespace editor
 		glm::ivec2 GetHeightMapResolution() const;
 		bool IsHeightMapLoaded() const;
 
-		glm::vec3 GetTerrainScale() const;
-		void SetTerrainScale(const glm::vec3& scale);
-		void ScaleToFitUnitSquare();
-		glm::mat4 GetTerrainScaleAsMatrix() const;
+		glm::mat4 GetHeightMapToWorldMatrix() const;
+
+		void SetWorldScale(float scale);
+		float GetWorldScale() const;
+
+		void SetHeightScale(float scale);
+		float GetHeightScale() const;
 
 		glm::vec3 HeightMapToWorldCoord(glm::ivec2 hmCoord) const;
 
 	private:
+		void ScaleToFitUnitSquare();
+
 		AssetStorage* mAssets = RtModuleLocator::Locate<AssetStorage>();
 		AssetID mHeightMap = uavpf::cBadID;	
 		glm::ivec2 mHeightMapResolution;
-		glm::vec3 mTerrainScale{ 1.0f };
+		glm::vec3 mHeightMapToTerrainScale{ 1.0f };
+		float mWorldScale = 1.0f;
 	};
 }
 

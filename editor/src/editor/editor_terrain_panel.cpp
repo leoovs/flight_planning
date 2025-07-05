@@ -4,6 +4,7 @@
 #include <imgui/imgui.h>
 
 #include "editor/editor_panel.h"
+#include "event/event_bus.h"
 #include "event/event_publisher.h"
 #include "graphics/graphics_context.h"
 #include "graphics/imgui_graphics_backend.h"
@@ -52,21 +53,24 @@ namespace editor
 		ImGui::NewLine();
 
 		glm::vec2 heightMapResolution = mTerrainEditor->GetHeightMapResolution();
-		glm::vec3 terrainScale = mTerrainEditor->GetTerrainScale();
-		float dragSpeed = 1.0f / std::max(heightMapResolution.x, heightMapResolution.y);
+		float worldScale = mTerrainEditor->GetWorldScale();
+		float heightScale = mTerrainEditor->GetHeightScale();
+		bool scaleUpdated = false;
 
-		ImGui::Text("Terrain Scale");
-		if (ImGui::DragFloat3("##TERRAIN-SCALE", glm::value_ptr(terrainScale), dragSpeed, 0.0f, 0.0f, "%.4f"))
-		{
-			mTerrainEditor->SetTerrainScale(terrainScale);
-			mPublisher.Publish<UpdateTerrainScaleEvent>(EventPublishMode::Queued, terrainScale);
-		}
+		ImGui::Text("World scale");
+		scaleUpdated = ImGui::DragFloat("##WORLD-SCALE", &worldScale, 0.1f, 0.0f, 0.0f, "%.1f")
+			|| scaleUpdated;
 
-		ImGui::SameLine();
-		if (ImGui::Button("Unit"))
+		ImGui::Text("Height scale");
+		scaleUpdated = ImGui::DragFloat("##HEIGHT-SCALE", &heightScale, 0.1f, 0.0f, 0.0f, "%.1f")
+			|| scaleUpdated;
+
+		if (scaleUpdated)
 		{
-			mTerrainEditor->ScaleToFitUnitSquare();
-			mPublisher.Publish<UpdateTerrainScaleEvent>(EventPublishMode::Queued, mTerrainEditor->GetTerrainScale());
+			mPublisher.Publish<UpdateTerrainScaleEvent>(
+				EventPublishMode::Queued,
+				worldScale,
+				heightScale);
 		}
 
 		ImGui::End();

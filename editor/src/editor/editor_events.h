@@ -4,6 +4,7 @@
 
 #include <glm/glm.hpp>
 
+#include "editor/nav_network.h"
 #include "editor/path_planner.h"
 #include "event/event.h"
 #include "uavpf/nav/nav_resolution.h"
@@ -31,10 +32,12 @@ namespace editor
 	class UpdateTerrainScaleEvent final : public Event
 	{
 	public:
-		glm::vec3 TerrainScale;
+		float WorldScale = 1.0f;
+		float HeightScale = 1.0f;
 
-		UpdateTerrainScaleEvent(glm::vec3 terrainScale)
-			: TerrainScale(terrainScale)
+		UpdateTerrainScaleEvent(float world, float height)
+			: WorldScale(world)
+			, HeightScale(height)
 		{}
 	};
 
@@ -68,5 +71,20 @@ namespace editor
 
 	class PathBuiltEvent final : public Event
 	{};
+
+	class AddNotamEvent final : public Event
+	{};
+
+	class UpdateNotamEvent final : public Event
+	{
+	public:
+		Notam UpdatedNotam;
+		size_t UpdatedNotamIndex = 0;
+
+		UpdateNotamEvent(Notam updatedNotam, size_t index)
+			: UpdatedNotam(updatedNotam)
+			, UpdatedNotamIndex(index)
+		{}
+	};
 }
 

@@ -23,8 +23,9 @@ namespace editor
 		EditorScenePanel(
 			GraphicsContext* graphics,
 			ImGuiGraphicsBackend* imguiGraphics,
-			TerrainEditor& terrainEditor,
-			PathPlanner& pathPlanner);
+			const TerrainEditor& terrainEditor,
+			const PathPlanner& pathPlanner,
+			const NavNetwork& navNetwork);
 		~EditorScenePanel() override = default;
 
 		EditorPanelKind GetKind() const override;
@@ -44,6 +45,7 @@ namespace editor
 		void RenderCoordinateAxes();
 		void RenderCheckpoints();
 		void RenderPath();
+		void RenderNotams();
 
 		bool OnHeightMapRequested(const HeightMapRequestedEvent& event);
 		bool OnHeightMapLoaded(const HeightMapLoadedEvent& event);
@@ -56,8 +58,9 @@ namespace editor
 
 		GraphicsContext* mGraphics = nullptr;
 		ImGuiGraphicsBackend* mImGuiGraphics = nullptr;
-		TerrainEditor* mTerrainEditor = nullptr;
-		PathPlanner* mPathPlanner = nullptr;
+		const TerrainEditor* mTerrainEditor = nullptr;
+		const PathPlanner* mPathPlanner = nullptr;
+		const NavNetwork* mNavNetwork = nullptr;
 		TerrainRenderer mTerrainRenderer;
 		OverlayRenderer mOverlayRenderer;
 		Camera mFreeCamera;
@@ -65,6 +68,7 @@ namespace editor
 		ImVec2 mPanelSize{};
 		bool mIsFocused = false;
 		uavpf::TerrainMesh mTerrainMesh;
+		glm::mat4 mModelMatrix = glm::mat4(1.0f);
 		std::unique_ptr<TerrainRenderMesh> mTerrainRenderMesh;
 		std::shared_ptr<Texture2D> mColorBuffer;
 		std::shared_ptr<Texture2D> mDepthBuffer;

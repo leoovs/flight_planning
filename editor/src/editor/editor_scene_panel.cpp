@@ -15,12 +15,14 @@ namespace editor
 	EditorScenePanel::EditorScenePanel(
 		GraphicsContext* graphics,
 		ImGuiGraphicsBackend* imguiGraphics,
-		TerrainEditor& terrainEditor,
-		PathPlanner& pathPlanner)
+		const TerrainEditor& terrainEditor,
+		const PathPlanner& pathPlanner,
+		const NavNetwork& navNetwork)
 		: mGraphics(graphics)
 		, mImGuiGraphics(imguiGraphics)
 		, mTerrainEditor(&terrainEditor)
 		, mPathPlanner(&pathPlanner)
+		, mNavNetwork(&navNetwork)
 		, mTerrainRenderer(graphics)
 		, mOverlayRenderer(graphics)
 	{
@@ -74,6 +76,8 @@ namespace editor
 			cameraMovement = glm::normalize(cameraMovement);
 			mFreeCamera.SetPosition(mFreeCamera.GetPosition() + cameraMovement * dt);
 		}
+
+		mModelMatrix = mTerrainEditor->GetHeightMapToWorldMatrix();
 	}
 
 	void EditorScenePanel::Render()
@@ -190,8 +194,7 @@ namespace editor
 
 	void EditorScenePanel::RenderTerrain()
 	{
-		glm::mat4 modelMatrix = mTerrainEditor->GetTerrainScaleAsMatrix();
-		mTerrainRenderer.Render(mTerrainRenderMesh.get(), modelMatrix);
+		mTerrainRenderer.Render(mTerrainRenderMesh.get(), mModelMatrix);
 	}
 
 	void EditorScenePanel::RenderCoordinateAxes()
@@ -251,6 +254,18 @@ namespace editor
 
 			mOverlayRenderer.RenderLine3D(worldCoord, prevWorldCoord, glm::vec3(1.0f));
 			mOverlayRenderer.RenderCircle3D(worldCoord, radius, glm::vec3(1.0f));
+		}
+	}
+
+	void EditorScenePanel::RenderNotams()
+	{
+		size_t notamCount = mNavNetwork->GetNotamCount();
+		for (size_t iNotam = 0; iNotam < notamCount; iNotam++)
+		{
+			Notam notam = mNavNetwork->GetNotam(iNotam);
+
+			glm::vec3 worldCoord = mTerrainEditor->HeightMapToWorldCoord(
+				mPathPlanner->NavCoordToHeightMapCoord(notam.NavCoord));
 		}
 	}
 
