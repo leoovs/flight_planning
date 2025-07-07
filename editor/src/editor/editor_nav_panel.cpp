@@ -49,6 +49,7 @@ namespace editor
 		}
 
 		ImGui::NewLine();
+		ImGui::Separator();
 
 		ImGui::Text("Nav coordinates");
 		for (ptrdiff_t iCheckpoint = 0; iCheckpoint < +CheckpointKind::Count_; iCheckpoint++)
@@ -105,6 +106,33 @@ namespace editor
 		}
 
 		ImGui::NewLine();
+		ImGui::Separator();
+
+		ImGui::Text("Weights");
+		ImGui::BeginTable("PATH-PLANNER-WEIGHTS", 2);
+		for (size_t iWeight = 0; iWeight < +PathPlannerWeight::Count_; iWeight++)
+		{
+			ImGui::PushID(iWeight);
+
+			ImGui::TableNextRow();
+
+			auto name = PathPlannerWeight(iWeight);
+			float weight = mPathPlanner->GetWeight(name);
+
+			ImGui::TableSetColumnIndex(0);
+			ImGui::Text("%s", ToString(name).data());
+			ImGui::TableSetColumnIndex(1);
+			if (ImGui::DragFloat("##DRAG-PATH-PLANNER-WEIGHT", &weight, 0.1f, 0.0f, 0.0f, "%.1f"))
+			{
+				mPublisher.Publish<UpdatePathPlannerWeightEvent>(EventPublishMode::Queued, name, weight);
+			}
+			
+			ImGui::PopID();
+		}
+		ImGui::EndTable();
+
+		ImGui::NewLine();
+		ImGui::Separator();
 
 		ImGui::Text("Notams");
 		ImGui::SameLine();
@@ -141,6 +169,11 @@ namespace editor
 				if (updated)
 				{
 					mPublisher.Publish<UpdateNotamEvent>(EventPublishMode::Queued, notam, iNotam);
+				}
+
+				if (ImGui::Button("Remove"))
+				{
+					mPublisher.Publish<RemoveNotamEvent>(EventPublishMode::Queued, iNotam);
 				}
 
 				ImGui::TreePop();

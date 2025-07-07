@@ -19,12 +19,10 @@ namespace editor
 		, mNotamNavEllipse(ellipse)
 	{}
 
-	float NotamCost::Evaluate(
-		const uavpf::experimental::NavCell& src,
-		const uavpf::experimental::NavCell& dst) const
+	float NotamCost::Evaluate(const uavpf::experimental::StepContext& ctx) const
 	{
-		float x = dst.NavCoords.x;
-		float y = dst.NavCoords.y;
+		float x = ctx.Destination.NavCoords.x;
+		float y = ctx.Destination.NavCoords.y;
 
 		float h = mNotamNavCoord.x;
 		float k = mNotamNavCoord.y;
@@ -111,6 +109,16 @@ namespace editor
 		SetRelativeCoord(CheckpointKind::End, relCoords.at(1));
 	}
 
+	float PathPlanner::GetWeight(PathPlannerWeight name) const
+	{
+		return mWeights.at(+name);
+	}
+
+	void PathPlanner::SetWeight(PathPlannerWeight name, float weight)
+	{
+		mWeights.at(+name) = weight;
+	}
+
 	glm::ivec2 PathPlanner::NavCoordToHeightMapCoord(glm::ivec2 navCoord) const
 	{
 		uavpf::experimental::NavSpace navSpace(mNavNetwork->GetResolution());
@@ -131,8 +139,15 @@ namespace editor
 	void PathPlanner::BuildPath()
 	{
 		uavpf::experimental::ComplexCost costs;
-		costs.Add(std::make_unique<uavpf::experimental::ClimbCost>(), 100.0f);
-		costs.Add(std::make_unique<uavpf::experimental::DistanceCost>(), 1.0f);
+
+		float distanceWeight = mWeights.at(+PathPlannerWeight::Distance);
+		float climbWeight = mWeights.at(+PathPlannerWeight::Climb);
+		float turningWeight = mWeights.at(+PathPlannerWeight::Turning);
+
+		costs.Add(std::make_unique<uavpf::experimental::DistanceCost>(), distanceWeight);
+		costs.Add(std::make_unique<uavpf::experimental::ClimbCost>(), climbWeight);
+		costs.Add(std::make_unique<uavpf::experimental::TurningCost>(), turningWeight);
+
 		PopulateNotamCosts(costs);
 
 		uavpf::experimental::NavGrid grid = mNavNetwork->GetGrid();
@@ -148,7 +163,7 @@ namespace editor
 			if (finder.IsEnd())
 			{
 				mNavPath = finder.ReconstructPath();
-				break;
+				return;
 			}
 
 			for (uavpf::experimental::ExplorationDirection dir
@@ -157,6 +172,8 @@ namespace editor
 				finder.ExploreNeighbour(dir);
 			}
 		}
+
+		mNavPath.clear();
 	}
 
 	void PathPlanner::EndBuildPath()

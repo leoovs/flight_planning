@@ -49,7 +49,7 @@ namespace uavpf::experimental
 	void PathFinder::ExploreNeighbour(ExplorationDirection direction)
 	{
 		glm::ivec2 neighbourCoords = mCurrent->Cell->NavCoords
-			+ ConvertDirectionToCoordOffset(direction);
+			+ ExplorationDirectionToCoordOffset(direction);
 		if (!mGrid->IsInBounds(neighbourCoords))
 		{
 			return;
@@ -57,16 +57,20 @@ namespace uavpf::experimental
 
 		PathNode& neighbour = GetAssociatedNode(mGrid->GetCell(neighbourCoords));
 
-		float tentativeScore = mCurrent->TotalCost + mCost->Evaluate(
-			*mCurrent->Cell,
-			*neighbour.Cell);
+		StepContext step;
+		step.Source = *mCurrent->Cell;
+		step.Destination = *neighbour.Cell;
+		step.ParentDirection = mCurrent->CameFromDirection;
+		step.CurrentDirection = direction;
+
+		float tentativeScore = mCurrent->TotalCost + mCost->Evaluate(step);
 
 		if (tentativeScore < neighbour.TotalCost)
 		{
 			neighbour.Parent = mCurrent;
 			neighbour.TotalCost = tentativeScore;
 			neighbour.HeuristicCost = CalculateHeuristic(*neighbour.Cell);
-			neighbour.NextDirection = direction;
+			neighbour.CameFromDirection = direction;
 
 			auto it = std::find(mToExplore.begin(), mToExplore.end(), &neighbour);	
 			if (mToExplore.end() == it)
@@ -103,7 +107,7 @@ namespace uavpf::experimental
 		}
 
 		float currentHeight = current->Cell->RelativeHeight;
-		ExplorationDirection currentDir = current->NextDirection;
+		ExplorationDirection currentDir = current->CameFromDirection;
 		int32_t heightTrend = -1;
 
 		while (nullptr != current)
@@ -116,7 +120,7 @@ namespace uavpf::experimental
 			}
 
 			float nextHeight = parent->Cell->RelativeHeight;
-			ExplorationDirection nextDir = parent->NextDirection;
+			ExplorationDirection nextDir = parent->CameFromDirection;
 			int32_t nextHeightTrend = 0;
 			
 			float heightSensitivity = glm::epsilon<float>();
@@ -157,34 +161,6 @@ namespace uavpf::experimental
 		return mEnd == node; 
 	}
 
-	glm::ivec2 PathFinder::ConvertDirectionToCoordOffset(ExplorationDirection direction) const
-	{
-		switch (direction)
-		{
-			case ExplorationDirection::None:
-				return { 0, 0 };
-			case ExplorationDirection::North:
-				return {  0,  1 };
-			case ExplorationDirection::South:
-				return {  0, -1 };
-			case ExplorationDirection::East:
-				return {  1,  0 };
-			case ExplorationDirection::West:
-				return { -1,  0 };
-			case ExplorationDirection::NorthWest:
-				return { -1,  1 };
-			case ExplorationDirection::NorthEast:
-				return {  1,  1 };
-			case ExplorationDirection::SouthEast:
-				return {  1, -1 };
-			case ExplorationDirection::SouthWest:
-				return { -1, -1 };
-			default:
-				assert(false);
-				return {};
-		}
-	}
-
 	PathNode& PathFinder::GetAssociatedNode(NavCell cell)
 	{
 		if (mNodePool.count(cell.Index))
@@ -211,6 +187,7 @@ namespace uavpf::experimental
 
 	float PathFinder::CalculateHeuristic(const NavCell& cell) const
 	{
-		return DistanceCost().Evaluate(cell, *mEnd->Cell);
+		NavCell endCell = *mEnd->Cell;
+		return glm::length(glm::vec2(cell.NavCoords - endCell.NavCoords));
 	}
 }

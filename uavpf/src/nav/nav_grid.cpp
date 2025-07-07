@@ -96,11 +96,13 @@ namespace uavpf::experimental
 
 	void NavGridBuilder::PopulateNavCoords()
 	{
+		assert(mCells.size() == mResolution.Width * mResolution.Depth);
+
 		ptrdiff_t iCell = 0;
 		for (NavCell& cell : mCells)
 		{
-			int32_t navX = iCell % mResolution.Width;
-			int32_t navZ = iCell / mResolution.Depth;
+			int32_t navX = static_cast<int32_t>(iCell) % mResolution.Width;
+			int32_t navZ = static_cast<int32_t>(iCell) / mResolution.Depth;
 
 			cell.Index = iCell++;
 			cell.NavCoords = { navX, navZ };

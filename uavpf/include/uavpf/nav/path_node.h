@@ -11,7 +11,7 @@ namespace uavpf::experimental
 		PathNode* Parent = nullptr;
 		float HeuristicCost = 0.0f;
 		float TotalCost = StepCost::cInfinite;
-		ExplorationDirection NextDirection = ExplorationDirection::None;
+		ExplorationDirection CameFromDirection = ExplorationDirection::None;
 
 		float CalculateScore() const
 		{

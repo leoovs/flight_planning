@@ -39,10 +39,12 @@ namespace editor
 		bool OnCloseHeightMapRequested(const CloseHeightMapRequestEvent& event);
 		bool OnUpdateNavGridResolutionEvent(const UpdateNavGridResolutionEvent& event);
 		bool OnUpdateCheckpointNavCoord(const UpdateCheckpointNavCoordEvent& event);
+		bool OnUpdatePathPlannerWeight(const UpdatePathPlannerWeightEvent& event);
 		bool OnBuildPath(const BuildPathEvent& event);
 		bool OnCancelBuildPath(const CancelBuildPathEvent& event);
 		bool OnAddNotam(const AddNotamEvent& event);
 		bool OnUpdateNotam(const UpdateNotamEvent& event);
+		bool OnRemoveNotam(const RemoveNotamEvent& event);
 
 		template<typename PanelT, typename... ArgsT>
 		void RegisterPanel(ArgsT&&... args)

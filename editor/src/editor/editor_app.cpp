@@ -44,6 +44,9 @@ namespace editor
 			}
 		}
 
+		// TODO: all this methods are supposed to be controllers in the
+		// MVC paradigm...
+
 		mSubscriber
 			.BeginClass(*this)
 				.SubscribeMethod(&EditorApp::OnWindowClosed)
@@ -52,10 +55,12 @@ namespace editor
 				.SubscribeMethod(&EditorApp::OnCloseHeightMapRequested)
 				.SubscribeMethod(&EditorApp::OnUpdateNavGridResolutionEvent)
 				.SubscribeMethod(&EditorApp::OnUpdateCheckpointNavCoord)
+				.SubscribeMethod(&EditorApp::OnUpdatePathPlannerWeight)
 				.SubscribeMethod(&EditorApp::OnBuildPath)
 				.SubscribeMethod(&EditorApp::OnCancelBuildPath)
 				.SubscribeMethod(&EditorApp::OnAddNotam)
 				.SubscribeMethod(&EditorApp::OnUpdateNotam)
+				.SubscribeMethod(&EditorApp::OnRemoveNotam)
 			.EndClass();
 	}
 
@@ -199,6 +204,14 @@ namespace editor
 		return true;
 	}
 
+	bool EditorApp::OnUpdatePathPlannerWeight(const UpdatePathPlannerWeightEvent& event)
+	{
+		mPathPlanner.SetWeight(
+			event.Name,
+			std::max(0.0f, event.Weight));
+		return true;
+	}
+
 	bool EditorApp::OnBuildPath(const BuildPathEvent& event)
 	{
 		auto beginPathBuilding = [this]() { mPathPlanner.BeginBuildPath(); };
@@ -244,6 +257,12 @@ namespace editor
 	bool EditorApp::OnUpdateNotam(const UpdateNotamEvent& event)
 	{
 		mNavNetwork.SetNotam(event.UpdatedNotamIndex, event.UpdatedNotam);
+		return true;
+	}
+
+	bool EditorApp::OnRemoveNotam(const RemoveNotamEvent& event)
+	{
+		mNavNetwork.RemoveNotam(event.NotamIndex);
 		return true;
 	}
 

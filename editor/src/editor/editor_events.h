@@ -63,6 +63,18 @@ namespace editor
 		{}
 	};
 
+	class UpdatePathPlannerWeightEvent final : public Event
+	{
+	public:
+		PathPlannerWeight Name = PathPlannerWeight::Distance;
+		float Weight = 0.0f;
+
+		UpdatePathPlannerWeightEvent(PathPlannerWeight name, float weight)
+			: Name(name)
+			, Weight(weight)
+		{}
+	};
+
 	class BuildPathEvent final : public Event
 	{};
 
@@ -74,6 +86,16 @@ namespace editor
 
 	class AddNotamEvent final : public Event
 	{};
+
+	class RemoveNotamEvent final : public Event
+	{
+	public:
+		int32_t NotamIndex = 0;
+
+		RemoveNotamEvent(int32_t notamIndex)
+			: NotamIndex(notamIndex)
+		{}
+	};
 
 	class UpdateNotamEvent final : public Event
 	{

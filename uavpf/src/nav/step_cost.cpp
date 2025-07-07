@@ -6,22 +6,61 @@
 
 namespace uavpf::experimental
 {
-	float DistanceCost::Evaluate(const NavCell& src, const NavCell& dst) const
+	//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	// 
+	// DistanceCost 
+	// 
+	//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+	float DistanceCost::Evaluate(const StepContext& ctx) const
 	{
-		return glm::length(glm::vec2(src.NavCoords - dst.NavCoords));
+		return glm::length(glm::vec2(ctx.Source.NavCoords - ctx.Destination.NavCoords));
 	}
 
-	float ClimbCost::Evaluate(const NavCell& src, const NavCell& dst) const
+	//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	// 
+	// ClimbCost 
+	// 
+	//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+	float ClimbCost::Evaluate(const StepContext& ctx) const
 	{
-		return glm::max(dst.RelativeHeight - src.RelativeHeight, 0.0f);
+		return glm::max(ctx.Destination.RelativeHeight - ctx.Source.RelativeHeight, 0.0f);
 	}
 
-	float ComplexCost::Evaluate(const NavCell& src, const NavCell& dst) const
+	//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	// 
+	// TurningCost
+	// 
+	//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+	float TurningCost::Evaluate(const StepContext& ctx) const
+	{
+		if (ctx.ParentDirection == ExplorationDirection::None)
+		{
+			return 0.0f;
+		}
+
+		auto parentNormalizedDir = glm::normalize(glm::vec2(
+			ExplorationDirectionToCoordOffset(ctx.ParentDirection)));
+		auto currentNormalizedDir = glm::normalize(glm::vec2(
+			ExplorationDirectionToCoordOffset(ctx.CurrentDirection)));
+
+		return 1.0f - glm::dot(parentNormalizedDir, currentNormalizedDir);
+	}
+
+	//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+	// 
+	// ComplexCost 
+	// 
+	//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+
+	float ComplexCost::Evaluate(const StepContext& ctx) const
 	{
 		float totalCost = 0.0f;
 		for (const auto& [cost, weight] : mCosts)
 		{
-			totalCost += weight * cost->Evaluate(src, dst);
+			totalCost += weight * cost->Evaluate(ctx);
 		}
 		return totalCost;
 	}

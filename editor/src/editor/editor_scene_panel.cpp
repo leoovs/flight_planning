@@ -99,6 +99,7 @@ namespace editor
 		RenderCoordinateAxes();
 		RenderCheckpoints();
 		RenderPath();
+		RenderNotams();
 
 		mGraphics->SetFramebuffer(nullptr);
 	}
@@ -259,13 +260,45 @@ namespace editor
 
 	void EditorScenePanel::RenderNotams()
 	{
+		mOverlayRenderer.IgnoreDepth(false);
+
 		size_t notamCount = mNavNetwork->GetNotamCount();
 		for (size_t iNotam = 0; iNotam < notamCount; iNotam++)
 		{
 			Notam notam = mNavNetwork->GetNotam(iNotam);
 
-			glm::vec3 worldCoord = mTerrainEditor->HeightMapToWorldCoord(
+			int32_t heightMapRadius = notam.RelativeRadius * mTerrainEditor->GetHeightMapResolution().x;
+			float worldSpaceRadius = mTerrainEditor->HeightMapToWorldCoord({ heightMapRadius, 0 }).x;
+
+			glm::vec3 worldSpaceCoord = mTerrainEditor->HeightMapToWorldCoord(
 				mPathPlanner->NavCoordToHeightMapCoord(notam.NavCoord));
+			worldSpaceCoord.y += mPathPlanner->GetWorldSpaceElevation();
+
+			float circleWidth = 0.0f == notam.RelativeRadius
+				? 0.01f
+				: 0.005f;
+			mOverlayRenderer.RenderCircle3D(worldSpaceCoord, circleWidth, glm::vec3(1.0f, 1.0f, 0.3f));
+
+			int32_t segmentCount = 30;
+			float deltaAngle = glm::two_pi<float>() / segmentCount;
+
+			for (int32_t iSegment = 0; iSegment < segmentCount; iSegment++)
+			{
+				int32_t nextSegment = (iSegment + 1) % segmentCount;
+
+				glm::vec3 offset{};
+				offset.x = worldSpaceRadius * glm::cos(iSegment * deltaAngle);
+				offset.z = worldSpaceRadius * glm::sin(iSegment * deltaAngle);
+
+				glm::vec3 nextOffset{};
+				nextOffset.x = worldSpaceRadius * glm::cos(nextSegment * deltaAngle);
+				nextOffset.z = worldSpaceRadius * glm::sin(nextSegment * deltaAngle);
+
+				mOverlayRenderer.RenderLine3D(
+					worldSpaceCoord + offset,
+					worldSpaceCoord + nextOffset,
+					glm::vec3(1.0f, 1.0f, 0.3f));
+			}
 		}
 	}
 

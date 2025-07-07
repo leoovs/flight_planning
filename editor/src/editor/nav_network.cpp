@@ -50,5 +50,10 @@ namespace editor
 	{
 		mNotams.at(index) = notam;
 	}
+
+	void NavNetwork::RemoveNotam(size_t index)
+	{
+		mNotams.erase(mNotams.begin() + index);
+	}
 }
 

@@ -31,14 +31,40 @@ namespace editor
 	public:
 		NotamCost(glm::vec2 navCoord, glm::vec2 ellipse);
 
-		float Evaluate(
-			const uavpf::experimental::NavCell& src,
-			const uavpf::experimental::NavCell& dst) const override;
+		float Evaluate(const uavpf::experimental::StepContext& ctx) const override;
 
 	private:
 		glm::vec2 mNotamNavCoord;
 		glm::vec2 mNotamNavEllipse;
 	};
+
+	enum class PathPlannerWeight
+	{
+		Distance,
+		Climb,
+		Turning,
+		Count_,
+	};
+
+	constexpr size_t operator+(PathPlannerWeight weight)
+	{
+		return static_cast<size_t>(weight);
+	}
+
+	constexpr std::string_view ToString(PathPlannerWeight weight)
+	{
+		switch (weight)
+		{
+			case PathPlannerWeight::Distance:
+				return "Distance";
+			case PathPlannerWeight::Climb:
+				return "Climb";
+			case PathPlannerWeight::Turning:
+				return "Turning";
+			default:
+				return "???";
+		}
+	}
 
 	class PathPlanner
 	{
@@ -60,6 +86,9 @@ namespace editor
 		void SetCheckpointNavCoords(const CheckpointNavCoords& navCoords);
 		void SetCheckpointRelativeCoords(const CheckpointRelativeCoords& relativeCoords);
 
+		float GetWeight(PathPlannerWeight name) const;
+		void SetWeight(PathPlannerWeight name, float weight);
+
 		glm::ivec2 NavCoordToHeightMapCoord(glm::ivec2 navCoord) const;
 
 		void BeginBuildPath();
@@ -79,6 +108,7 @@ namespace editor
 		const NavNetwork* mNavNetwork = nullptr;
 		CheckpointNavCoords mCheckpointNavCoords{};
 		std::vector<uavpf::experimental::NavCell> mNavPath;
+		std::array<float, +PathPlannerWeight::Count_> mWeights{};
 		std::atomic_bool mBuildingPath;
 		float mWorldSpaceElevation = 0.02f;
 	};

@@ -5,7 +5,7 @@
 
 #include "uavpf/nav/exploration_direction.h"
 #include "uavpf/nav/nav_grid.h"
-#include "uavpf/nav/path_node.h"
+#include "uavpf/nav/path_graph.h"
 #include "uavpf/nav/step_cost.h"
 
 namespace uavpf::experimental
@@ -31,7 +31,6 @@ namespace uavpf::experimental
 	private:
 		bool IsEnd(PathNode* node) const;
 
-		glm::ivec2 ConvertDirectionToCoordOffset(ExplorationDirection direction) const;
 		PathNode& GetAssociatedNode(NavCell cell);
 		std::deque<PathNode*>::const_iterator FindNodeWithLeastCost() const;
 		float CalculateHeuristic(const NavCell& cell) const;

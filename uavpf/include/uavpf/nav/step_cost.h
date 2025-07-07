@@ -4,6 +4,8 @@
 #include <vector>
 #include <limits>
 
+#include "uavpf/nav/step_context.h"
+
 namespace uavpf::experimental
 {
 	struct NavCell;
@@ -15,7 +17,7 @@ namespace uavpf::experimental
 
 		virtual ~StepCost() = default;
 
-		virtual float Evaluate(const NavCell& src, const NavCell& dst) const = 0;
+		virtual float Evaluate(const StepContext& ctx) const = 0;
 	};
 
 	class DistanceCost final : public StepCost
@@ -23,7 +25,7 @@ namespace uavpf::experimental
 	public:
 		~DistanceCost() override = default;
 
-		float Evaluate(const NavCell& src, const NavCell& dst) const override;
+		float Evaluate(const StepContext& ctx) const override;
 	};
 
 	class ClimbCost final : public StepCost
@@ -31,7 +33,15 @@ namespace uavpf::experimental
 	public:
 		~ClimbCost() override = default;
 
-		float Evaluate(const NavCell& src, const NavCell& dst) const override;
+		float Evaluate(const StepContext& ctx) const override;
+	};
+
+	class TurningCost final : public StepCost
+	{
+	public:
+		~TurningCost() override = default;
+
+		float Evaluate(const StepContext& ctx) const override;
 	};
 
 	class ComplexCost final : public StepCost
@@ -41,7 +51,7 @@ namespace uavpf::experimental
 
 		~ComplexCost() override = default;
 
-		float Evaluate(const NavCell& src, const NavCell& dst) const override;
+		float Evaluate(const StepContext& ctx) const override;
 
 		void Add(std::unique_ptr<StepCost> cost, float weight = 1.0f);
 
