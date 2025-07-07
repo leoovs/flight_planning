@@ -45,6 +45,7 @@ namespace editor
 		bool OnAddNotam(const AddNotamEvent& event);
 		bool OnUpdateNotam(const UpdateNotamEvent& event);
 		bool OnRemoveNotam(const RemoveNotamEvent& event);
+		bool OnClearNotams(const ClearNotamsEvent& event);
 
 		template<typename PanelT, typename... ArgsT>
 		void RegisterPanel(ArgsT&&... args)

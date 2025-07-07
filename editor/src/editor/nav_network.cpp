@@ -55,5 +55,10 @@ namespace editor
 	{
 		mNotams.erase(mNotams.begin() + index);
 	}
+	
+	void NavNetwork::ClearNotams()
+	{
+		mNotams.clear();
+	}
 }
 

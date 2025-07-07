@@ -27,7 +27,7 @@ namespace editor
 			{
 				if (ImGui::BeginMenu("Import"))
 				{
-					if (ImGui::MenuItem("TIFF Height Map"))
+					if (ImGui::MenuItem("Height map (*.tif, *.tiff)"))
 					{
 						const char* tiffFilters[]{ "*.tif", "*.tiff" };
 						const char* filePath = tinyfd_openFileDialog(

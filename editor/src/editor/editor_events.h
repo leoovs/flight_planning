@@ -87,16 +87,6 @@ namespace editor
 	class AddNotamEvent final : public Event
 	{};
 
-	class RemoveNotamEvent final : public Event
-	{
-	public:
-		int32_t NotamIndex = 0;
-
-		RemoveNotamEvent(int32_t notamIndex)
-			: NotamIndex(notamIndex)
-		{}
-	};
-
 	class UpdateNotamEvent final : public Event
 	{
 	public:
@@ -108,5 +98,18 @@ namespace editor
 			, UpdatedNotamIndex(index)
 		{}
 	};
+
+	class RemoveNotamEvent final : public Event
+	{
+	public:
+		int32_t NotamIndex = 0;
+
+		RemoveNotamEvent(int32_t notamIndex)
+			: NotamIndex(notamIndex)
+		{}
+	};
+
+	class ClearNotamsEvent final : public Event
+	{};
 }
 

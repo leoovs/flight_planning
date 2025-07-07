@@ -33,6 +33,7 @@ namespace editor
 		Notam GetNotam(size_t index) const;
 		void SetNotam(size_t index, Notam notam);
 		void RemoveNotam(size_t index);
+		void ClearNotams();
 
 	private:
 		const TerrainEditor* mTerrainEditor = nullptr;

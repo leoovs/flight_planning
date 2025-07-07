@@ -9,15 +9,6 @@ target_sources(
 	PRIVATE
 	"src/main.cpp"
 
-	# "src/app/app_context.cpp"
-	# "src/app/app_service.cpp"
-	# "src/app/asset_storage.cpp"
-	# "src/app/editor_app.cpp"
-	# "src/app/editor_state.cpp"
-	# "src/app/path_mission.cpp"
-	# "src/app/tasks.cpp"
-	# "src/app/terrain_scaler.cpp"
-
 	"src/asset/asset_storage.cpp"
 	"src/asset/height_map_asset.cpp"
 
@@ -98,5 +89,15 @@ set_target_properties(
 	PROPERTIES
 	CXX_STANDARD 17
 	CXX_STANDARD_REQUIRED TRUE
+)
+
+add_custom_command(
+	TARGET editor
+	POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E make_directory "$<TARGET_FILE_DIR:editor>/assets"
+	COMMAND ${CMAKE_COMMAND} -E copy_directory 
+	"${CMAKE_CURRENT_SOURCE_DIR}/assets" 
+	"$<TARGET_FILE_DIR:editor>/assets"
+	COMMENT "Copying entire assets directory"
 )
 

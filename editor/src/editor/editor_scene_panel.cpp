@@ -71,7 +71,7 @@ namespace editor
 			cameraMovement += mFreeCamera.GetRightVector();
 		}
 
-		if (glm::length(cameraMovement))
+		if (glm::length(cameraMovement) && mIsFocused)
 		{
 			cameraMovement = glm::normalize(cameraMovement);
 			mFreeCamera.SetPosition(mFreeCamera.GetPosition() + cameraMovement * dt);
@@ -204,10 +204,14 @@ namespace editor
 		glm::vec3 right(1.0f, 0.0f, 0.0f);
 		glm::vec3 up(0.0f, 1.0f, 0.0f);
 
+		glm::vec3 milkyRed(1.0f, 0.7f, 0.73f);
+		glm::vec3 milkyGreen(0.7f, 1.0f, 0.76f);
+		glm::vec3 milkyBlue(0.7f, 0.85f, 1.0f);
+
 		mOverlayRenderer.IgnoreDepth(true);
-		mOverlayRenderer.RenderLine3D(glm::vec3(0.0f), front, front);
-		mOverlayRenderer.RenderLine3D(glm::vec3(0.0f), right, right);
-		mOverlayRenderer.RenderLine3D(glm::vec3(0.0f), up, up);
+		mOverlayRenderer.RenderLine3D(glm::vec3(0.0f), front, milkyRed);
+		mOverlayRenderer.RenderLine3D(glm::vec3(0.0f), right, milkyGreen);
+		mOverlayRenderer.RenderLine3D(glm::vec3(0.0f), up, milkyBlue);
 	}
 
 	void EditorScenePanel::RenderCheckpoints()
@@ -272,7 +276,7 @@ namespace editor
 
 			glm::vec3 worldSpaceCoord = mTerrainEditor->HeightMapToWorldCoord(
 				mPathPlanner->NavCoordToHeightMapCoord(notam.NavCoord));
-			worldSpaceCoord.y += mPathPlanner->GetWorldSpaceElevation();
+			worldSpaceCoord.y += 0.01f + mPathPlanner->GetWorldSpaceElevation();
 
 			float circleWidth = 0.0f == notam.RelativeRadius
 				? 0.01f

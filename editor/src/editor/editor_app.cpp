@@ -15,6 +15,8 @@ namespace editor
 {
 	void EditorApp::Setup()
 	{
+		ImGui::GetIO().Fonts->AddFontFromFileTTF("assets/OpenSans-Regular.ttf", 19.0f);
+
 		mTasks = RtModuleLocator::Locate<TaskScheduler>();
 		auto* graphics = RtModuleLocator::Locate<GraphicsContext>();
 		auto* imguiGraphics = RtModuleLocator::Locate<ImGuiGraphicsBackend>();
@@ -61,6 +63,7 @@ namespace editor
 				.SubscribeMethod(&EditorApp::OnAddNotam)
 				.SubscribeMethod(&EditorApp::OnUpdateNotam)
 				.SubscribeMethod(&EditorApp::OnRemoveNotam)
+				.SubscribeMethod(&EditorApp::OnClearNotams)
 			.EndClass();
 	}
 
@@ -263,6 +266,12 @@ namespace editor
 	bool EditorApp::OnRemoveNotam(const RemoveNotamEvent& event)
 	{
 		mNavNetwork.RemoveNotam(event.NotamIndex);
+		return true;
+	}
+
+	bool EditorApp::OnClearNotams(const ClearNotamsEvent& event)
+	{
+		mNavNetwork.ClearNotams();
 		return true;
 	}
 

@@ -41,17 +41,20 @@ namespace editor
 		uavpf::experimental::NavResolution res = mNavNetwork->GetResolution();
 
 		ImGui::Text("Nav Grid resolution");
+		ImGui::Indent(10.0f);
 		if (ImGui::DragInt2("##NAV-RES", &res.Width, 1.0f, 1, 1000, "%d", ImGuiSliderFlags_AlwaysClamp))
 		{
 			mPublisher.Publish<UpdateNavGridResolutionEvent>(
 				EventPublishMode::Immediate,
 				res);
 		}
+		ImGui::Indent(-10.0f);
 
 		ImGui::NewLine();
 		ImGui::Separator();
 
 		ImGui::Text("Nav coordinates");
+		ImGui::Indent(10.0f);
 		for (ptrdiff_t iCheckpoint = 0; iCheckpoint < +CheckpointKind::Count_; iCheckpoint++)
 		{
 			auto kind = CheckpointKind(iCheckpoint);
@@ -87,6 +90,7 @@ namespace editor
 
 			ImGui::PopID();
 		}
+		ImGui::Indent(-10.0f);
 
 		if (ImGui::Button("Build"))
 		{
@@ -109,6 +113,7 @@ namespace editor
 		ImGui::Separator();
 
 		ImGui::Text("Weights");
+		ImGui::Indent(10.0f);
 		ImGui::BeginTable("PATH-PLANNER-WEIGHTS", 2);
 		for (size_t iWeight = 0; iWeight < +PathPlannerWeight::Count_; iWeight++)
 		{
@@ -129,6 +134,7 @@ namespace editor
 			
 			ImGui::PopID();
 		}
+		ImGui::Indent(-10.0f);
 		ImGui::EndTable();
 
 		ImGui::NewLine();
@@ -136,11 +142,18 @@ namespace editor
 
 		ImGui::Text("Notams");
 		ImGui::SameLine();
-		if (ImGui::Button("+"))
+		float buttonWidth = ImGui::GetFrameHeight();
+		if (ImGui::Button("+", ImVec2(buttonWidth, buttonWidth)))
 		{
 			mPublisher.Publish<AddNotamEvent>(EventPublishMode::Queued);
 		}
+		ImGui::SameLine();
+		if (ImGui::Button("Clear all"))
+		{
+			mPublisher.Publish<ClearNotamsEvent>(EventPublishMode::Queued);
+		}
 
+		ImGui::BeginChild("###NOTAM-LIST", ImVec2(0, 200), ImGuiChildFlags_Border);
 		size_t notamCount = mNavNetwork->GetNotamCount();
 		for (size_t iNotam = 0; iNotam < notamCount; iNotam++)
 		{
@@ -163,7 +176,7 @@ namespace editor
 
 					ImGui::EndTable();
 				}
-				updated = ImGui::DragFloat("Radius", &notam.RelativeRadius, 0.1f, 0.0f, 1.0f)
+				updated = ImGui::DragFloat("Radius", &notam.RelativeRadius, 0.001f, 0.0f, 1.0f)
 					|| updated;
 
 				if (updated)
@@ -180,6 +193,8 @@ namespace editor
 			}
 			ImGui::PopID();
 		}
+
+		ImGui::EndChild();
 
 		ImGui::End();
 	}

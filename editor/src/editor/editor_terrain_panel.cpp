@@ -48,7 +48,10 @@ namespace editor
 		mPanelSize = ImGui::GetWindowSize();
 
 		ImTextureID heightMapID = (ImTextureID)imguiGraphics->GetTextureID(mHeightMapTexture.get());
+		ImGui::Text("Height map");
+		ImGui::Indent(10.0f);
 		ImGui::Image(heightMapID, FitHeightMapTextureSize(), { 0, 1 }, { 1, 0 });
+		ImGui::Indent(-10.0f);
 
 		ImGui::NewLine();
 
@@ -58,12 +61,16 @@ namespace editor
 		bool scaleUpdated = false;
 
 		ImGui::Text("World scale");
+		ImGui::Indent(10.0f);
 		scaleUpdated = ImGui::DragFloat("##WORLD-SCALE", &worldScale, 0.1f, 0.0f, 0.0f, "%.1f")
 			|| scaleUpdated;
+		ImGui::Indent(-10.0f);
 
 		ImGui::Text("Height scale");
+		ImGui::Indent(10.0f);
 		scaleUpdated = ImGui::DragFloat("##HEIGHT-SCALE", &heightScale, 0.1f, 0.0f, 0.0f, "%.1f")
 			|| scaleUpdated;
+		ImGui::Indent(-10.0f);
 
 		if (scaleUpdated)
 		{
