@@ -35,7 +35,7 @@ namespace editor
 	std::shared_ptr<Asset> HeightMapImporter::Import(std::filesystem::path assetPath)
 	{
 		uavpf::TiffLoader tiffLoader;
-		uavpf::TiffImage heightMapImage = tiffLoader.LoadImageFromFile(assetPath.string());
+		uavpf::TiffImage heightMapImage = tiffLoader.LoadImageFromFile(assetPath);
 
 		mLoadSuccessful = tiffLoader.GetLoadStatus() == uavpf::TiffLoadStatus::Success;
 		if (!mLoadSuccessful)

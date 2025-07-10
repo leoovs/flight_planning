@@ -2,25 +2,29 @@
 
 #include <filesystem>
 
-#include <unipp/convert.hpp>
-
 #include "image/tiff_image_handle.h"
 
 namespace uavpf
 {
-	TiffImage TiffLoader::LoadImageFromFile(std::string_view fileName)
+	TiffImage TiffLoader::LoadImageFromFile(std::filesystem::path imagePath)
 	{
-		if (!std::filesystem::exists(fileName))
+		if (!std::filesystem::exists(imagePath))
 		{
 			mLastLoadStatus = TiffLoadStatus::FileNotFound;
 			return TiffImage();
 		}
 
-		std::u16string uniFileName;
-		unipp::convert(fileName.begin(), fileName.end(), std::back_inserter(uniFileName));
-		std::wstring wideFileName(uniFileName.begin(), uniFileName.end());
+		// Ugly workaround for different fs::path implementations
+		TIFF* nativeTiff = nullptr;
+		if constexpr (std::is_same_v<std::filesystem::path::value_type, wchar_t>)
+		{
+			nativeTiff = TIFFOpenW(imagePath.c_str(), "r");
+		}
+		else
+		{
+			nativeTiff = TIFFOpen(imagePath.u8string().c_str(), "r");
+		}
 
-		TIFF* nativeTiff = TIFFOpenW(wideFileName.data(), "r");
 		if (nullptr == nativeTiff)
 		{
 			mLastLoadStatus = TiffLoadStatus::LoaderFailure;

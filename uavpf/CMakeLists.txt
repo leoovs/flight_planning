@@ -9,7 +9,6 @@ cpmaddpackage(
 	OPTIONS "CMAKE_POLICY_VERSION_MINIMUM 3.5"
 )
 cpmaddpackage("gh:g-truc/glm#1.0.1")
-cpmaddpackage("gh:leoovs/unipp#dev-eachindex")
 
 add_library(uavpf STATIC)
 
@@ -69,7 +68,6 @@ target_link_libraries(
 	glm::glm
 	PRIVATE
 	TIFF::tiff
-	unipp::unipp
 )
 
 target_compile_definitions(

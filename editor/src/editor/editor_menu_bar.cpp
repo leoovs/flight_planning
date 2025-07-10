@@ -1,5 +1,7 @@
 #include "editor/editor_menu_bar.h"
 
+#include <filesystem>
+
 #include <imgui/imgui.h>
 #include <tinyfiledialogs.h>
 
@@ -61,7 +63,9 @@ namespace editor
 
 	void EditorMenuBar::RequestLoadHeightMap(const char* filePath)
 	{
-		std::filesystem::path assetPath(filePath);	
+		
+		std::filesystem::path assetPath = std::filesystem::u8path(filePath);
+
 		mPublisher.Publish<HeightMapRequestedEvent>(EventPublishMode::Queued, std::move(assetPath));
 	}
 }

@@ -54,6 +54,7 @@ namespace editor
 				.SubscribeMethod(&EditorApp::OnWindowClosed)
 				.SubscribeMethod(&EditorApp::OnUpdateTerrainScale)
 				.SubscribeMethod(&EditorApp::OnHeightMapRequested)
+				.SubscribeMethod(&EditorApp::OnHeightMapLoaded)
 				.SubscribeMethod(&EditorApp::OnCloseHeightMapRequested)
 				.SubscribeMethod(&EditorApp::OnUpdateNavGridResolutionEvent)
 				.SubscribeMethod(&EditorApp::OnUpdateCheckpointNavCoord)

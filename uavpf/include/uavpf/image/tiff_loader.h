@@ -1,5 +1,6 @@
 #pragma once
 
+#include <filesystem>
 #include <string_view>
 
 #include "uavpf/image/tiff_image.h"
@@ -21,7 +22,7 @@ namespace uavpf
 	class TiffLoader
 	{
 	public:
-		TiffImage LoadImageFromFile(std::string_view fileName);
+		TiffImage LoadImageFromFile(std::filesystem::path imagePath);
 		TiffLoadStatus GetLoadStatus() const;
 
 	private:
