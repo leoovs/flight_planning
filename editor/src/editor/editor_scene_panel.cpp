@@ -141,8 +141,8 @@ namespace editor
 		Texture2DParams params;
 		params.DebugName = "SCENE-CLR";
 		params.Format = GraphicsFormat::R8G8B8A8_UNORM;
-		params.Width = width;
-		params.Height = height;
+		params.Width = std::max(width, 8);
+		params.Height = std::max(height, 8);
 
 		auto deleter = [this](Texture2D* texture)
 		{

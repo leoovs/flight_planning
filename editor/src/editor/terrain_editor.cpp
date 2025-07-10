@@ -11,6 +11,10 @@ namespace editor
 	void TerrainEditor::LoadHeightMap(const std::filesystem::path& path)
 	{
 		mHeightMap = mAssets->Load(path, AssetKind::HeightMap);
+		if (uavpf::cBadID == mHeightMap)
+		{
+			return;
+		}
 
 		auto hm = mAssets->Get<HeightMapAsset>(mHeightMap)->GetHeightMap();
 		mHeightMapResolution = {

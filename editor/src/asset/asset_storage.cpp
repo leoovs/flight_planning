@@ -16,6 +16,11 @@ namespace editor
 		}
 
 		std::shared_ptr<Asset> asset = importer->Import(assetPath);
+		if (nullptr == asset)
+		{
+			return uavpf::cBadID;
+		}
+
 		return RegisterAsset(assetPath, asset);
 	}
 

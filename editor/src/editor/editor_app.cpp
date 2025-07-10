@@ -157,25 +157,29 @@ namespace editor
 
 		auto postLoadedEvent = [this]()
 		{
-			mPublisher.Publish<HeightMapLoadedEvent>(EventPublishMode::Queued);
-		};
-
-		auto enablePanels = [this]()
-		{
-			Enable(EditorPanelKind::Terrain);
-			Enable(EditorPanelKind::Scene);
-			Enable(EditorPanelKind::Nav);
+			if (mTerrainEditor.IsHeightMapLoaded())
+			{
+				mPublisher.Publish<HeightMapLoadedEvent>(EventPublishMode::Queued);
+			}
 		};
 
 		auto task = TaskBuilder()
 			.BeginSequence()
 				.DoThreaded(loadHeightMap)
-				.Do(enablePanels)
 				.Do(postLoadedEvent)
 			.End()
 			.Build();
 
 		mTasks->Push(std::move(task));
+
+		return true;
+	}
+
+	bool EditorApp::OnHeightMapLoaded(const HeightMapLoadedEvent& event)
+	{
+		Enable(EditorPanelKind::Nav);
+		Enable(EditorPanelKind::Scene);
+		Enable(EditorPanelKind::Terrain);
 
 		return true;
 	}
