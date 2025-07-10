@@ -1,7 +1,15 @@
 set(BUILD_SHARED_LIBS OFF)
 
-cpmaddpackage("gl:libtiff/libtiff@4.7.0")
+# cpmaddpackage("gl:libtiff/libtiff@4.7.0")
+
+cpmaddpackage(
+	NAME libtiff
+	GITLAB_REPOSITORY libtiff/libtiff
+	VERSION 4.7.0
+	OPTIONS "CMAKE_POLICY_VERSION_MINIMUM 3.5"
+)
 cpmaddpackage("gh:g-truc/glm#1.0.1")
+cpmaddpackage("gh:leoovs/unipp#dev-eachindex")
 
 add_library(uavpf STATIC)
 
@@ -61,6 +69,7 @@ target_link_libraries(
 	glm::glm
 	PRIVATE
 	TIFF::tiff
+	unipp::unipp
 )
 
 target_compile_definitions(

@@ -2,6 +2,8 @@
 
 #include <filesystem>
 
+#include <unipp/convert.hpp>
+
 #include "image/tiff_image_handle.h"
 
 namespace uavpf
@@ -14,7 +16,11 @@ namespace uavpf
 			return TiffImage();
 		}
 
-		TIFF* nativeTiff = TIFFOpen(fileName.data(), "r");
+		std::u16string uniFileName;
+		unipp::convert(fileName.begin(), fileName.end(), std::back_inserter(uniFileName));
+		std::wstring wideFileName(uniFileName.begin(), uniFileName.end());
+
+		TIFF* nativeTiff = TIFFOpenW(wideFileName.data(), "r");
 		if (nullptr == nativeTiff)
 		{
 			mLastLoadStatus = TiffLoadStatus::LoaderFailure;
