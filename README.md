@@ -12,7 +12,18 @@ A 3D-space route planning software for unmanned aerial vehicles.
 You can clone the repository by executing
 `git clone https://github.com/leoovs/flight_planning` 
 
-2. **Run CMake configuration**
+2. **Install system dependencies (Linux-only)**
+
+* Install [SDL3 build depenencies](https://github.com/libsdl-org/SDL/blob/main/docs/README-linux.md#build-dependencies).
+* Install one of the required file dialog utilities:
+  1. Xdialog
+  2. Zenity
+  3. YAD
+
+If not available or installed, basic console input will be used as a source for 
+file name.
+
+3. **Run CMake configuration**
 
 You can run CMake configuration by executing
 ```Bash
@@ -23,5 +34,5 @@ cmake -B build
 
 3. **Build the targets**
 
-You can build the targets by running `cmake --build build --parallel`
+You can build the targets by running `cmake --build build --parallel`.
 
