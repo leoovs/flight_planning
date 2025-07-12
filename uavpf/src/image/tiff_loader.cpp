@@ -14,16 +14,14 @@ namespace uavpf
 			return TiffImage();
 		}
 
-		// Ugly workaround for different fs::path implementations
 		TIFF* nativeTiff = nullptr;
-		if constexpr (std::is_same_v<std::filesystem::path::value_type, wchar_t>)
-		{
-			nativeTiff = TIFFOpenW(imagePath.c_str(), "r");
-		}
-		else
-		{
+
+		// Ugly workaround for different fs::path implementations
+#ifdef _WIN32
+			nativeTiff = TIFFOpenW(imagePath.wstring().c_str(), "r");
+#else
 			nativeTiff = TIFFOpen(imagePath.u8string().c_str(), "r");
-		}
+#endif
 
 		if (nullptr == nativeTiff)
 		{
