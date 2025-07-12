@@ -32,7 +32,7 @@ cmake -B build
 # or cmake -B build -G <your_generator> if you wish to provide an alternative generator
 ```
 
-3. **Build the targets**
+3. **Build the editor**
 
-You can build the targets by running `cmake --build build --parallel`.
+You can build the editor by running `cmake --build build --parallel --target editor`.
 
