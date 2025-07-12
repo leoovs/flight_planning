@@ -16,9 +16,9 @@ You can clone the repository by executing
 
 * Install [SDL3 build depenencies](https://github.com/libsdl-org/SDL/blob/main/docs/README-linux.md#build-dependencies).
 * Install one of the required file dialog utilities:
-  1. Xdialog
-  2. Zenity
-  3. YAD
+  - Xdialog
+  - Zenity
+  - YAD
 
 If not available or installed, basic console input will be used as a source for 
 file name.
