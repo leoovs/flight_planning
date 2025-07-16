@@ -162,7 +162,8 @@ namespace editor
 			finder.PeekNext();
 			if (finder.IsEnd())
 			{
-				mNavPath = finder.ReconstructPath();
+				mNavPath = finder.ReconstructAndTruncatePath2();
+				// mNavPath = finder.ReconstructPath();
 				return;
 			}
 

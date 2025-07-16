@@ -1,8 +1,10 @@
 #include "uavpf/nav/path_finder.h"
 #include "uavpf/nav/exploration_direction.h"
+#include "uavpf/debug/logger_provider.h"
+
+#include <glm/ext/scalar_constants.hpp>
 
 #include <algorithm>
-#include <glm/ext/scalar_constants.hpp>
 
 namespace uavpf::experimental
 {
@@ -82,8 +84,6 @@ namespace uavpf::experimental
 
 	std::vector<NavCell> PathFinder::ReconstructPath() const
 	{
-		return ReconstructAndTruncatePath();
-
 		std::vector<NavCell> path;
 		PathNode* current = mCurrent;
 
@@ -108,7 +108,7 @@ namespace uavpf::experimental
 
 		float currentHeight = current->Cell->RelativeHeight;
 		ExplorationDirection currentDir = current->CameFromDirection;
-		int32_t heightTrend = -1;
+		float heightGain = 0.0f;
 
 		while (nullptr != current)
 		{
@@ -120,40 +120,92 @@ namespace uavpf::experimental
 			}
 
 			float nextHeight = parent->Cell->RelativeHeight;
+			float currentHeightGain = nextHeight - currentHeight;
 			ExplorationDirection nextDir = parent->CameFromDirection;
-			int32_t nextHeightTrend = 0;
 			
-			float heightSensitivity = glm::epsilon<float>();
-			heightSensitivity = 1e-1f;
+			constexpr float cHeightSensitivity = 1e-2f;
+			
 			float heightDiff = nextHeight - currentHeight;
 
-			if (heightDiff > heightSensitivity)
-			{
-				nextHeightTrend = 1;
-			}
-			else if (heightDiff < -heightSensitivity)
-			{
-				nextHeightTrend = 2;
-			}
-
 			bool dirDiffers = nextDir != currentDir;
-			bool heightTrendDiffers = heightTrend != nextHeightTrend;
+			bool heightGainLowered = currentHeightGain - heightGain < -cHeightSensitivity; 
+			bool parentIsEnd = current->Cell == mEnd->Cell;
 
-			bool anythingDiffers = dirDiffers || heightTrendDiffers;
-
-			if (anythingDiffers)
+			bool cannotTruncate = dirDiffers || heightGainLowered || parentIsEnd;
+			if (cannotTruncate)
 			{
 				path.push_back(*current->Cell);	
 			}
 
 			currentDir = nextDir;
-			heightTrend = nextHeightTrend;
 			currentHeight = nextHeight;
+			heightGain = currentHeightGain;
 
 			current = parent;
 		}
 
 		return path;
+	}
+
+	std::vector<NavCell> PathFinder::ReconstructAndTruncatePath2() const
+	{
+		std::vector<NavCell> path = ReconstructPath();
+
+		std::vector<NavCell> truncatedPath;
+		truncatedPath.reserve(path.size());
+
+		NavCell current = path.front();
+		truncatedPath.push_back(current);
+
+		float currentHeight = current.RelativeHeight;
+		float prevHeightGain = 0.0f;
+		int32_t prevHeightTrend = 0;
+		
+		for (ptrdiff_t iCell = 1; iCell < path.size(); iCell++)
+		{
+			const NavCell& next = path.at(iCell);
+
+			constexpr float cHeightPrecision = 1e-2f;
+
+			float heightDifference = currentHeight - next.RelativeHeight;
+
+			float gainRelativeToCurrent = next.RelativeHeight - current.RelativeHeight;
+
+			int32_t currentHeightTrend = 0;
+			if (heightDifference < -cHeightPrecision)
+			{
+				currentHeightTrend = -1;
+			}
+			else if (heightDifference > cHeightPrecision)
+			{
+				currentHeightTrend = 1;
+			}
+
+			bool heightTrendMismatch = currentHeightTrend != prevHeightTrend;
+			bool heightGainLess = heightTrendMismatch
+				? glm::abs(gainRelativeToCurrent - prevHeightGain) < cHeightPrecision
+				: false;
+			bool dirMismatch = mNodePool.at(current.Index).CameFromDirection
+				!= mNodePool.at(next.Index).CameFromDirection;
+			bool isEnd = &path.back() == &next;
+
+			bool cannotTruncate = heightTrendMismatch
+				|| heightGainLess
+				|| dirMismatch
+				|| isEnd;
+
+			if (cannotTruncate)
+			{
+				truncatedPath.push_back(next);
+				current = next;
+			}
+
+			prevHeightTrend = currentHeightTrend;
+			prevHeightGain = gainRelativeToCurrent;
+			currentHeight = next.RelativeHeight;
+		}
+
+		return truncatedPath;
 	}
 
 	bool PathFinder::IsEnd(PathNode* node) const

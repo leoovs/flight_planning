@@ -29,7 +29,11 @@ namespace editor
 
 	void EditorNavPanel::OnImGui()
 	{
-		ImGui::Begin("Solver");
+		if (!ImGui::Begin("Solver"))
+		{
+			ImGui::End();
+			return;
+		}
 
 		bool disabled = mPathPlanner->IsBuildingPath();
 		if (disabled)

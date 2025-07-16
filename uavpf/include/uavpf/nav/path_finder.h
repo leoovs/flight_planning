@@ -27,6 +27,7 @@ namespace uavpf::experimental
 
 		std::vector<NavCell> ReconstructPath() const;
 		std::vector<NavCell> ReconstructAndTruncatePath() const;
+		std::vector<NavCell> ReconstructAndTruncatePath2() const;
 
 	private:
 		bool IsEnd(PathNode* node) const;

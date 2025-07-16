@@ -6,7 +6,9 @@ cpmaddpackage(
 	NAME libtiff
 	GITLAB_REPOSITORY libtiff/libtiff
 	VERSION 4.7.0
-	OPTIONS "CMAKE_POLICY_VERSION_MINIMUM 3.5"
+	OPTIONS
+		"CMAKE_POLICY_VERSION_MINIMUM 3.5"
+		"BUILD_SHARED_LIBS OFF"
 )
 cpmaddpackage("gh:g-truc/glm#1.0.1")
 
