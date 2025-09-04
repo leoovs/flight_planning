@@ -41,6 +41,14 @@ namespace editor
 		return mKind;
 	}
 
+	void OglShader::SetUniform(std::string_view name, int x)
+	{
+		glProgramUniform1i(
+			mNativeProgram,
+			mUniformLocator.GetUniformLocation(name),
+			x);
+	}
+
 	void OglShader::SetUniform(std::string_view name, float x)
 	{
 		glProgramUniform1f(

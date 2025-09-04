@@ -42,7 +42,7 @@ namespace editor
 			ImGui::PushStyleVar(ImGuiStyleVar_Alpha, 0.5f);
 		}
 
-		uavpf::experimental::NavResolution res = mNavNetwork->GetResolution();
+		uavpf::NavResolution res = mNavNetwork->GetResolution();
 
 		ImGui::Text("Nav Grid resolution");
 		ImGui::Indent(10.0f);

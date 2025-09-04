@@ -4,7 +4,7 @@
 
 #include "uavpf/nav/nav_resolution.h"
 
-namespace uavpf::experimental
+namespace uavpf
 {
 	class NavSpace
 	{

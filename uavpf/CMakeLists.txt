@@ -1,7 +1,5 @@
 set(BUILD_SHARED_LIBS OFF)
 
-# cpmaddpackage("gl:libtiff/libtiff@4.7.0")
-
 cpmaddpackage(
 	NAME libtiff
 	GITLAB_REPOSITORY libtiff/libtiff
@@ -26,10 +24,6 @@ target_sources(
 	PRIVATE
 	"src/format_str.cpp"
 	"src/version.cpp"
-
-	"src/algo/astar_algorithm.cpp"
-	"src/algo/astar_cost.cpp"
-	"src/algo/navgrid.cpp"
 
 	"src/debug/concise_log_formatter.cpp"
 	"src/debug/console_log_emitter.cpp"

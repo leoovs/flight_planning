@@ -2,7 +2,7 @@
 
 #include <cassert>
 
-namespace uavpf::experimental
+namespace uavpf
 {
 	NavSpace::NavSpace(NavResolution resolution)
 		: mResolution(resolution)

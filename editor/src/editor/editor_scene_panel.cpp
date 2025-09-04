@@ -15,16 +15,18 @@ namespace editor
 	EditorScenePanel::EditorScenePanel(
 		GraphicsContext* graphics,
 		ImGuiGraphicsBackend* imguiGraphics,
+		TerrainRenderer& terrainRenderer,
+		OverlayRenderer& overlayRenderer,
 		const TerrainEditor& terrainEditor,
 		const PathPlanner& pathPlanner,
 		const NavNetwork& navNetwork)
 		: mGraphics(graphics)
 		, mImGuiGraphics(imguiGraphics)
+		, mTerrainRenderer(terrainRenderer)
+		, mOverlayRenderer(overlayRenderer)
 		, mTerrainEditor(&terrainEditor)
 		, mPathPlanner(&pathPlanner)
 		, mNavNetwork(&navNetwork)
-		, mTerrainRenderer(graphics)
-		, mOverlayRenderer(graphics)
 	{
 		CreateRenderTextures(8, 8);
 	}

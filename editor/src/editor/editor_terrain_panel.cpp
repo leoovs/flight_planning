@@ -14,8 +14,11 @@
 
 namespace editor
 {
-	EditorTerrainPanel::EditorTerrainPanel(TerrainEditor& terrainEditor)
+	EditorTerrainPanel::EditorTerrainPanel(
+		TerrainEditor& terrainEditor,
+		TerrainRenderer& renderer)
 		: mTerrainEditor(&terrainEditor)
+		, mRenderer(renderer)
 	{}
 
 	EditorPanelKind EditorTerrainPanel::GetKind() const
@@ -54,6 +57,22 @@ namespace editor
 		ImGui::Indent(-10.0f);
 
 		ImGui::NewLine();
+		ImGui::Separator();
+
+		ImGui::Text("Display Mode");
+		ImGui::Indent(10.0f);
+		auto displayMode = static_cast<int>(mRenderer.GetDisplayMode());
+		ImGui::Combo(
+			"##",
+			&displayMode,
+			[](void* userptr, int item) -> const char*
+			{
+				return ToString(static_cast<TerrainDisplayMode>(item)).data();
+			},
+			nullptr,
+			2);
+		mRenderer.SetDisplayMode(static_cast<TerrainDisplayMode>(displayMode));	
+		ImGui::Indent(-10.0f);
 
 		glm::vec2 heightMapResolution = mTerrainEditor->GetHeightMapResolution();
 		float worldScale = mTerrainEditor->GetWorldScale();

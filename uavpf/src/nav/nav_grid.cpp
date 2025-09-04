@@ -5,7 +5,7 @@
 #include "uavpf/terrain/height_map.h"
 #include "uavpf/nav/nav_space.h"
 
-namespace uavpf::experimental
+namespace uavpf
 {
 	//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 	//

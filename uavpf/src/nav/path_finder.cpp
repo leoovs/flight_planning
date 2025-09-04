@@ -6,7 +6,7 @@
 
 #include <algorithm>
 
-namespace uavpf::experimental
+namespace uavpf
 {
 	PathFinder::PathFinder(
 		const NavGrid& grid,

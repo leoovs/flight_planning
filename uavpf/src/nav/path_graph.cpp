@@ -1,6 +1,6 @@
 #include "uavpf/nav/path_graph.h"
 
-namespace uavpf::experimental
+namespace uavpf
 {
 	PathNode& PathGraph::FindForCell(const NavCell& cell)
 	{

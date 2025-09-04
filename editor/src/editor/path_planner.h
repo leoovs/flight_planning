@@ -26,12 +26,12 @@ namespace editor
 		return static_cast<size_t>(kind);
 	}
 
-	class NotamCost final : public uavpf::experimental::StepCost
+	class NotamCost final : public uavpf::StepCost
 	{
 	public:
 		NotamCost(glm::vec2 navCoord, glm::vec2 ellipse);
 
-		float Evaluate(const uavpf::experimental::StepContext& ctx) const override;
+		float Evaluate(const uavpf::StepContext& ctx) const override;
 
 	private:
 		glm::vec2 mNotamNavCoord;
@@ -95,19 +95,19 @@ namespace editor
 		bool IsBuildingPath() const;
 		void BuildPath();
 		void EndBuildPath();
-		const std::vector<uavpf::experimental::NavCell>& GetPath() const;
+		const std::vector<uavpf::NavCell>& GetPath() const;
 
 		float GetWorldSpaceElevation() const;
 		void SetWorldSpaceElevation(float elevation);
 
 	private:
 		void ClampCheckpointNavCoords();
-		void PopulateNotamCosts(uavpf::experimental::ComplexCost& costs);
+		void PopulateNotamCosts(uavpf::ComplexCost& costs);
 
 		const TerrainEditor* mTerrainEditor = nullptr;
 		const NavNetwork* mNavNetwork = nullptr;
 		CheckpointNavCoords mCheckpointNavCoords{};
-		std::vector<uavpf::experimental::NavCell> mNavPath;
+		std::vector<uavpf::NavCell> mNavPath;
 		std::array<float, +PathPlannerWeight::Count_> mWeights{};
 		std::atomic_bool mBuildingPath;
 		float mWorldSpaceElevation = 0.02f;

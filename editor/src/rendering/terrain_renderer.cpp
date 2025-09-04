@@ -79,6 +79,7 @@ namespace editor
 			#version 460 core
 
 			uniform vec3 uEyePosition;
+			uniform int uIsMonochrome;
 
 			in vec4 modelSpacePosition;
 			in vec4 worldSpacePosition;
@@ -101,9 +102,19 @@ namespace editor
 				vec3 lightDir =  normalize(uEyePosition - vec3(worldSpacePosition));
 
 				float height = modelSpacePosition.y;
-				float light = max(0.4, dot(normalize(lightDir), normalize(normal)));
+				float light = max(0.2, dot(normalize(lightDir), normalize(normal)));
 
-				vec3 color = vec3(0.3f, height, 1 - height) * light;
+				vec3 color;
+				if (uIsMonochrome == 1)
+				{
+					color = vec3(0.3f);
+				}
+				else
+				{
+					color = vec3(0.3f, height, 1 - height);
+				}
+
+				color *= light;
 
 				oColor = vec4(color, 1.0);
 			}
@@ -165,6 +176,16 @@ namespace editor
 			camera.GetPosition());
 	}
 
+	void TerrainRenderer::SetDisplayMode(TerrainDisplayMode mode)
+	{
+		mDisplayMode = mode;
+	}
+
+	TerrainDisplayMode TerrainRenderer::GetDisplayMode() const
+	{
+		return mDisplayMode;
+	}
+
 	void TerrainRenderer::Clear()
 	{
 		mGraphics->ClearColor(mFramebuffer, 0.25f, 0.25f, 0.25f, 1.0f);
@@ -182,6 +203,9 @@ namespace editor
 		mGraphics->SetFramebuffer(mFramebuffer);
 
 		mShaders.at(TerrainVS)->SetUniform("uModel", modelMatrix);
+		mShaders.at(TerrainPS)->SetUniform(
+			"uIsMonochrome",
+			static_cast<int>(TerrainDisplayMode::Monochrome == mDisplayMode));
 
 		mGraphics->SetShader(ShaderKind::Vertex, mShaders.at(TerrainVS));
 		mGraphics->SetShader(ShaderKind::Pixel, mShaders.at(TerrainPS));

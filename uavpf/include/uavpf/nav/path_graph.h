@@ -7,7 +7,7 @@
 #include "uavpf/nav/nav_cell.h"
 #include "uavpf/nav/path_node.h"
 
-namespace uavpf::experimental
+namespace uavpf
 {
 	class PathGraph
 	{

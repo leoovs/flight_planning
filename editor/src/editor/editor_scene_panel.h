@@ -23,6 +23,8 @@ namespace editor
 		EditorScenePanel(
 			GraphicsContext* graphics,
 			ImGuiGraphicsBackend* imguiGraphics,
+			TerrainRenderer& terrainRenderer,
+			OverlayRenderer& overlayRenderer,
 			const TerrainEditor& terrainEditor,
 			const PathPlanner& pathPlanner,
 			const NavNetwork& navNetwork);
@@ -58,11 +60,11 @@ namespace editor
 
 		GraphicsContext* mGraphics = nullptr;
 		ImGuiGraphicsBackend* mImGuiGraphics = nullptr;
+		TerrainRenderer& mTerrainRenderer;
+		OverlayRenderer& mOverlayRenderer;
 		const TerrainEditor* mTerrainEditor = nullptr;
 		const PathPlanner* mPathPlanner = nullptr;
 		const NavNetwork* mNavNetwork = nullptr;
-		TerrainRenderer mTerrainRenderer;
-		OverlayRenderer mOverlayRenderer;
 		Camera mFreeCamera;
 
 		ImVec2 mPanelSize{};
@@ -72,7 +74,7 @@ namespace editor
 		std::unique_ptr<TerrainRenderMesh> mTerrainRenderMesh;
 		std::shared_ptr<Texture2D> mColorBuffer;
 		std::shared_ptr<Texture2D> mDepthBuffer;
-		std::vector<uavpf::experimental::NavCell> mCachedPath;
+		std::vector<uavpf::NavCell> mCachedPath;
 	};
 }
 

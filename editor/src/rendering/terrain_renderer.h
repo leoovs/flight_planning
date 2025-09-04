@@ -4,6 +4,7 @@
 
 #include "graphics/graphics_context.h"
 #include "rendering/camera.h"
+#include "rendering/terrain_display_mode.h"
 
 namespace editor
 {
@@ -24,6 +25,9 @@ namespace editor
 
 		void SetTargetTextures(Texture2D* colorBuffer, Texture2D* depthStencilBuffer);
 		void SetCamera(const Camera& camera);
+
+		void SetDisplayMode(TerrainDisplayMode mode);
+		TerrainDisplayMode GetDisplayMode() const;
 
 		void Clear();
 		void Render(TerrainRenderMesh* mesh, const glm::mat4& modelMatrix);
@@ -57,5 +61,6 @@ namespace editor
 		std::array<ShaderSource, ShaderIndexCount> mShaderSources = GetShaderSources();
 
 		Camera mCamera;
+		TerrainDisplayMode mDisplayMode = TerrainDisplayMode::Heightmap;
 	};
 }

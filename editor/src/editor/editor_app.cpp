@@ -21,12 +21,15 @@ namespace editor
 		auto* graphics = RtModuleLocator::Locate<GraphicsContext>();
 		auto* imguiGraphics = RtModuleLocator::Locate<ImGuiGraphicsBackend>();
 
+		mTerrainRenderer = std::make_unique<TerrainRenderer>(graphics);
+		mOverlayRenderer = std::make_unique<OverlayRenderer>(graphics);
+
 		RegisterPanel<EditorDebugPanel>();
 		RegisterPanel<EditorDockspacePanel>();
 		RegisterPanel<EditorMenuBar>();
 		RegisterPanel<EditorNavPanel>(mPathPlanner, mNavNetwork);
-		RegisterPanel<EditorScenePanel>(graphics, imguiGraphics, mTerrainEditor, mPathPlanner, mNavNetwork);
-		RegisterPanel<EditorTerrainPanel>(mTerrainEditor);
+		RegisterPanel<EditorScenePanel>(graphics, imguiGraphics, *mTerrainRenderer, *mOverlayRenderer, mTerrainEditor, mPathPlanner, mNavNetwork);
+		RegisterPanel<EditorTerrainPanel>(mTerrainEditor, *mTerrainRenderer);
 
 		Enable(EditorPanelKind::Dockspace);
 		Enable(EditorPanelKind::MenuBar);

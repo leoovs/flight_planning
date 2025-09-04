@@ -9,13 +9,16 @@
 #include "editor/editor_events.h"
 #include "editor/terrain_editor.h"
 #include "graphics/texture_2d.h"
+#include "rendering/terrain_renderer.h"
 
 namespace editor
 {
 	class EditorTerrainPanel final : public EditorPanel
 	{
 	public:
-		EditorTerrainPanel(TerrainEditor& terrainEditor);
+		EditorTerrainPanel(
+			TerrainEditor& terrainEditor,
+			TerrainRenderer& renderer);
 		~EditorTerrainPanel() override = default;
 
 		void Connect(EventBus events) override;
@@ -35,6 +38,7 @@ namespace editor
 		EventSubscriber mSubscriber;
 		EventPublisher mPublisher;
 		TerrainEditor* mTerrainEditor = nullptr;
+		TerrainRenderer& mRenderer;
 		std::shared_ptr<Texture2D> mHeightMapTexture;
 		ImVec2 mPanelSize{};
 	};

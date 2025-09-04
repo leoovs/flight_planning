@@ -29,6 +29,7 @@ namespace editor
 
 		ShaderKind GetKind() const override;
 
+		void SetUniform(std::string_view name, int x) override;
 		void SetUniform(std::string_view name, float x) override;
 		void SetUniform(std::string_view name, float x, float y) override;
 		void SetUniform(std::string_view name, float x, float y, float z) override;

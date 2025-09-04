@@ -22,11 +22,11 @@ namespace editor
 	public:
 		NavNetwork(const TerrainEditor& terrainEditor);
 
-		void SetResolution(uavpf::experimental::NavResolution resolution);
-		uavpf::experimental::NavResolution GetResolution() const;
+		void SetResolution(uavpf::NavResolution resolution);
+		uavpf::NavResolution GetResolution() const;
 		void PopulateHeight();
 
-		const uavpf::experimental::NavGrid& GetGrid() const;
+		const uavpf::NavGrid& GetGrid() const;
 
 		void AddNotam(Notam notam);
 		size_t GetNotamCount() const;
@@ -38,8 +38,8 @@ namespace editor
 	private:
 		const TerrainEditor* mTerrainEditor = nullptr;
 
-		uavpf::experimental::NavResolution mResolution;
-		uavpf::experimental::NavGrid mGrid;
+		uavpf::NavResolution mResolution;
+		uavpf::NavGrid mGrid;
 
 		std::vector<Notam> mNotams;
 	};

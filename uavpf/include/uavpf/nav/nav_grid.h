@@ -10,7 +10,7 @@ namespace uavpf
 	class HeightMap;
 }
 
-namespace uavpf::experimental
+namespace uavpf
 {
 	class NavGrid
 	{

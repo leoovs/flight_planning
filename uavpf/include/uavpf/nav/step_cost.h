@@ -6,7 +6,7 @@
 
 #include "uavpf/nav/step_context.h"
 
-namespace uavpf::experimental
+namespace uavpf
 {
 	struct NavCell;
 

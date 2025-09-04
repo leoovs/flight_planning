@@ -10,6 +10,8 @@
 #include "event/event_publisher.h"
 #include "event/event_subscriber.h"
 #include "platform/platform_events.h"
+#include "rendering/overlay_renderer.h"
+#include "rendering/terrain_renderer.h"
 #include "runtime/app.h"
 #include "runtime/rt_module_locator.h"
 #include "tasking/task_scheduler.h"
@@ -67,6 +69,8 @@ namespace editor
 
 		TaskScheduler* mTasks = nullptr;
 
+		std::unique_ptr<TerrainRenderer> mTerrainRenderer;
+		std::unique_ptr<OverlayRenderer> mOverlayRenderer;
 		TerrainEditor mTerrainEditor;
 		NavNetwork mNavNetwork{ mTerrainEditor };
 		PathPlanner mPathPlanner{ mTerrainEditor, mNavNetwork };

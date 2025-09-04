@@ -15,6 +15,7 @@ namespace editor
 
 		virtual ShaderKind GetKind() const = 0;
 
+		virtual void SetUniform(std::string_view name, int value) = 0;
 		virtual void SetUniform(std::string_view name, float x) = 0;
 		virtual void SetUniform(std::string_view name, float x, float y) = 0;
 		virtual void SetUniform(std::string_view name, float x, float y, float z) = 0;

@@ -4,7 +4,7 @@
 
 #include "uavpf/nav/nav_cell.h"
 
-namespace uavpf::experimental
+namespace uavpf
 {
 	//+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
 	// 

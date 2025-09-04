@@ -44,9 +44,9 @@ namespace editor
 	class UpdateNavGridResolutionEvent final : public Event
 	{
 	public:
-		uavpf::experimental::NavResolution Resolution;
+		uavpf::NavResolution Resolution;
 
-		UpdateNavGridResolutionEvent(uavpf::experimental::NavResolution res)
+		UpdateNavGridResolutionEvent(uavpf::NavResolution res)
 			: Resolution(res)
 		{}
 	};

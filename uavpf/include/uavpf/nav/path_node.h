@@ -3,7 +3,7 @@
 #include "uavpf/nav/step_cost.h"
 #include "uavpf/nav/exploration_direction.h"
 
-namespace uavpf::experimental
+namespace uavpf
 {
 	struct PathNode
 	{

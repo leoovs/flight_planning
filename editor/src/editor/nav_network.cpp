@@ -6,12 +6,12 @@ namespace editor
 		: mTerrainEditor(&terrainEditor)
 	{}
 
-	void NavNetwork::SetResolution(uavpf::experimental::NavResolution resolution)
+	void NavNetwork::SetResolution(uavpf::NavResolution resolution)
 	{
 		mResolution = resolution;
 	}
 
-	uavpf::experimental::NavResolution NavNetwork::GetResolution() const
+	uavpf::NavResolution NavNetwork::GetResolution() const
 	{
 		return mResolution;
 	}
@@ -20,13 +20,13 @@ namespace editor
 	{
 		const uavpf::HeightMap& hm = mTerrainEditor->GetHeightMap();
 
-		mGrid = uavpf::experimental::NavGridBuilder()
+		mGrid = uavpf::NavGridBuilder()
 			.Resize(mResolution.Width, mResolution.Depth)
 			.PopulateHeight(hm)
 			.Build();
 	}
 
-	const uavpf::experimental::NavGrid& NavNetwork::GetGrid() const
+	const uavpf::NavGrid& NavNetwork::GetGrid() const
 	{
 		return mGrid;
 	}

@@ -8,7 +8,7 @@
 #include "uavpf/nav/path_graph.h"
 #include "uavpf/nav/step_cost.h"
 
-namespace uavpf::experimental
+namespace uavpf
 {
 	class PathFinder
 	{

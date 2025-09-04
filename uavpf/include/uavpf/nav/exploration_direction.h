@@ -4,7 +4,7 @@
 
 #include <glm/glm.hpp>
 
-namespace uavpf::experimental
+namespace uavpf
 {
 	enum class ExplorationDirection
 	{

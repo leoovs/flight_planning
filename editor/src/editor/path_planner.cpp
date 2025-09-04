@@ -19,7 +19,7 @@ namespace editor
 		, mNotamNavEllipse(ellipse)
 	{}
 
-	float NotamCost::Evaluate(const uavpf::experimental::StepContext& ctx) const
+	float NotamCost::Evaluate(const uavpf::StepContext& ctx) const
 	{
 		float x = ctx.Destination.NavCoords.x;
 		float y = ctx.Destination.NavCoords.y;
@@ -121,7 +121,7 @@ namespace editor
 
 	glm::ivec2 PathPlanner::NavCoordToHeightMapCoord(glm::ivec2 navCoord) const
 	{
-		uavpf::experimental::NavSpace navSpace(mNavNetwork->GetResolution());
+		uavpf::NavSpace navSpace(mNavNetwork->GetResolution());
 		glm::ivec2 heightMapRes = mTerrainEditor->GetHeightMapResolution();
 		return navSpace.FromNavCoord(navCoord, heightMapRes);
 	}
@@ -138,20 +138,20 @@ namespace editor
 
 	void PathPlanner::BuildPath()
 	{
-		uavpf::experimental::ComplexCost costs;
+		uavpf::ComplexCost costs;
 
 		float distanceWeight = mWeights.at(+PathPlannerWeight::Distance);
 		float climbWeight = mWeights.at(+PathPlannerWeight::Climb);
 		float turningWeight = mWeights.at(+PathPlannerWeight::Turning);
 
-		costs.Add(std::make_unique<uavpf::experimental::DistanceCost>(), distanceWeight);
-		costs.Add(std::make_unique<uavpf::experimental::ClimbCost>(), climbWeight);
-		costs.Add(std::make_unique<uavpf::experimental::TurningCost>(), turningWeight);
+		costs.Add(std::make_unique<uavpf::DistanceCost>(), distanceWeight);
+		costs.Add(std::make_unique<uavpf::ClimbCost>(), climbWeight);
+		costs.Add(std::make_unique<uavpf::TurningCost>(), turningWeight);
 
 		PopulateNotamCosts(costs);
 
-		uavpf::experimental::NavGrid grid = mNavNetwork->GetGrid();
-		uavpf::experimental::PathFinder finder(
+		uavpf::NavGrid grid = mNavNetwork->GetGrid();
+		uavpf::PathFinder finder(
 			grid,
 			grid.GetCell(mCheckpointNavCoords.at(+CheckpointKind::Start)),
 			grid.GetCell(mCheckpointNavCoords.at(+CheckpointKind::End)),
@@ -167,8 +167,8 @@ namespace editor
 				return;
 			}
 
-			for (uavpf::experimental::ExplorationDirection dir
-				: uavpf::experimental::EnumerateExplorationDirections())
+			for (uavpf::ExplorationDirection dir
+				: uavpf::EnumerateExplorationDirections())
 			{
 				finder.ExploreNeighbour(dir);
 			}
@@ -182,7 +182,7 @@ namespace editor
 		mBuildingPath = false;
 	}
 
-	const std::vector<uavpf::experimental::NavCell>& PathPlanner::GetPath() const
+	const std::vector<uavpf::NavCell>& PathPlanner::GetPath() const
 	{
 		return mNavPath;
 	}
@@ -199,7 +199,7 @@ namespace editor
 
 	void PathPlanner::ClampCheckpointNavCoords()
 	{
-		uavpf::experimental::NavResolution res = mNavNetwork->GetResolution();
+		uavpf::NavResolution res = mNavNetwork->GetResolution();
 
 		for (glm::ivec2& navCoord : mCheckpointNavCoords) 
 		{
@@ -213,9 +213,9 @@ namespace editor
 		}
 	}
 
-	void PathPlanner::PopulateNotamCosts(uavpf::experimental::ComplexCost& costs)
+	void PathPlanner::PopulateNotamCosts(uavpf::ComplexCost& costs)
 	{
-		uavpf::experimental::NavResolution res = mNavNetwork->GetResolution();
+		uavpf::NavResolution res = mNavNetwork->GetResolution();
 		size_t notamCount = mNavNetwork->GetNotamCount();
 
 		for (size_t iNotam = 0; iNotam < notamCount; iNotam++)
