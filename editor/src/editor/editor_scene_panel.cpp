@@ -119,10 +119,12 @@ namespace editor
 			CreateRenderTextures(currentPanelSize.x, currentPanelSize.y);
 		}
 		mPanelSize = currentPanelSize;
+		float currentRatio = mPanelSize.x / mPanelSize.y;
+
 		mFreeCamera.SetProjectionMatrix(
 			glm::perspective(
 				glm::radians(50.0f),
-				mPanelSize.x / mPanelSize.y,
+				currentRatio,
 				0.05f,
 				50.0f));
 
