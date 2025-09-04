@@ -59,7 +59,7 @@ namespace editor
 		ImGui::NewLine();
 		ImGui::Separator();
 
-		ImGui::Text("Display Mode");
+		ImGui::Text("Display mode");
 		ImGui::Indent(10.0f);
 		auto displayMode = static_cast<int>(mRenderer.GetDisplayMode());
 		ImGui::Combo(

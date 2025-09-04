@@ -7,6 +7,12 @@ cpmaddpackage(
 	OPTIONS
 		"CMAKE_POLICY_VERSION_MINIMUM 3.5"
 		"BUILD_SHARED_LIBS OFF"
+		"ld-version-script OFF"
+		"tiff-contrib OFF"
+		"tiff-docs OFF"
+		"tiff-tests OFF"
+		"tiff-tools OFF"
+		"tiff-install OFF"
 )
 cpmaddpackage("gh:g-truc/glm#1.0.1")
 
