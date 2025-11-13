@@ -102,7 +102,8 @@ namespace editor
 				vec3 lightDir =  normalize(uEyePosition - vec3(worldSpacePosition));
 
 				float height = modelSpacePosition.y;
-				float light = max(0.2, dot(normalize(lightDir), normalize(normal)));
+				float lightAmbient = 0.4;
+				float light = max(lightAmbient, dot(normalize(lightDir), normalize(normal)));
 
 				vec3 color;
 				if (uIsMonochrome == 1)

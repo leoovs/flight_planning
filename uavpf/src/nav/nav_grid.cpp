@@ -31,9 +31,10 @@ namespace uavpf
 
 	bool NavGrid::IsInBounds(glm::ivec2 navCoords) const
 	{
-		return ToCellIndex(navCoords) < mCells.size()
-			&& navCoords.x >= 0
-			&& navCoords.y >= 0;
+		return navCoords.x < mResolution.Width &&
+			navCoords.y < mResolution.Depth &&
+			navCoords.x >= 0 &&
+			navCoords.y >= 0;
 	}
 
 	const NavCell& NavGrid::GetCell(glm::ivec2 navCoords) const
